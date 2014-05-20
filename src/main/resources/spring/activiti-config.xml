@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+       http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
+
+    <tx:annotation-driven transaction-manager="transactionManager" />
+
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource"
+          p:driverClass="${jdbc.driver}" p:url="${jdbc.url}"
+          p:username="${jdbc.user}"
+          p:password="${jdbc.pw}"/>
+
+    <bean id="proxiedDataSource" class="org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy" p:targetDataSource-ref="dataSource"/>
+
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager" p:dataSource-ref="dataSource"/>
+
+    <bean id="processEngineConfiguration" class="org.activiti.spring.SpringProcessEngineConfiguration">
+        <property name="databaseType" value="${jdbc.type}"/>
+        <property name="dataSource" ref="dataSource"/>
+        <property name="transactionManager" ref="transactionManager"/>
+        <property name="databaseSchemaUpdate" value="true"/>
+        <property name="deploymentResources" value="classpath*:bpmn/*.bpmn20.xml"/>
+        <property name="jobExecutorActivate" value="false"/>
+        <property name="history" value="full" />
+    </bean>
+
+    <bean id="processEngine" class="org.activiti.spring.ProcessEngineFactoryBean">
+        <property name="processEngineConfiguration" ref="processEngineConfiguration"/>
+    </bean>
+
+    <bean id="repositoryService" class="org.activiti.engine.RepositoryService"
+          factory-bean="processEngine"
+          factory-method="getRepositoryService"/>
+    <bean id="runtimeService" class="org.activiti.engine.RuntimeService"
+          factory-bean="processEngine"
+          factory-method="getRuntimeService"/>
+    <bean id="taskService"
+          factory-bean="processEngine" class="org.activiti.engine.TaskService"
+          factory-method="getTaskService"/>
+    <bean id="historyService"
+          factory-bean="processEngine" class="org.activiti.engine.HistoryService"
+          factory-method="getHistoryService"/>
+    <bean id="managementService" class="org.activiti.engine.ManagementService"
+          factory-bean="processEngine"
+          factory-method="getManagementService"/>
+    <bean id="identityService" class="org.activiti.engine.IdentityService"
+          factory-bean="processEngine"
+          factory-method="getIdentityService"/>
+
+    <bean class="com.studerw.activiti.user.UserAccountWorkflow" id="userAccountWorkflow"></bean>
+
+</beans>
+

@@ -1,0 +1,32 @@
+body {
+    padding-top: 50px;
+}
+.starter-template {
+    padding: 40px 15px;
+ /*   text-align: center;*/
+}
+.flash {
+    text-align: center;
+    padding:	.3em .4em;
+    margin:		0 auto .5em;
+    clear:		both;
+    max-width:	46.923em; /* 610/13 */
+    *max-width:	45.750em; /* 610/13.3333 - for IE */
+    border: thin solid #ff0;
+    background: #ffe;
+}
+
+.errorblock {
+    margin: 0 auto;
+    color: #E64B58;
+    background-color: #ffEEEE;
+    border: 1px solid #ff0000;
+    padding: 5px;
+    width: 400px;
+}
+
+.errorblock p{
+    color: #E64B58;
+    margin: 5px 2px;
+}
+

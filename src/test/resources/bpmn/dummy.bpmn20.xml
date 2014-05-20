@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/processdef">
+  <process id="dummyProcess" isExecutable="true">
+    <startEvent id="sid-FACA1D48-D415-4591-A0CA-C6573013AEB6"></startEvent>
+    <userTask id="sid-36154DFE-91EF-4247-B17E-654061AC6768" name="Dummy Task">
+    </userTask>
+    <sequenceFlow id="sid-0769B127-1717-4F65-8632-41F719D5CBA0" sourceRef="sid-FACA1D48-D415-4591-A0CA-C6573013AEB6" targetRef="sid-36154DFE-91EF-4247-B17E-654061AC6768"></sequenceFlow>
+    <scriptTask id="sid-EA5F724C-11D2-45FD-90FD-060C7E8ABA86" name="sayHello Groovy" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>System.out.println("Groovy Activity here ******");</script>
+    </scriptTask>
+    <sequenceFlow id="sid-53CB6052-8DB5-490F-87EE-83F265440445" sourceRef="sid-36154DFE-91EF-4247-B17E-654061AC6768" targetRef="sid-EA5F724C-11D2-45FD-90FD-060C7E8ABA86"></sequenceFlow>
+    <endEvent id="sid-E70F21EA-39E3-484A-AAD0-7182D2388478"></endEvent>
+    <sequenceFlow id="sid-C37B8884-063D-4A76-9458-6BCED03F27F6" sourceRef="sid-EA5F724C-11D2-45FD-90FD-060C7E8ABA86" targetRef="sid-E70F21EA-39E3-484A-AAD0-7182D2388478"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_process">
+    <bpmndi:BPMNPlane bpmnElement="dummyProcess" id="BPMNPlane_process">
+      <bpmndi:BPMNShape bpmnElement="sid-FACA1D48-D415-4591-A0CA-C6573013AEB6" id="BPMNShape_sid-FACA1D48-D415-4591-A0CA-C6573013AEB6">
+        <omgdc:Bounds height="30.0" width="30.0" x="266.3333282470703" y="169.33333587646484"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-36154DFE-91EF-4247-B17E-654061AC6768" id="BPMNShape_sid-36154DFE-91EF-4247-B17E-654061AC6768">
+        <omgdc:Bounds height="80.0" width="100.0" x="378.3333282470703" y="144.33333587646484"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-EA5F724C-11D2-45FD-90FD-060C7E8ABA86" id="BPMNShape_sid-EA5F724C-11D2-45FD-90FD-060C7E8ABA86">
+        <omgdc:Bounds height="80.0" width="100.0" x="555.0" y="144.33333587646484"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-E70F21EA-39E3-484A-AAD0-7182D2388478" id="BPMNShape_sid-E70F21EA-39E3-484A-AAD0-7182D2388478">
+        <omgdc:Bounds height="28.0" width="28.0" x="700.0" y="170.33333587646484"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="sid-53CB6052-8DB5-490F-87EE-83F265440445" id="BPMNEdge_sid-53CB6052-8DB5-490F-87EE-83F265440445">
+        <omgdi:waypoint x="478.3333282470703" y="184.33333587646484"></omgdi:waypoint>
+        <omgdi:waypoint x="555.0" y="184.33333587646484"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-C37B8884-063D-4A76-9458-6BCED03F27F6" id="BPMNEdge_sid-C37B8884-063D-4A76-9458-6BCED03F27F6">
+        <omgdi:waypoint x="655.0" y="184.33333587646484"></omgdi:waypoint>
+        <omgdi:waypoint x="700.0" y="184.33333587646484"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-0769B127-1717-4F65-8632-41F719D5CBA0" id="BPMNEdge_sid-0769B127-1717-4F65-8632-41F719D5CBA0">
+        <omgdi:waypoint x="296.3333282470703" y="184.33333587646484"></omgdi:waypoint>
+        <omgdi:waypoint x="378.3333282470703" y="184.33333587646484"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
