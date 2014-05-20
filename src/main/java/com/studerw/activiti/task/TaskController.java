@@ -83,7 +83,15 @@ public class TaskController {
             return "redirect:/tasks.htm";
         }
 
-        this.taskService.approveTask(taskApproval);
+        try {
+            this.taskService.approveTask(taskApproval);
+        }
+        catch(Exception e){
+            redirectAttributes.addFlashAttribute("error", true);
+            redirectAttributes.addFlashAttribute("errorMsg", e.getMessage());
+            return "redirect:/tasks.htm";
+        }
+
         redirectAttributes.addFlashAttribute("msg", "The task has been completed");
         return "redirect:/tasks.htm";
     }

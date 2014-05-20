@@ -13,8 +13,8 @@
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
-    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/js/html5shiv.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/js/respond.min.js"></script>
     <![endif]-->
 </head>
 <body>
@@ -27,7 +27,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand brand" href="#">Activiti Test</a>
+            <a class="navbar-brand brand" href="#">Activiti Example</a>
         </div>
         <div class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
@@ -118,6 +118,12 @@
                 </form>
             </div>
         </div>
+    </div>
+</div>
+
+<div id="footer">
+    <div class="container">
+        <p class="text-muted">Place sticky footer content here.</p>
     </div>
 </div>
 <script src="${pageContext.request.contextPath}/resources/js/jquery-1.10.1.js"></script>

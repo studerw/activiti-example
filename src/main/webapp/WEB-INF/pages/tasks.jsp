@@ -7,15 +7,20 @@
 <head>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Activiti Test</title>
+    <title>Activiti Example Tasks</title>
 
     <link href="${pageContext.request.contextPath}/resources/css/bootstrap.css" rel="stylesheet">
     <link href="${pageContext.request.contextPath}/resources/css/app.css" rel="stylesheet">
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
-    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/js/html5shiv.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/js/respond.min.js"></script>
     <![endif]-->
+    <style type="text/css">
+        .panel.panel-default {
+            margin: 15px 0;
+        }
+    </style>
 </head>
 
 <body>
@@ -29,7 +34,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand brand" href="#">Activiti Test</a>
+            <a class="navbar-brand brand" href="#">Activiti Example</a>
         </div>
         <div class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
@@ -38,151 +43,213 @@
                 <li class="active"><a href="${pageContext.request.contextPath}/tasks.htm">Tasks</a></li>
                 <li><a href="${pageContext.request.contextPath}/j_spring_security_logout">Sign Out</a></li>
             </ul>
+            <p class="navbar-text navbar-right"><a href="#" class="navbar-link">${userName}</a></p>
+            <a href="#" class="navbar-text navbar-right navbar-link">Alerts <span class="badge">0</span></a>
         </div>
     </div>
 </div>
 
 <div class="container">
 
-    <div class="centered">
-        <c:if test="${error == true}">
-            <div class="panel panel-default">
-                <div class="panel-body">
-                    <div class="bg-danger">
-                        <p>Your login attempt was not successful.</p>
+    <div class="start-template">
+        <div class="page-header">
+            <span class="glyphicon glyphicon-tasks pull-right"></span>
 
-                        <p> Cause: ${sessionScope["SPRING_SECURITY_LAST_EXCEPTION"].message}</p>
-                    </div>
-                </div>
-            </div>
-
-        </c:if>
-        <c:if test="${not empty msg}">
-            <div class="msg">
-                <p class="bg-success">${msg}</p>
-            </div>
-        </c:if>
-    </div>
-
-    <div id="bs-content" class="starter-template">
-        <div class="panel panel-default">
-            <!-- Default panel contents -->
-            <div class="panel-heading">Tasks for ${userName}</div>
-            <div class="panel-body">
-                <c:choose>
-                    <c:when test="${not empty tasks}">
-                        <table class="table table-striped table-bordered" style="text-align: left">
-                            <c:forEach var="task" items="${tasks}">
-                                <tr>
-                                    <td>
-                                        <form class="form-horizontal" role="form" method="post"
-                                              action="${pageContext.request.contextPath}/tasks/approve.htm">
-                                            <div class="form-group">
-                                                <label class="col-sm-2 control-label">Description</label>
-
-                                                <div class="col-sm-10">
-                                                    <p class="form-control-static">${task.name}</p>
-                                                </div>
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label class="col-sm-2 control-label">Created</label>
-
-                                                <div class="col-sm-10">
-                                                    <p class="form-control-static"><fmt:formatDate type="date"
-                                                                                                   dateStyle="medium"
-                                                                                                   timeStyle="medium"
-                                                                                                   value="${task.createTime}"/>
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <c:set var="userReg" value="${task.processVariables['userForm']}"/>
-
-                                            <div class="form-group">
-                                                <label class="col-sm-2 control-label">New User ID</label>
-
-                                                <div class="col-sm-10">
-                                                    <p class="form-control-static"> ${userReg.userName}</p>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="col-sm-2 control-label">Group</label>
-
-                                                <div class="col-sm-10">
-                                                    <p class="form-control-static"> ${userReg.group}</p>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="col-sm-2 control-label">New User Name</label>
-
-                                                <div class="col-sm-10">
-                                                    <p class="form-control-static">${userReg.firstName} ${userReg.lastName}</p>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="col-sm-2 control-label">New User Email</label>
-
-                                                <div class="col-sm-10">
-                                                    <p class="form-control-static"> ${userReg.email}</p>
-                                                </div>
-                                            </div>
-                                            <hr/>
-                                            <div class="form-group">
-                                                <label for="comment-${task.id}"
-                                                       class="col-sm-2 control-label">Comment</label>
-
-                                                <div class="col-sm-10">
-                                                    <textarea class="form-control" rows="3" id="comment-${task.id}"
-                                                              name="comment" required></textarea>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <div class="col-sm-offset-2 col-sm-10">
-                                                    <div class="radio">
-                                                        <label>
-                                                            <input type="radio" name="approved"
-                                                                   id="optionsRadios1-${task.id}"
-                                                                   value="true" checked>Approve this new User
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <div class="col-sm-offset-2 col-sm-10">
-                                                    <div class="radio">
-                                                        <label>
-                                                            <input type="radio" name="approved"
-                                                                   id="optionsRadios2-${task.id}"
-                                                                   value="false">Deny this new User
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <div class="col-sm-offset-2 col-sm-10">
-                                                    <button type="submit" class="btn btn-primary">Complete</button>
-                                                </div>
-                                            </div>
-                                            <input type="hidden" name="taskId" value="${task.id}"/>
-                                        </form>
-                                    </td>
-                                </tr>
-                            </c:forEach>
-                        </table>
-                    </c:when>
-                    <c:otherwise>
-                        <p class="bg-info">User has no assigned or candidate tasks</p>
-                    </c:otherwise>
-                </c:choose>
-            </div>
-
-
+            <h2>Tasks
+                <small>${userName}</small>
+            </h2>
         </div>
 
+        <c:if test="${error == true}">
+            <div class="errorblock">
+                <c:if test="${not empty errors}">
+                    <div class="errorBox">
+                        <c:forEach var="objError" items="${errors}">
+                            ${objError.field} - ${objError.defaultMessage}<br>
+                        </c:forEach>
+                    </div>
+                </c:if>
+                <c:if test="${not empty errorMsg}">
+                    <div class="errorBox">
+                        <p><strong>${errorMsg}</strong></p>
+                    </div>
+                </c:if>
+            </div>
+        </c:if>
 
+        <c:if test="${not empty msg}">
+            <div class="flash">
+                <p><strong>${msg}</strong></p>
+            </div>
+        </c:if>
+    </div>
+
+
+    <c:choose>
+        <c:when test="${not empty tasks}">
+            <div class="panel-group" id="accordion">
+                <c:forEach var="task" items="${tasks}">
+                    <c:set var="currId" value="${task.id}"/>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <c:choose>
+                                <c:when test="${task.name eq 'Approve New User Account'}">
+                                    <span class="glyphicon glyphicon-user pull-right"></span>
+                                </c:when>
+                                <c:when test="${task.name eq 'Approve Document for Publishing'}">
+                                    <span class="glyphicon glyphicon-paperclip pull-right"></span>
+                                </c:when>
+                                <c:otherwise>
+                                    <span class="glyphicon glyphicon-tasks pull-right"></span>
+                                </c:otherwise>
+                            </c:choose>
+
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne-${task.id}">
+                                        ${task.name} - ${task.createTime}
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="collapseOne-${currId}" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <form class="form-horizontal" role="form" method="post"
+                                      action="${pageContext.request.contextPath}/tasks/approve.htm">
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">Description</label>
+
+                                        <div class="col-sm-10">
+                                            <p class="form-control-static">${task.name}</p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label">Created</label>
+
+                                        <div class="col-sm-10">
+                                            <p class="form-control-static"><fmt:formatDate type="date"
+                                                                                           dateStyle="medium"
+                                                                                           timeStyle="medium"
+                                                                                           value="${task.createTime}"/>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <c:if test="${task.name eq 'Approve New User Account'}">
+                                        <c:set var="userReg" value="${task.processVariables['userForm']}"/>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">New User ID</label>
+
+                                            <div class="col-sm-10">
+                                                <p class="form-control-static"> ${userReg.userName}</p>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">Group</label>
+
+                                            <div class="col-sm-10">
+                                                <p class="form-control-static"> ${userReg.group}</p>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">New User Name</label>
+
+                                            <div class="col-sm-10">
+                                                <p class="form-control-static">${userReg.firstName} ${userReg.lastName}</p>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">New User Email</label>
+
+                                            <div class="col-sm-10">
+                                                <p class="form-control-static"> ${userReg.email}</p>
+                                            </div>
+                                        </div>
+                                    </c:if>
+                                    <c:if test="${task.name eq 'Approve Document for Publishing'}">
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">Document Title</label>
+
+                                            <div class="col-sm-10">
+                                                <p class="form-control-static"><a
+                                                        href="${pageContext.request.contextPath}/document/view.htm?id=${task.processVariables['document'].id}"
+                                                        target="_blank">${task.processVariables['document'].title}</a>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">Document Author</label>
+
+                                            <div class="col-sm-10">
+                                                <p class="form-control-static"> ${task.processVariables['document'].author}</p>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">Document State</label>
+
+                                            <div class="col-sm-10">
+                                                <p class="form-control-static"> ${task.processVariables['document'].state}</p>
+                                            </div>
+                                        </div>
+                                    </c:if>
+                                    <hr/>
+                                    <div class="form-group">
+                                        <label for="comment-${task.id}"
+                                               class="col-sm-2 control-label">Comment</label>
+
+                                        <div class="col-sm-10">
+                                            <textarea class="form-control" rows="3" id="comment-${task.id}"
+                                                      name="comment" required></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-sm-offset-2 col-sm-10">
+                                            <div class="radio">
+                                                <label>
+                                                    <input type="radio" name="approved"
+                                                           id="optionsRadios1-${task.id}"
+                                                           value="true" checked>Approve
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-sm-offset-2 col-sm-10">
+                                            <div class="radio">
+                                                <label>
+                                                    <input type="radio" name="approved"
+                                                           id="optionsRadios2-${task.id}"
+                                                           value="false">Reject
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-sm-offset-2 col-sm-10">
+                                            <button type="submit" class="btn btn-primary">Complete</button>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" name="taskId" value="${task.id}"/>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </c:forEach>
+            </div>
+        </c:when>
+        <c:otherwise>
+            <p>You do not currently have any tasks to complete.</p>
+        </c:otherwise>
+    </c:choose>
+</div>
+
+
+</div>
+</div>
+
+
+<div id="footer">
+    <div class="container">
+        <p class="text-muted">Place sticky footer content here.</p>
     </div>
 </div>
-<%--end container--%>
 
 <script src="${pageContext.request.contextPath}/resources/js/jquery-1.10.1.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/json2.js"></script>

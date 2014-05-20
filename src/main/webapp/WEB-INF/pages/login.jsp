@@ -10,13 +10,13 @@
     <title>Sign In</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="resources/css/bootstrap.css" rel="stylesheet" media="screen">
-    <link href="resources/css/app.css" rel="stylesheet" media="screen">
+    <link href="${pageContext.request.contextPath}/resources/css/bootstrap.css" rel="stylesheet" media="screen">
+    <link href="${pageContext.request.contextPath}/resources/css/app.css" rel="stylesheet" media="screen">
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
-    <script src="resources/js/html5shiv.js"></script>
-    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/js/html5shiv.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/js/respond.min.js"></script>
     <![endif]-->
 
     <style type="text/css">
@@ -53,11 +53,12 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand brand" href="#">Activiti Test</a>
+            <a class="navbar-brand brand" href="#">Activiti Example</a>
         </div>
         <div class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
                 <li class="active"><a href="${pageContext.request.contextPath}/index.htm">Home</a></li>
+                <li><a href="${pageContext.request.contextPath}/j_spring_security_logout">Sign Out</a></li>
             </ul>
         </div>
     </div>
@@ -79,13 +80,13 @@
 
             </c:if>
             <c:if test="${not empty msg}">
-                <div class="msg">
-                    <p class="bg-success">${msg}</p>
+                <div class="flash">
+                   <p><strong>${msg}</strong></p>
                 </div>
             </c:if>
         </div>
 
-        <div class="panel panel-primary">
+        <div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">Login</h3>
             </div>
@@ -110,13 +111,13 @@
                     </div>
                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 
-                    <button class="btn btn-primary btn-lg" name="submit" type="submit">Sign in</button>
+                    <button class="btn btn-primary btn-lg pull-right" name="submit" type="submit">Sign in</button>
                 </form>
             </div>
         </div>
 
         <div class="pull-right">
-            <button class="btn btn-primary" data-toggle="modal" data-target="#userModal">
+            <button class="btn" data-toggle="modal" data-target="#userModal">
                 <span class="glyphicon glyphicon-user"></span> Users
             </button>
         </div>
@@ -152,8 +153,13 @@
     </div>
 </div>
 
+<div id="footer">
+    <div class="container">
+        <p class="text-muted">Place sticky footer content here.</p>
+    </div>
+</div>
 
-<script src="resources/js/jquery-1.10.1.js"></script>
-<script src="resources/js/bootstrap.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/jquery-1.10.1.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/bootstrap.js"></script>
 </body>
 </html>

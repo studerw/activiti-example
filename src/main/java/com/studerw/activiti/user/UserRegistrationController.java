@@ -42,7 +42,7 @@ public class UserRegistrationController {
         if (request.getRemoteUser() != null) {
             return "redirect:j_spring_security_logout";
         }
-        List<Group> groups = identityService.createGroupQuery().groupType("assignment").list();
+        List<Group> groups = userService.getAssignmentGroups(request.getRemoteUser());
         model.addAttribute("groups", groups);
         return "userRegistration";
     }

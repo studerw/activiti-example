@@ -5,7 +5,12 @@ import com.studerw.activiti.model.TaskApproval;
 import com.studerw.activiti.model.TaskForm;
 import com.studerw.activiti.user.UserService;
 import org.activiti.engine.IdentityService;
+import org.activiti.engine.RuntimeService;
+import org.activiti.engine.TaskService;
+import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,15 +30,17 @@ public class LocalTaskService {
     private static final Logger log = LoggerFactory.getLogger(LocalTaskService.class);
 
     @Autowired
-    org.activiti.engine.TaskService actTaskService;
+    TaskService taskService;
     @Autowired
     IdentityService identityService;
+    @Autowired
+    RuntimeService runtimeService;
     @Autowired
     UserService userService;
 
     public List<TaskForm> getTasks(String userId) {
         log.debug("Getting tasks for user: {}", userId);
-        List<Task> tasks = actTaskService.createTaskQuery().
+        List<Task> tasks = taskService.createTaskQuery().
                 includeProcessVariables().
                 taskCandidateOrAssigned(userId).
                 orderByTaskCreateTime().asc().list();
@@ -57,15 +64,24 @@ public class LocalTaskService {
     public void approveTask(boolean approved, String comment, String taskId){
         log.debug("New User task completion: " + approved);
         UserDetails userDetails = userService.currentUser();
-        identityService.setAuthenticatedUserId(userDetails.getUsername());
-        Task task = actTaskService.createTaskQuery().taskId(taskId).singleResult();
-        if (task == null){
-            throw new RuntimeException("Unable to find task - it's possible another user has already completed it");
+        try {
+            identityService.setAuthenticatedUserId(userDetails.getUsername());
+            Task task = taskService.createTaskQuery().taskId(taskId).includeProcessVariables().singleResult();
+            if (task == null){
+                throw new RuntimeException("Unable to find task - it's possible another user has already completed it");
+            }
+            Map<String, Object> vars = task.getProcessVariables();
+            if (StringUtils.equalsIgnoreCase((String)vars.get("initiator"), userDetails.getUsername())){
+                throw new RuntimeException("The author of a document cannot perform approvals of the same document");
+            }
+            taskService.setAssignee(task.getId(), userDetails.getUsername());
+            taskService.addComment(task.getId(), task.getProcessInstanceId(), comment);
+            Map <String, Object> taskVariables = new HashMap<String, Object>();
+            taskVariables.put("approved", approved);
+            taskService.complete(task.getId(), taskVariables);
         }
-        actTaskService.setAssignee(task.getId(), userDetails.getUsername());
-        actTaskService.addComment(task.getId(), task.getProcessInstanceId(), comment);
-        Map<String, Object> taskVariables = new HashMap<String, Object>();
-        taskVariables.put("approved", approved);
-        actTaskService.complete(task.getId(), taskVariables);
+        finally{
+            identityService.setAuthenticatedUserId(null);
+        }
     }
 }

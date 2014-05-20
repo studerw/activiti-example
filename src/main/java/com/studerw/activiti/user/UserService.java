@@ -45,6 +45,11 @@ public class UserService {
         this.identityService = identityService;
     }
 
+    public UserDetails currentUser(){
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return userDetails;
+    }
+
     public void submitForApproval(UserForm userForm){
         User user = identityService.createUserQuery().userId(userForm.getUserName()).singleResult();
         if (user != null){
@@ -58,11 +63,6 @@ public class UserService {
         taskService.addCandidateGroup(task.getId(), userForm.getGroup());
 
         log.debug("beginning user registration workflow with instance id: " + pi.getId());
-    }
-
-    public UserDetails currentUser(){
-        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return userDetails;
     }
 
 
@@ -100,4 +100,9 @@ public class UserService {
         return userMap;
     }
 
+    public List<Group> getAssignmentGroups(String userId){
+        List<Group> groups = identityService.createGroupQuery().groupType("assignment").
+                orderByGroupId().asc().list();
+        return groups;
+    }
 }

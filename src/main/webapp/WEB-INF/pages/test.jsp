@@ -9,8 +9,8 @@
     <link href="${pageContext.request.contextPath}/resources/css/app.css" rel="stylesheet" >
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
-    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/js/html5shiv.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/js/respond.min.js"></script>
     <![endif]-->
 </head>
 
@@ -34,6 +34,9 @@
                 <li><a href="${pageContext.request.contextPath}/tasks.htm">Tasks</a></li>
                 <li><a href="${pageContext.request.contextPath}/j_spring_security_logout">Sign Out</a></li>
             </ul>
+            <p class="navbar-text navbar-right"><a href="#" class="navbar-link">${userName}</a></p>
+            <a href="#" class="navbar-text navbar-right navbar-link">Alerts <span class="badge">0</span></a>
+
         </div><!--/.nav-collapse -->
     </div>
 </div>
@@ -48,6 +51,11 @@
 </div><!-- /.container -->
 
 
+<div id="footer">
+    <div class="container">
+        <p class="text-muted">Place sticky footer content here.</p>
+    </div>
+</div>
 <!-- Bootstrap core JavaScript
 ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->

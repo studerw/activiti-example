@@ -1,21 +1,36 @@
 package com.studerw.activiti.model;
 
 import com.google.common.base.Objects;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * User: studerw
  * Date: 5/20/14
  */
-public class Document {
-    String id;
-    String author;
-    String title;
-    String content;
-    String summary;
-    String group;
-    Date created;
+public class Document implements Comparable<Document>,Serializable {
+    @NotNull
+    String id = "TEMP";
+    @NotNull
+    private String author;
+    @NotNull
+    private String title;
+    @NotNull
+    private String content;
+    @NotNull
+    private String summary;
+    @NotNull
+    private String groupId;
+    @NotNull
+    @DateTimeFormat(pattern = "yyyy/MM/dd")
+    private Date createdDate;
+    @NotNull
+    private String state = "DRAFT";
+
+    public Document(){};
 
     public String getId() {
         return id;
@@ -57,20 +72,28 @@ public class Document {
         this.summary = summary;
     }
 
-    public String getGroup() {
-        return group;
+    public String getGroupId() {
+        return groupId;
     }
 
-    public void setGroup(String group) {
-        this.group = group;
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
     }
 
-    public Date getCreated() {
-        return created;
+    public Date getCreatedDate() {
+        return createdDate;
     }
 
-    public void setCreated(Date created) {
-        this.created = created;
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
     }
 
     @Override
@@ -81,9 +104,32 @@ public class Document {
                 .add("title", title)
                 .add("content", content)
                 .add("summary", summary)
-                .add("group", group)
-                .add("created", created)
+                .add("groupId", groupId)
+                .add("createdDate", createdDate)
+                .add("state", state)
                 .toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Document)) return false;
+
+        Document document = (Document) o;
+
+        if (!id.equals(document.id)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    @Override
+    public int compareTo(Document o) {
+        return this.createdDate.compareTo(o.createdDate);
     }
 }
 

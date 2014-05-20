@@ -13,8 +13,6 @@ import java.io.Serializable;
  * Date: 5/18/14
  */
 public class UserForm implements Serializable {
-
-
     @NotNull @Size(min=5,max=50)
     private String userName;
     @JsonIgnore
