@@ -46,6 +46,15 @@ public class documentWorkflow {
 
     public void denied(Execution execution) {
         log.debug("process id: " + execution.getProcessInstanceId());
-        log.debug("user account denied");
+        ProcessInstance pi = runtimeService.createProcessInstanceQuery().
+                processInstanceId(execution.getProcessInstanceId()).singleResult();
+        String docId = pi.getBusinessKey();
+        Document doc = this.docSrvc.getDocument(docId);
+        Map<String, Object> vars = runtimeService.getVariables(execution.getId());
+        log.debug("setting doc {} with title = {}: state set to REJECTED", doc.getId(), doc.getTitle());
+        doc.setState("REJECTED");
+        this.docSrvc.updateDocument(doc);
+
+        log.debug("document rejected: " + docId);
     }
 }

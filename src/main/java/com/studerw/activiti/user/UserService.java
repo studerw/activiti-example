@@ -101,8 +101,16 @@ public class UserService {
     }
 
     public List<Group> getAssignmentGroups(String userId){
-        List<Group> groups = identityService.createGroupQuery().groupType("assignment").
-                orderByGroupId().asc().list();
+        List<Group> groups = identityService.createGroupQuery().groupMember(userId)
+                .groupType("assignment")
+                .orderByGroupId().asc().list();
+        return groups;
+    }
+
+    public List<Group> getAllAssignmentGroups(){
+        List<Group> groups = identityService.createGroupQuery()
+                .groupType("assignment")
+                .orderByGroupId().asc().list();
         return groups;
     }
 }

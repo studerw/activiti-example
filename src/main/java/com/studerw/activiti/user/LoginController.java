@@ -37,6 +37,7 @@ public class LoginController {
     public String loginFail(ModelMap model) {
         log.debug("loginFail()");
         model.addAttribute("error", true);
+        model.addAttribute("users", userWithGroups());
         return "login";
     }
 

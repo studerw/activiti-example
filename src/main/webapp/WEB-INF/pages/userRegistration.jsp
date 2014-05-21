@@ -56,7 +56,7 @@
             </div>
         </c:if>
 
-        <div class="panel panel-primary">
+        <div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">New User Registration</h3>
             </div>

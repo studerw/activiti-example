@@ -37,6 +37,7 @@ public class DocumentController {
     public void addUserInfo(ModelMap model, HttpServletRequest request){
         UserDetails user = userService.currentUser();
         model.addAttribute("userDetails", user);
+        model.addAttribute("userName", user.getUsername());
         List<Group> groups = userService.getAssignmentGroups(request.getRemoteUser());
         model.addAttribute("groups", groups);
     }
@@ -50,16 +51,12 @@ public class DocumentController {
 
     @RequestMapping(value="/list.htm", method = RequestMethod.GET)
 	public String getDocuments(ModelMap model, HttpServletRequest request) {
-        String userName = request.getRemoteUser();
-        model.addAttribute("userName", userName);
-        model.addAttribute("documents", this.docService.getGroupDocumentsByUser(userName));
+        model.addAttribute("documents", this.docService.getGroupDocumentsByUser(request.getRemoteUser()));
 		return "document/list";
 	}
 
     @RequestMapping(value="/add.htm", method = RequestMethod.GET)
     public String addDocument(ModelMap model, HttpServletRequest request) {
-        String userName = request.getRemoteUser();
-        model.addAttribute("userName", userName);
         model.addAttribute("document", newDocument());
         return "document/add";
     }
@@ -80,7 +77,8 @@ public class DocumentController {
     }
 
     @RequestMapping(value="/view.htm", method = RequestMethod.GET)
-    public String viewDocument(ModelMap modelMap, @RequestParam(value = "id", required = true) String id,
+    public String viewDocument(ModelMap modelMap,
+                               @RequestParam(value = "id", required = true) String id,
                                HttpServletRequest request) {
         log.debug("viewing doc {} ", id);
         Document doc = docService.getDocument(id);
