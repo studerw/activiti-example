@@ -8,16 +8,6 @@
        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
        http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
 
-    <tx:annotation-driven transaction-manager="transactionManager" />
-
-    <bean id="dataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource"
-          p:driverClass="${jdbc.driver}" p:url="${jdbc.url}"
-          p:username="${jdbc.user}"
-          p:password="${jdbc.pw}"/>
-
-    <bean id="proxiedDataSource" class="org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy" p:targetDataSource-ref="dataSource"/>
-
-    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager" p:dataSource-ref="dataSource"/>
 
     <bean id="processEngineConfiguration" class="org.activiti.spring.SpringProcessEngineConfiguration">
         <property name="databaseType" value="${jdbc.type}"/>

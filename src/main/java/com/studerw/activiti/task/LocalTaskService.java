@@ -78,6 +78,7 @@ public class LocalTaskService {
             taskService.addComment(task.getId(), task.getProcessInstanceId(), comment);
             Map <String, Object> taskVariables = new HashMap<String, Object>();
             taskVariables.put("approved", approved);
+            taskService.setVariableLocal(task.getId(), "taskOutcome", approved ? "Approved" : "Rejected");
             taskService.complete(task.getId(), taskVariables);
         }
         finally{

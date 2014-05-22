@@ -12,33 +12,20 @@ import java.util.List;
  * Date: 5/20/14
  */
 public interface DocumentDao extends IBaseDao<Document> {
-    @Override
-    @Transactional
+
     String create(Document Document);
 
-    @Override
     void createWithId(Document obj);
 
-    @Override
-    @Transactional(readOnly = true)
     Document read(String DocumentId);
 
-    @Override
-    @Transactional(readOnly = true)
     List<Document> readAll();
 
-    @Override
-    @Transactional(readOnly = true)
     int getCount();
 
-    @Override
-    @Transactional
     void delete(String DocumentId);
 
-    @Override
-    @Transactional
     void update(Document Document);
 
-    @Override
     List<Document> readPage(PagingCriteria criteria);
 }

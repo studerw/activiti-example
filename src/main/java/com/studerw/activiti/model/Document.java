@@ -12,6 +12,12 @@ import java.util.Date;
  * Date: 5/20/14
  */
 public class Document implements Comparable<Document>,Serializable {
+    public final static String STATE_DRAFT = "DRAFT";
+    public final static String STATE_APPROVED = "APPROVED";
+    public final static String STATE_REJECTED = "REJECTED";
+    public final static String STATE_WAITING_FOR_APPROVAL = "WAITING FOR APPROVAL";
+    public final static String STATE_PUBLISHED = "PUBLISHED";
+
     @NotNull
     String id = "TEMP";
     @NotNull
@@ -28,7 +34,7 @@ public class Document implements Comparable<Document>,Serializable {
     @DateTimeFormat(pattern = "yyyy/MM/dd")
     private Date createdDate;
     @NotNull
-    private String state = "DRAFT";
+    private String state = STATE_DRAFT;
 
     public Document(){};
 

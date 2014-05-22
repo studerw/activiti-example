@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.studerw.activiti.model.Document;
 import com.studerw.activiti.model.UserForm;
+import com.studerw.activiti.user.InvalidAccessException;
 import com.studerw.activiti.user.UserService;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.RuntimeService;
@@ -77,36 +78,42 @@ public class DocumentService {
     }
 
     @Transactional
-    public void createDocument(Document document){
+    public String createDocument(Document document){
         String id = document.getId();
         if (!("TEMP".equals(id) || StringUtils.isBlank(id))){
             throw new IllegalArgumentException("Can't save new doc with id already set");
         }
         document.setId(null);
         String newId = this.docDao.create(document);
-        document.setId(newId);
-        document.setState("WAITING FOR APPROVAL");
+        return newId;
+    }
+    public void submitForApproval(String docId){
+        Document doc = this.docDao.read(docId);
+        log.debug("beginning doc approval workflow for doc {}. ", doc.getId());
+        UserDetails userDetails = this.userService.currentUser();
+        if(!StringUtils.equals(userDetails.getUsername(), doc.getAuthor())){
+            throw new InvalidAccessException("Only the author of a doc can submit for approval");
+        }
+        doc.setState(Document.STATE_WAITING_FOR_APPROVAL);
 
         //Workflow
-        log.debug("beginning doc approval workflow for doc {}. ",newId);
-        UserDetails userDetails = this.userService.currentUser();
         //TODO check author and currentUser
         Map<String,Object> processVariables = Maps.newHashMap();
         processVariables.put("approved", Boolean.FALSE);
-        processVariables.put("initiator", userDetails.getUsername());
-        processVariables.put("document", document);
+        processVariables.put("initiator", doc.getAuthor());
         try {
             identityService.setAuthenticatedUserId(userDetails.getUsername());
-            ProcessInstance pi = runtimeService.startProcessInstanceByKey("docApproval", newId, processVariables);
+            ProcessInstance pi = runtimeService.startProcessInstanceByKey("docApproval", doc.getId(), processVariables);
             Task task = taskService.createTaskQuery().processInstanceId(pi.getProcessInstanceId()).singleResult();
-            taskService.addCandidateGroup(task.getId(), document.getGroupId());
-
-            this.docDao.update(document);
-
+            task.setAssignee(userDetails.getUsername());
+            //taskService.addCandidateGroup(task.getId(), document.getGroupId());
+            this.docDao.update(doc);
+            taskService.complete(task.getId());
         } finally {
             identityService.setAuthenticatedUserId(null);
         }
     }
+
 
     @Transactional
     public void updateDocument(Document document){

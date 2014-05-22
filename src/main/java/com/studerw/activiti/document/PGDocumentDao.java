@@ -47,19 +47,19 @@ public class PGDocumentDao implements DocumentDao {
 
     @Override
     @Transactional
-    public String create(Document Document) {
-        log.debug("Inserting Document into SQL backend: " + Document);
-        checkArgument(StringUtils.isBlank(Document.getId()), "Document id cannot be already set");
+    public String create(Document document) {
+        log.debug("Inserting Document into SQL backend: " + document);
+        checkArgument(StringUtils.isBlank(document.getId()), "Document id cannot be already set");
 
         String id = UUID.randomUUID().toString();
-        Document.setId(id);
+        document.setId(id);
         String sql = "INSERT INTO Document (id, author, title, content, summary, group_id, state_, created_date) " +
                 "VALUES (:id, :author, :title, :content, :summary, :groupId, :state, :createdDate)";
 
-        BeanPropertySqlParameterSource source = new BeanPropertySqlParameterSource(Document);
+        BeanPropertySqlParameterSource source = new BeanPropertySqlParameterSource(document);
         int results = this.namedJdbcTemplate.update(sql, source);
         log.debug("Got: " + results + " results");
-
+        document.setId(id);
         return id;
     }
 
@@ -71,20 +71,20 @@ public class PGDocumentDao implements DocumentDao {
 
     @Override
     @Transactional(readOnly = true)
-    public Document read(String DocumentId) {
+    public Document read(String documentId) {
         String sql = "SELECT * FROM Document where id = :id";
-        Map<String, String> params = ImmutableMap.of("id", DocumentId);
-        Document Document = this.namedJdbcTemplate.queryForObject(sql, params, new DocumentRowMapper());
-        return Document;
+        Map<String, String> params = ImmutableMap.of("id", documentId);
+        Document document = this.namedJdbcTemplate.queryForObject(sql, params, new DocumentRowMapper());
+        return document;
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<Document> readAll() {
         String sql = "SELECT * FROM Document ORDER BY created_date ASC";
-        List<Document> Documents = this.namedJdbcTemplate.query(sql, new DocumentRowMapper());
-        log.debug("got all Documents: " + Documents.size());
-        return Documents;
+        List<Document> documents = this.namedJdbcTemplate.query(sql, new DocumentRowMapper());
+        log.debug("got all Documents: " + documents.size());
+        return documents;
     }
 
 
@@ -94,16 +94,16 @@ public class PGDocumentDao implements DocumentDao {
         String sql = "SELECT count(*) FROM Document";
         @SuppressWarnings("unchecked")
         int count  = this.namedJdbcTemplate.queryForObject(sql, Collections.EMPTY_MAP, Integer.class);
-        log.debug("Got count: " + count + " of Documents");
+        log.debug("Got count: " + count + " of documents");
         return count;
     }
 
 
     @Override
     @Transactional
-    public void delete(String DocumentId) {
+    public void delete(String documentId) {
         String sql = "DELETE FROM Document WHERE id = :id";
-        Map<String, String> params = ImmutableMap.of("id", DocumentId);
+        Map<String, String> params = ImmutableMap.of("id", documentId);
         int deleted = this.namedJdbcTemplate.update(sql, params);
         log.debug("Deleted: " + deleted + " Documents");
     }
@@ -111,17 +111,18 @@ public class PGDocumentDao implements DocumentDao {
 
     @Override
     @Transactional
-    public void update(Document Document) {
-        checkArgument(StringUtils.isNotBlank(Document.getId()), "Document id cannot be blank");
+    public void update(Document document) {
+        checkArgument(StringUtils.isNotBlank(document.getId()), "document id cannot be blank");
         String sql = "UPDATE Document SET author=:author, title=:title, content=:content, summary=:summary," +
                 " group_Id=:groupId, state_=:state, created_date=:createdDate WHERE id=:id";
 
-        BeanPropertySqlParameterSource source = new BeanPropertySqlParameterSource(Document);
+        BeanPropertySqlParameterSource source = new BeanPropertySqlParameterSource(document);
         int results = this.namedJdbcTemplate.update(sql, source);
         log.debug("Updated: " + results + " Documents");
     }
 
     @Override
+    @Transactional(readOnly =  true)
     public List<Document> readPage(PagingCriteria criteria) {
         log.debug("reading page with criteria: " + criteria);
         if (criteria == null || criteria.getLimit() == null || criteria.getStart() == null){
@@ -131,9 +132,9 @@ public class PGDocumentDao implements DocumentDao {
         String sql = "SELECT LIMIT :start :limit * FROM Document ORDER BY created_date ASC";
         BeanPropertySqlParameterSource source = new BeanPropertySqlParameterSource(criteria);
 
-        List<Document> Documents = this.namedJdbcTemplate.query(sql, source, new DocumentRowMapper());
-        log.debug(Documents.size() + " Documents returned using criteria: " + criteria);
+        List<Document> documents = this.namedJdbcTemplate.query(sql, source, new DocumentRowMapper());
+        log.debug(documents.size() + " Documents returned using criteria: " + criteria);
 
-        return Documents;
+        return documents;
     }
 }

@@ -9,6 +9,7 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
@@ -16,7 +17,7 @@ import java.util.Map;
  * User: studerw
  * Date: 5/18/14
  */
-//@Service("userAccountWorkflow")
+@Service("userAccountWorkflow")
 public class UserAccountWorkflow {
     private static final Logger log = LoggerFactory.getLogger(UserAccountWorkflow.class);
 

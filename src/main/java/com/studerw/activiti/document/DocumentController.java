@@ -76,6 +76,7 @@ public class DocumentController {
         return "redirect:/document/list.htm";
     }
 
+
     @RequestMapping(value="/view.htm", method = RequestMethod.GET)
     public String viewDocument(ModelMap modelMap,
                                @RequestParam(value = "id", required = true) String id,
