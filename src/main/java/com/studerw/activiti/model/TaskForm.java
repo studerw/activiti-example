@@ -28,6 +28,8 @@ public class TaskForm {
     Map<String,Object> processVariables;
     boolean suspended;
 
+
+
     public TaskForm(){}
 
     public static TaskForm fromTask(Task task) throws InvocationTargetException, IllegalAccessException {

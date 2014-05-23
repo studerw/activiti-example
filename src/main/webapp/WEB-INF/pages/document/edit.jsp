@@ -78,7 +78,7 @@
         </c:if>
     </div>
 
-        <div class="panel panel-primary">
+    <div class="panel panel-primary">
             <div class="panel-heading">
                 <h3 class="panel-title">${document.title}</h3>
             </div>
@@ -94,7 +94,7 @@
                     <div class="form-group">
                         <label for="author" class="col-sm-2 control-label">Author</label>
                         <div class="col-sm-10">
-                            <p id="author" class="form-control-static">${document.author}</p>
+                            <form:input path="author" id="author" cssClass="form-control" readonly="true" />
                         </div>
                     </div>
                     <div class="form-group">
@@ -107,19 +107,19 @@
                     <div class="form-group">
                         <label for="title" class="col-sm-2 control-label">Title</label>
                         <div class="col-sm-10">
-                            <form:input  cssClass="form-control" id="title" path="title" readonly="true"/>
+                            <form:input  cssClass="form-control" id="title" path="title" readonly="false"/>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="content" class="col-sm-2 control-label">Content</label>
                         <div class="col-sm-10">
-                            <form:textarea  cssClass="form-control" id="content" path="content" rows="6" readonly="true"/>
+                            <form:textarea  cssClass="form-control" id="content" path="content" rows="6" readonly="false"/>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="summary" class="col-sm-2 control-label">Summary</label>
                         <div class="col-sm-10">
-                            <form:textarea  cssClass="form-control" id="summary" path="summary" rows="3" readonly="true"/>
+                            <form:textarea  cssClass="form-control" id="summary" path="summary" rows="3" readonly="false"/>
                         </div>
                     </div>
                     <div class="form-group">
@@ -134,18 +134,25 @@
                             <form:input  cssClass="form-control" id="state" path="state" readonly="true"/>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <div class="checkbox">
+                                <label for="isSubmit">
+                                    <input name="isSubmit" id="isSubmit" type="checkbox"> Submit for Approval?
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pull-right">
+                        <button type="submit" class="btn btn-primary btn-default">Save Document </button>
 
+                    </div>
                     <%--<div class="pull-right">--%>
                         <%--<button type="submit" class="btn btn-primary btn-lg">Submit for Approval</button>--%>
                     <%--</div>--%>
                 </form:form>
             </div>
         </div>
-    <div c  lass="panel panel-primary">
-        <div class="panel-heading">
-            <h3 class="panel-title">${document.title}</h3>
-        </div>
-        <div class="panel-body">
     </div>
 
 </div>

@@ -96,7 +96,7 @@
                                 <c:when test="${task.name eq 'Approve New User Account'}">
                                     <span class="glyphicon glyphicon-user pull-right"></span>
                                 </c:when>
-                                <c:when test="${task.name eq 'Approve Document for Publishing'}">
+                                <c:when test="${task.name eq 'Approve Document'}">
                                     <span class="glyphicon glyphicon-paperclip pull-right"></span>
                                 </c:when>
                                 <c:otherwise>
@@ -163,29 +163,30 @@
                                             </div>
                                         </div>
                                     </c:if>
-                                    <c:if test="${task.name eq 'Approve Document for Publishing'}">
+                                    <c:if test="${task.name eq 'Approve Document'}">
                                         <div class="form-group">
                                             <label class="col-sm-2 control-label">Document Title</label>
 
                                             <div class="col-sm-10">
                                                 <p class="form-control-static"><a
-                                                        href="${pageContext.request.contextPath}/document/view.htm?id=${task.processVariables['document'].id}"
-                                                        target="_blank">${task.processVariables['document'].title}</a>
+                                                        href="${pageContext.request.contextPath}/document/view.htm?id=${task.processVariables['docId']}"
+                                                        target="_blank">View document</a>
                                                 </p>
                                             </div>
                                         </div>
+
                                         <div class="form-group">
                                             <label class="col-sm-2 control-label">Document Author</label>
 
                                             <div class="col-sm-10">
-                                                <p class="form-control-static"> ${task.processVariables['document'].author}</p>
+                                                <p class="form-control-static"> ${task.processVariables['docAuthor']}</p>
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             <label class="col-sm-2 control-label">Document State</label>
 
                                             <div class="col-sm-10">
-                                                <p class="form-control-static"> ${task.processVariables['document'].state}</p>
+                                                <p class="form-control-static"> ${task.processVariables['docTitle']}</p>
                                             </div>
                                         </div>
                                     </c:if>

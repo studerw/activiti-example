@@ -1,13 +1,18 @@
 package com.studerw.activiti.task;
 
 import com.google.common.collect.Lists;
+import com.studerw.activiti.model.HistoricTask;
 import com.studerw.activiti.model.TaskApproval;
 import com.studerw.activiti.model.TaskForm;
 import com.studerw.activiti.user.UserService;
+import org.activiti.engine.HistoryService;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.history.HistoricProcessInstance;
+import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.runtime.ProcessInstance;
+import org.activiti.engine.task.Comment;
 import org.activiti.engine.task.Task;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -37,6 +42,8 @@ public class LocalTaskService {
     RuntimeService runtimeService;
     @Autowired
     UserService userService;
+    @Autowired
+    HistoryService historyService;
 
     public List<TaskForm> getTasks(String userId) {
         log.debug("Getting tasks for user: {}", userId);
@@ -84,5 +91,26 @@ public class LocalTaskService {
         finally{
             identityService.setAuthenticatedUserId(null);
         }
+    }
+
+    public List<HistoricTask>  getTaskHistory(String businessKey){
+        HistoricProcessInstance pi = historyService.createHistoricProcessInstanceQuery().
+                includeProcessVariables().processInstanceBusinessKey(businessKey).singleResult();
+
+        log.debug("Duration time in millis: " + pi.getDurationInMillis());
+        List<HistoricTaskInstance> hTasks;
+        hTasks = historyService.createHistoricTaskInstanceQuery().includeTaskLocalVariables().processInstanceBusinessKey(businessKey).list();
+        List<HistoricTask> historicTasks = Lists.newArrayList();
+        for(HistoricTaskInstance hti : hTasks){
+            HistoricTask ht = new HistoricTask();
+            ht.setId(hti.getId());
+            ht.setName(hti.getName());
+            ht.setUserId(hti.getAssignee());
+            ht.setComments(taskService.getTaskComments(hti.getId()));
+            Map<String, Object> vars = hti.getTaskLocalVariables();
+            ht.setLocalVars(vars);
+            historicTasks.add(ht);
+        }
+        return historicTasks;
     }
 }

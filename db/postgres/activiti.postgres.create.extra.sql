@@ -1,5 +1,5 @@
 create table DOCUMENT(
-    ID varchar(64),
+    ID varchar(255),
     AUTHOR varchar(255),
     TITLE varchar(255),
     SUMMARY varchar(10000),
@@ -11,7 +11,7 @@ create table DOCUMENT(
 );
 
 create table ALERT(
-    ID varchar(64),
+    ID varchar(255),
     CREATED_BY varchar(255),
     MESSAGE varchar(10000),
     PRIORITY  int,

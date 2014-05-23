@@ -36,9 +36,11 @@
                     <li class="active"><a href="${pageContext.request.contextPath}/index.htm">Home</a></li>
                     <li><a href="${pageContext.request.contextPath}/document/list.htm">Documents</a></li>
                     <li><a href="${pageContext.request.contextPath}/tasks.htm">Tasks</a></li>
-                    <li><a href="#">Alerts <span class="badge">0</span></a></li>
                     <li><a href="${pageContext.request.contextPath}/j_spring_security_logout">Sign Out</a></li>
             </ul>
+            <p class="navbar-text navbar-right"><a href="#" class="navbar-link">${userName}</a></p>
+            <a href="#" class="navbar-text navbar-right navbar-link">Alerts <span class="badge">0</span></a>
+
         </div>
     </div>
 </div>

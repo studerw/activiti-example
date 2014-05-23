@@ -65,7 +65,7 @@
 </div>
 
 <div class="container">
-    <div class="starter-template">
+    <div class="starter-template" style="width: 550px; margin: 10px auto;">
         <div class="centered">
             <c:if test="${error == true}">
                 <div class="panel panel-default">
@@ -77,7 +77,6 @@
                         </div>
                     </div>
                 </div>
-
             </c:if>
             <c:if test="${not empty msg}">
                 <div class="flash">
@@ -94,7 +93,7 @@
                 <form style="margin: 20px;" class="form-horizontal" role="form" action="j_spring_security_check"
                       method="post">
                     <div class="form-group">
-                        <label for="j_username" class="col-sm-2 control-label">User Name</label>
+                        <label for="j_username" class="col-sm-2 control-label">User</label>
 
                         <div class="col-sm-10">
                             <input type="text" class="form-control" id="j_username" name="j_username" required

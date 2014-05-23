@@ -137,5 +137,9 @@ public class Document implements Comparable<Document>,Serializable {
     public int compareTo(Document o) {
         return this.createdDate.compareTo(o.createdDate);
     }
+
+    public boolean isEditable(){
+        return STATE_DRAFT.equals(this.state)|| STATE_REJECTED.equals(this.state);
+    }
 }
 

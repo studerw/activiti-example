@@ -110,8 +110,18 @@
                         </div>
                     </div>
                     <form:hidden path="id" />
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <div class="checkbox">
+                                <label for="isSubmit">
+                                    <input name="isSubmit" id="isSubmit" type="checkbox"> Submit for Approval?
+                                </label>
+                            </div>
+                        </div>
+                    </div>
                     <div class="pull-right">
-                        <button type="submit" class="btn btn-primary btn-lg">Submit for Approval</button>
+                        <button type="submit" class="btn btn-primary btn-default">Save Document </button>
+
                     </div>
                 </form:form>
             </div>

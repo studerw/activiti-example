@@ -101,6 +101,9 @@ public class DocumentService {
         Map<String,Object> processVariables = Maps.newHashMap();
         processVariables.put("approved", Boolean.FALSE);
         processVariables.put("initiator", doc.getAuthor());
+        processVariables.put("docId", doc.getId());
+        processVariables.put("docTitle", doc.getTitle());
+        processVariables.put("docAuthor", doc.getAuthor());
         try {
             identityService.setAuthenticatedUserId(userDetails.getUsername());
             ProcessInstance pi = runtimeService.startProcessInstanceByKey("docApproval", doc.getId(), processVariables);
@@ -108,7 +111,7 @@ public class DocumentService {
             task.setAssignee(userDetails.getUsername());
             //taskService.addCandidateGroup(task.getId(), document.getGroupId());
             this.docDao.update(doc);
-            taskService.complete(task.getId());
+            taskService.complete(task.getId(), processVariables);
         } finally {
             identityService.setAuthenticatedUserId(null);
         }

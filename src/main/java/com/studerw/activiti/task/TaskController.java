@@ -75,7 +75,7 @@ public class TaskController {
                           BindingResult result,
                           final RedirectAttributes redirectAttributes,
                           HttpServletRequest request) {
-        log.debug("task approval: {}", taskApproval.toString());
+          log.debug("task approval: {}", taskApproval.toString());
 
         if (result.hasFieldErrors()) {
             redirectAttributes.addFlashAttribute("error", true);

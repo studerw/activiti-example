@@ -34,10 +34,5 @@
 
     <import resource="activiti-config.xml"/>
 
-    <bean id="demoDataGenerator" class="org.activiti.explorer.demo.DemoDataGenerator" init-method="init" depends-on="processEngine">
-        <property name="processEngine" ref="processEngine" />
-        <property name="createDemoUsersAndGroups" value="true" />
-        <property name="createDemoProcessDefinitions" value="false" />
-        <property name="createDemoModels" value="false" />
-    </bean>
+
 </beans>
