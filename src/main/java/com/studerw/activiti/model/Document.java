@@ -1,6 +1,7 @@
 package com.studerw.activiti.model;
 
 import com.google.common.base.Objects;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
@@ -31,7 +32,7 @@ public class Document implements Comparable<Document>,Serializable {
     @NotNull
     private String groupId;
     @NotNull
-    @DateTimeFormat(pattern = "yyyy/MM/dd")
+    @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm Z")
     private Date createdDate;
     @NotNull
     private String state = STATE_DRAFT;
@@ -135,7 +136,7 @@ public class Document implements Comparable<Document>,Serializable {
 
     @Override
     public int compareTo(Document o) {
-        return this.createdDate.compareTo(o.createdDate);
+        return ObjectUtils.compare(this.createdDate, o.createdDate);
     }
 
     public boolean isEditable(){

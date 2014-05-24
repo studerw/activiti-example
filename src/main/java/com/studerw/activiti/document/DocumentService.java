@@ -6,6 +6,7 @@ import com.studerw.activiti.model.Document;
 import com.studerw.activiti.model.UserForm;
 import com.studerw.activiti.user.InvalidAccessException;
 import com.studerw.activiti.user.UserService;
+import com.studerw.activiti.util.Workflow;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
@@ -89,7 +90,7 @@ public class DocumentService {
     }
     public void submitForApproval(String docId){
         Document doc = this.docDao.read(docId);
-        log.debug("beginning doc approval workflow for doc {}. ", doc.getId());
+        log.debug("beginning (or continuing) doc approval workflow for doc {}. ", doc.getId());
         UserDetails userDetails = this.userService.currentUser();
         if(!StringUtils.equals(userDetails.getUsername(), doc.getAuthor())){
             throw new InvalidAccessException("Only the author of a doc can submit for approval");
@@ -99,24 +100,44 @@ public class DocumentService {
         //Workflow
         //TODO check author and currentUser
         Map<String,Object> processVariables = Maps.newHashMap();
-        processVariables.put("approved", Boolean.FALSE);
         processVariables.put("initiator", doc.getAuthor());
         processVariables.put("docId", doc.getId());
         processVariables.put("docTitle", doc.getTitle());
         processVariables.put("docAuthor", doc.getAuthor());
         try {
             identityService.setAuthenticatedUserId(userDetails.getUsername());
-            ProcessInstance pi = runtimeService.startProcessInstanceByKey("docApproval", doc.getId(), processVariables);
-            Task task = taskService.createTaskQuery().processInstanceId(pi.getProcessInstanceId()).singleResult();
-            task.setAssignee(userDetails.getUsername());
-            //taskService.addCandidateGroup(task.getId(), document.getGroupId());
+            ProcessInstance current = this.getCurrentProcess(docId);
+            if (current == null){
+                current = runtimeService.startProcessInstanceByKey(Workflow.PROCESS_ID_DOC_APPROVAL, doc.getId(), processVariables);
+            }
+            Task task = taskService.createTaskQuery().processInstanceId(current.getProcessInstanceId()).singleResult();
+            taskService.setAssignee(task.getId(), userDetails.getUsername());
             this.docDao.update(doc);
-            taskService.complete(task.getId(), processVariables);
+            taskService.setVariableLocal(task.getId(), "taskOutcome", "Submitted for Approval");
+            taskService.complete(task.getId());
         } finally {
             identityService.setAuthenticatedUserId(null);
         }
     }
 
+    /**
+     * It's possible this document is being resubmitted after reject - no need to create a new process.
+     * @param docId
+     * @return the associated ProcessInstance or null if one does not exist
+     */
+    ProcessInstance getCurrentProcess(String  docId){
+        List<ProcessInstance> instances =
+        runtimeService.createProcessInstanceQuery().processInstanceBusinessKey(docId).list();
+        if (instances.size() == 0){
+            return null;
+        }
+        else if (instances.size() > 1){
+            throw new RuntimeException("More than one process found for document: " + docId + " - zero or one should have been found.");
+        }
+        else {
+            return instances.get(0);
+        }
+    }
 
     @Transactional
     public void updateDocument(Document document){

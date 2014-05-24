@@ -1,12 +1,17 @@
 package com.studerw.activiti.web;
 
+import com.google.common.collect.Maps;
 import com.studerw.activiti.model.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.ModelAndView;
+
+import java.util.Map;
 
 /**
  * Annotated ControllerAdvice bean that globally configures all other controllers with exception handling, bean binding, etc.
@@ -31,9 +36,13 @@ public class DefaultControllerAdvice {
      * With Ajax calls we need to send a 200 OK response with a status of success: false.
      */
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Response> handleException(Exception ex) {
-        log.error("Caught Exception - returning error resonse: ", ex);
+    public ModelAndView handleException(Exception ex) {
+        log.error("Caught Exception - returning error response: {}", ex.getMessage());
+        ex.printStackTrace();
+        Map<String, Object> model = Maps.newHashMap();
         Response response = new Response(false, ex.getMessage());
-        return new ResponseEntity<Response>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        model.put("response", response);
+        return new ModelAndView("error", model);
+        //return new ResponseEntity<Response>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

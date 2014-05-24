@@ -5,14 +5,11 @@ create table ACT_GE_PROPERTY (
     primary key (NAME_)
 );
 
-insert into ACT_GE_PROPERTY
-values ('schema.version', '5.15.1', 1);
+insert into ACT_GE_PROPERTY values ('schema.version', '5.15.1', 1);
 
-insert into ACT_GE_PROPERTY
-values ('schema.history', 'create(5.15.1)', 1);
+insert into ACT_GE_PROPERTY values ('schema.history', 'create(5.15.1)', 1);
 
-insert into ACT_GE_PROPERTY
-values ('next.dbid', '1', 1);
+insert into ACT_GE_PROPERTY values ('next.dbid', '1', 1);
 
 create table ACT_GE_BYTEARRAY (
     ID_ varchar(64),

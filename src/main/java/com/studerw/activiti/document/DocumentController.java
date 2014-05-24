@@ -80,7 +80,7 @@ public class DocumentController {
             this.docService.submitForApproval(docId);
         }
         if (isSubmit) {
-            redirectAttributes.addFlashAttribute("msg", "Your Document has been submitted for approval<br/>" +
+            redirectAttributes.addFlashAttribute("msg", "Your Document has been submitted for approval.<br/>" +
                     "You will receive alerts when it has been reviewed");
         } else {
             redirectAttributes.addFlashAttribute("msg", "Your Document has been Saved");
@@ -106,7 +106,7 @@ public class DocumentController {
             this.docService.submitForApproval(document.getId());
         }
         if (isSubmit) {
-            redirectAttributes.addFlashAttribute("msg", "Your Document has been submitted for approval<br/>" +
+            redirectAttributes.addFlashAttribute("msg", "Your Document has been submitted for approval.<br/>" +
                     "You will receive alerts when it has been reviewed");
         } else {
             redirectAttributes.addFlashAttribute("msg", "Your Document has been Saved");
@@ -123,13 +123,13 @@ public class DocumentController {
         log.debug("viewing doc {} ", id);
         Document doc = docService.getDocument(id);
         model.addAttribute("document", doc);
-        List<HistoricTask> hts = this.localTaskSrvc.getTaskHistory(id);
+        List<HistoricTask> hts = this.localTaskSrvc.getDocApprovalHistory(id);
         model.addAttribute("historicTasks", hts);
         String currentUser = this.userService.currentUser().getUsername();
         if (doc.getAuthor().equals(currentUser) && doc.isEditable()) {
             return "document/edit";
         } else if (doc.getAuthor().equals(currentUser)) {
-            model.addAttribute("msg", "The document cannot be edited while currently waiting approval");
+            model.addAttribute("msg", "The document cannot be edited in its current state.");
         } else {
             model.addAttribute("msg", "Only the original author may edit the document");
         }

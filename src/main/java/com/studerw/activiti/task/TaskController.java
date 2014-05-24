@@ -95,4 +95,6 @@ public class TaskController {
         redirectAttributes.addFlashAttribute("msg", "The task has been completed");
         return "redirect:/tasks.htm";
     }
+
+
 }

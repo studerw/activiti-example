@@ -13,6 +13,9 @@
         </session-management>
 
         <intercept-url pattern="/login.htm" access="permitAll" />
+        <intercept-url pattern="/error" access="permitAll" />
+        <intercept-url pattern="/noerror" access="permitAll" />
+        <intercept-url pattern="/noerrornoview" access="permitAll" />
         <intercept-url pattern="/loginfailed.htm" access="permitAll" />
         <intercept-url pattern="/resources/**" access="permitAll" />
         <intercept-url pattern="/userRegistration.htm/**" access="permitAll" />

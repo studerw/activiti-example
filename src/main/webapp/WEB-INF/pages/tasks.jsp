@@ -5,49 +5,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Activiti Example Tasks</title>
-
-    <link href="${pageContext.request.contextPath}/resources/css/bootstrap.css" rel="stylesheet">
-    <link href="${pageContext.request.contextPath}/resources/css/app.css" rel="stylesheet">
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-    <script src="${pageContext.request.contextPath}/resources/js/html5shiv.js"></script>
-    <script src="${pageContext.request.contextPath}/resources/js/respond.min.js"></script>
-    <![endif]-->
+    <jsp:include page="fragments/head.jsp"/>
+    <title>Tasks</title>
     <style type="text/css">
-        .panel.panel-default {
+        .panel-task {
             margin: 15px 0;
         }
     </style>
 </head>
 
 <body>
-
-<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-    <div class="container">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand brand" href="#">Activiti Example</a>
-        </div>
-        <div class="collapse navbar-collapse">
-            <ul class="nav navbar-nav">
-                <li><a href="${pageContext.request.contextPath}/index.htm">Home</a></li>
-                <li><a href="${pageContext.request.contextPath}/document/list.htm">Documents</a></li>
-                <li class="active"><a href="${pageContext.request.contextPath}/tasks.htm">Tasks</a></li>
-                <li><a href="${pageContext.request.contextPath}/j_spring_security_logout">Sign Out</a></li>
-            </ul>
-            <p class="navbar-text navbar-right"><a href="#" class="navbar-link">${userName}</a></p>
-            <a href="#" class="navbar-text navbar-right navbar-link">Alerts <span class="badge">0</span></a>
-        </div>
-    </div>
-</div>
+<jsp:include page="fragments/navbar-top.jsp"/>
 
 <div class="container">
 
@@ -90,7 +58,7 @@
             <div class="panel-group" id="accordion">
                 <c:forEach var="task" items="${tasks}">
                     <c:set var="currId" value="${task.id}"/>
-                    <div class="panel panel-default">
+                    <div class="panel panel-default panel-task">
                         <div class="panel-heading">
                             <c:choose>
                                 <c:when test="${task.name eq 'Approve New User Account'}">
@@ -106,7 +74,10 @@
 
                             <h4 class="panel-title">
                                 <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne-${task.id}">
-                                        ${task.name} - ${task.createTime}
+                                        ${task.name} - <fmt:formatDate type="date"
+                                                                       dateStyle="medium"
+                                                                       timeStyle="medium"
+                                                                       value="${task.createTime}"/>
                                 </a>
                             </h4>
                         </div>
@@ -125,13 +96,10 @@
                                         <label class="col-sm-2 control-label">Created</label>
 
                                         <div class="col-sm-10">
-                                            <p class="form-control-static"><fmt:formatDate type="date"
-                                                                                           dateStyle="medium"
-                                                                                           timeStyle="medium"
-                                                                                           value="${task.createTime}"/>
-                                            </p>
+                                            <p class="form-control-static">${task.createTime}</p>
                                         </div>
                                     </div>
+                                    <hr/>
                                     <c:if test="${task.name eq 'Approve New User Account'}">
                                         <c:set var="userReg" value="${task.processVariables['userForm']}"/>
                                         <div class="form-group">
@@ -165,12 +133,12 @@
                                     </c:if>
                                     <c:if test="${task.name eq 'Approve Document'}">
                                         <div class="form-group">
-                                            <label class="col-sm-2 control-label">Document Title</label>
+                                            <label class="col-sm-2 control-label">Document</label>
 
                                             <div class="col-sm-10">
                                                 <p class="form-control-static"><a
                                                         href="${pageContext.request.contextPath}/document/view.htm?id=${task.processVariables['docId']}"
-                                                        target="_blank">View document</a>
+                                                        onclick="window.open(this.href, 'View Document','left=20,top=20,width=800,height=600,scrollbars=1,toolbar=0,resizable=1'); return false;" >View document</a>
                                                 </p>
                                             </div>
                                         </div>
@@ -183,7 +151,7 @@
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label class="col-sm-2 control-label">Document State</label>
+                                            <label class="col-sm-2 control-label">Document Title</label>
 
                                             <div class="col-sm-10">
                                                 <p class="form-control-static"> ${task.processVariables['docTitle']}</p>
@@ -242,21 +210,19 @@
 </div>
 
 
-</div>
-</div>
+<jsp:include page="fragments/footer.jsp"/>
 
-
-<div id="footer">
-    <div class="container">
-        <p class="text-muted">Place sticky footer content here.</p>
-    </div>
-</div>
-
-<script src="${pageContext.request.contextPath}/resources/js/jquery-1.10.1.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/json2.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/underscore.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/backbone.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/bootstrap.js"></script>
 <%--<script src="${pageContext.request.contextPath}/resources/js/app/tasks/main.js"></script>--%>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            $('li#nav-tasks').addClass('active');
+        });
+    })(jQuery);
+</script>
+
 </body>
 </html>

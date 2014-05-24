@@ -4,18 +4,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>New User Register</title>
-    <!-- Bootstrap -->
-    <link href="${pageContext.request.contextPath}/resources/css/bootstrap.css" rel="stylesheet" media="screen">
-    <link href="${pageContext.request.contextPath}/resources/css/app.css" rel="stylesheet" media="screen">
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-    <script src="${pageContext.request.contextPath}/resources/js/html5shiv.js"></script>
-    <script src="${pageContext.request.contextPath}/resources/js/respond.min.js"></script>
-    <![endif]-->
+    <title>New User Registration</title>
+    <jsp:include page="fragments/head.jsp"/>
 </head>
 <body>
 <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
@@ -38,7 +28,7 @@
 </div>
 
 <div class="container">
-    <div class="starter-template">
+    <div class="start-template">
 
         <c:if test="${error == true}">
             <div class="panel panel-default">
@@ -121,12 +111,6 @@
     </div>
 </div>
 
-<div id="footer">
-    <div class="container">
-        <p class="text-muted">Place sticky footer content here.</p>
-    </div>
-</div>
-<script src="${pageContext.request.contextPath}/resources/js/jquery-1.10.1.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/bootstrap.js"></script>
+<jsp:include page="fragments/footer.jsp"/>
 </body>
 </html>

@@ -1,7 +1,10 @@
 package com.studerw.activiti.model;
 
 import com.google.common.base.Objects;
+import com.studerw.activiti.util.Workflow;
 import org.activiti.engine.task.Comment;
+import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 import java.util.List;
@@ -11,13 +14,14 @@ import java.util.Map;
  * User: studerw
  * Date: 5/22/14
  */
-public class HistoricTask implements Comparable<HistoricTask>{
+public class HistoricTask implements Comparable<HistoricTask> {
 
     String id;
     String name;
     String userId;
     List<Comment> comments;
     Map<String, Object> localVars;
+    @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm Z")
     Date completedDate;
 
     //String taskOutcome;
@@ -85,6 +89,10 @@ public class HistoricTask implements Comparable<HistoricTask>{
 
     @Override
     public int compareTo(HistoricTask o) {
-        return this.completedDate.compareTo(o.completedDate);
+        return ObjectUtils.compare(this.completedDate, o.completedDate);
+    }
+
+    boolean isDocApprovalType() {
+        return Workflow.TASK_NAME_DOC_APPROVAL.equals(this.name);
     }
 }

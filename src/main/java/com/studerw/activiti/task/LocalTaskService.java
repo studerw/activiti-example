@@ -5,14 +5,13 @@ import com.studerw.activiti.model.HistoricTask;
 import com.studerw.activiti.model.TaskApproval;
 import com.studerw.activiti.model.TaskForm;
 import com.studerw.activiti.user.UserService;
+import com.studerw.activiti.util.Workflow;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricTaskInstance;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Comment;
 import org.activiti.engine.task.Task;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -22,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +45,12 @@ public class LocalTaskService {
     @Autowired
     HistoryService historyService;
 
+    /**
+     * @param userId
+     * @return a list of all tasks either assigned or as possible candidate based on user groups.
+     *         Removes all cases of 'ApproveDoc' tasks where the user is the author of the document, as we
+     *         assume the document author cannot also be an approver. This may change in the future.
+     */
     public List<TaskForm> getTasks(String userId) {
         log.debug("Getting tasks for user: {}", userId);
         List<Task> tasks = taskService.createTaskQuery().
@@ -53,64 +59,94 @@ public class LocalTaskService {
                 orderByTaskCreateTime().asc().list();
         List<TaskForm> taskForms = Lists.newArrayList();
         try {
-            for(Task task : tasks){
-                taskForms.add(TaskForm.fromTask(task));
+            for (Task task : tasks) {
+                if (!isDocAuthor(task, userId)) {
+                    taskForms.add(TaskForm.fromTask(task));
+                }
             }
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             throw new RuntimeException("Error converting task to Task Form", e);
         }
         log.debug("got {} tasks for user {}", taskForms.size(), userId);
         return taskForms;
     }
 
-    public void approveTask(TaskApproval taskApproval){
+    public void approveTask(TaskApproval taskApproval) {
         this.approveTask(taskApproval.getApproved(), taskApproval.getComment(), taskApproval.getTaskId());
     }
 
-    public void approveTask(boolean approved, String comment, String taskId){
+    public void approveTask(boolean approved, String comment, String taskId) {
         log.debug("New User task completion: " + approved);
         UserDetails userDetails = userService.currentUser();
         try {
             identityService.setAuthenticatedUserId(userDetails.getUsername());
             Task task = taskService.createTaskQuery().taskId(taskId).includeProcessVariables().singleResult();
-            if (task == null){
+            if (task == null) {
                 throw new RuntimeException("Unable to find task - it's possible another user has already completed it");
             }
             Map<String, Object> vars = task.getProcessVariables();
-            if (StringUtils.equalsIgnoreCase((String)vars.get("initiator"), userDetails.getUsername())){
+            runtimeService.setVariable(task.getExecutionId(), "approved", approved);
+            vars.put("approved", approved);
+            if (StringUtils.equalsIgnoreCase((String) vars.get("initiator"), userDetails.getUsername())) {
                 throw new RuntimeException("The author of a document cannot perform approvals of the same document");
             }
             taskService.setAssignee(task.getId(), userDetails.getUsername());
             taskService.addComment(task.getId(), task.getProcessInstanceId(), comment);
-            Map <String, Object> taskVariables = new HashMap<String, Object>();
-            taskVariables.put("approved", approved);
+            Map<String, Object> taskVariables = new HashMap<String, Object>();
             taskService.setVariableLocal(task.getId(), "taskOutcome", approved ? "Approved" : "Rejected");
             taskService.complete(task.getId(), taskVariables);
-        }
-        finally{
+        } finally {
             identityService.setAuthenticatedUserId(null);
         }
     }
 
-    public List<HistoricTask>  getTaskHistory(String businessKey){
+    /**
+     * Returns a list of <strong>completed</strong> Doc Approval Tasks.
+     *
+     * @param businessKey
+     * @return
+     */
+    public List<HistoricTask> getDocApprovalHistory(String businessKey) {
+        log.debug("getting historic tasks for doc: " + businessKey);
         HistoricProcessInstance pi = historyService.createHistoricProcessInstanceQuery().
                 includeProcessVariables().processInstanceBusinessKey(businessKey).singleResult();
 
+        if (pi == null) {
+            return Collections.emptyList();
+        }
         log.debug("Duration time in millis: " + pi.getDurationInMillis());
         List<HistoricTaskInstance> hTasks;
         hTasks = historyService.createHistoricTaskInstanceQuery().includeTaskLocalVariables().processInstanceBusinessKey(businessKey).list();
         List<HistoricTask> historicTasks = Lists.newArrayList();
-        for(HistoricTaskInstance hti : hTasks){
-            HistoricTask ht = new HistoricTask();
-            ht.setId(hti.getId());
-            ht.setName(hti.getName());
-            ht.setUserId(hti.getAssignee());
-            ht.setComments(taskService.getTaskComments(hti.getId()));
-            Map<String, Object> vars = hti.getTaskLocalVariables();
-            ht.setLocalVars(vars);
-            historicTasks.add(ht);
+        for (HistoricTaskInstance hti : hTasks) {
+            if (StringUtils.startsWith(hti.getProcessDefinitionId(), Workflow.PROCESS_ID_DOC_APPROVAL)
+                    && hti.getEndTime() != null) {
+                historicTasks.add(fromActiviti(hti));
+            }
         }
+        Collections.sort(historicTasks);
         return historicTasks;
+    }
+
+    protected HistoricTask fromActiviti(HistoricTaskInstance hti) {
+        HistoricTask ht = new HistoricTask();
+        ht.setId(hti.getId());
+        ht.setName(hti.getName());
+        ht.setUserId(hti.getAssignee());
+        ht.setComments(taskService.getTaskComments(hti.getId()));
+        Map<String, Object> vars = hti.getTaskLocalVariables();
+        ht.setLocalVars(vars);
+        ht.setCompletedDate(hti.getEndTime());
+
+        return ht;
+    }
+
+    boolean isDocAuthor(Task task, String userId) {
+        //is not docApprove Task
+        if (!Workflow.TASK_NAME_DOC_APPROVAL.equals(task.getName())) {
+            return false;
+        }
+        String author = (String) task.getProcessVariables().get("initiator");
+        return ObjectUtils.equals(author, userId);
     }
 }

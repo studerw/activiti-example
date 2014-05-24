@@ -79,6 +79,11 @@ public class DocumentWorkflow {
         this.docSrvc.updateDocument(doc);
     }
 
+    /**
+     * Task listener that runs when an approveDoc task is created. Sets the candidate group to the document's group.
+     * @param execution
+     * @param task
+     */
     public void setAssignee(Execution execution, DelegateTask task){
         String pId = execution.getProcessInstanceId();
         log.debug("doc being published - procId={}", pId);

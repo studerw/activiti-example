@@ -5,41 +5,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Sign In</title>
-
-    <!-- Bootstrap core CSS -->
-    <link href="${pageContext.request.contextPath}/resources/css/bootstrap.css" rel="stylesheet" media="screen">
-    <link href="${pageContext.request.contextPath}/resources/css/app.css" rel="stylesheet" media="screen">
-
-    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
-    <!--[if lt IE 9]>
-    <script src="${pageContext.request.contextPath}/resources/js/html5shiv.js"></script>
-    <script src="${pageContext.request.contextPath}/resources/js/respond.min.js"></script>
-    <![endif]-->
-
-    <style type="text/css">
-        body {
-            padding-top: 40px;
-            padding-bottom: 40px;
-            /*background-color: #eee;*/
-        }
-
-        .centered {
-            margin: 0 auto;
-        }
-
-        .form-signin .form-signin-heading,
-        .form-signin .checkbox {
-            margin-bottom: 10px;
-        }
-
-        .form-signin .checkbox {
-            font-weight: normal;
-        }
-
-    </style>
+    <jsp:include page="fragments/head.jsp"/>
 </head>
 
 <body>
@@ -55,17 +22,11 @@
             </button>
             <a class="navbar-brand brand" href="#">Activiti Example</a>
         </div>
-        <div class="collapse navbar-collapse">
-            <ul class="nav navbar-nav">
-                <li class="active"><a href="${pageContext.request.contextPath}/index.htm">Home</a></li>
-                <li><a href="${pageContext.request.contextPath}/j_spring_security_logout">Sign Out</a></li>
-            </ul>
-        </div>
-    </div>
+            </div>
 </div>
 
 <div class="container">
-    <div class="starter-template" style="width: 550px; margin: 10px auto;">
+    <div class="start-template" style="width: 500px; margin: 10px auto;">
         <div class="centered">
             <c:if test="${error == true}">
                 <div class="panel panel-default">
@@ -97,12 +58,11 @@
 
                         <div class="col-sm-10">
                             <input type="text" class="form-control" id="j_username" name="j_username" required
-                                   autofocus>
+                                   placeholder="User Name" autofocus>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="j_password" class="col-sm-2 control-label">Password</label>
-
                         <div class="col-sm-10">
                             <input type="password" class="form-control" id="j_password" name="j_password"
                                    placeholder="Password" required>
@@ -110,7 +70,7 @@
                     </div>
                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 
-                    <button class="btn btn-primary btn-lg pull-right" name="submit" type="submit">Sign in</button>
+                    <button class="btn btn-primary btn-default pull-right" name="submit" type="submit">Sign in</button>
                 </form>
             </div>
         </div>
@@ -152,13 +112,6 @@
     </div>
 </div>
 
-<div id="footer">
-    <div class="container">
-        <p class="text-muted">Place sticky footer content here.</p>
-    </div>
-</div>
-
-<script src="${pageContext.request.contextPath}/resources/js/jquery-1.10.1.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/bootstrap.js"></script>
+<jsp:include page="fragments/footer.jsp"/>
 </body>
 </html>

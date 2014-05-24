@@ -12,7 +12,44 @@
         <context:include-filter type="annotation" expression="org.springframework.web.bind.annotation.ControllerAdvice" />
     </context:component-scan>
 
-    <mvc:annotation-driven/>
+    <mvc:annotation-driven content-negotiation-manager="contentNegotiationManager" />
+
+    <bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+        <property name="contentNegotiationManager" ref="contentNegotiationManager"/>
+
+        <!-- Define the view resolvers explicitly -->
+        <property name="viewResolvers">
+            <list>
+                <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+                    <property name="prefix" value="/WEB-INF/pages/"/>
+                    <property name="suffix" value=".jsp"/>
+                </bean>
+            </list>
+        </property>
+        <property name="defaultViews">
+            <list>
+                <bean id="jsonView" class="org.springframework.web.servlet.view.json.MappingJacksonJsonView" />
+            </list>
+        </property>
+    </bean>
+
+
+
+    <bean id="contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
+        <property name="favorPathExtension" value="false" />
+        <property name="favorParameter" value="false" />
+        <!--<property name="defaultContentType" value="application/json"/>-->
+        <!--
+        <property name="mediaTypes">
+            <map>
+                <entry key="html" value="text/html" />
+                <entry key="json" value="application/json" />
+                <entry key="xml" value="application/xml" />
+            </map>
+        </property>
+        -->
+    </bean>
+
 
     <mvc:resources order="1" location="/resources/" mapping="/resources/**"/>
     
@@ -26,9 +63,9 @@
 
     <context:property-placeholder location="classpath:spring/app.properties" />
 
-    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-        <property name="prefix" value="/WEB-INF/pages/"/>
-        <property name="suffix" value=".jsp"/>
-    </bean>
+    <!--
+     View resolver that delegates to other view resolvers based on the content type
+ -->
+
 
 </beans>

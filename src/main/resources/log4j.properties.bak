@@ -4,6 +4,7 @@ log4j.logger.com.studerw.activiti=DEBUG
 #log4j.additivity.com.studerwderw.activiti=false
 
 log4j.logger.org.springframework=WARN
+log4j.logger.org.springframework.web.accept=DEBUG
 
 log4j.logger.org.activiti=WARN
 log4j.logger.org.apache.ibatis=DEBUG

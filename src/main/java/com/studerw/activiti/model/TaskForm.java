@@ -3,6 +3,7 @@ package com.studerw.activiti.model;
 import com.google.common.base.Objects;
 import org.activiti.engine.task.Task;
 import org.apache.commons.beanutils.BeanUtils;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
@@ -17,6 +18,7 @@ public class TaskForm {
     String owner;
     String delegate;
     String category;
+    @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm Z")
     Date createTime;
     String description;
     String executionId;

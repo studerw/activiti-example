@@ -3,6 +3,7 @@ package com.studerw.activiti.user;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.studerw.activiti.model.UserForm;
+import com.studerw.activiti.util.Workflow;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
@@ -58,7 +59,7 @@ public class UserService {
         Map<String,Object> processVariables = Maps.newHashMap();
         processVariables.put("approved", Boolean.FALSE);
         processVariables.put("userForm", userForm);
-        ProcessInstance pi = runtimeService.startProcessInstanceByKey("newChromeUser", processVariables);
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey(Workflow.PROCESS_ID_USER_APPROVAL, processVariables);
         Task task = taskService.createTaskQuery().processInstanceId(pi.getProcessInstanceId()).singleResult();
         taskService.addCandidateGroup(task.getId(), userForm.getGroup());
 
