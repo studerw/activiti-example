@@ -144,14 +144,14 @@
                                         </div>
 
                                         <div class="form-group">
-                                            <label class="col-sm-2 control-label">Document Author</label>
+                                            <label class="col-sm-2 control-label">Author</label>
 
                                             <div class="col-sm-10">
                                                 <p class="form-control-static"> ${task.processVariables['docAuthor']}</p>
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label class="col-sm-2 control-label">Document Title</label>
+                                            <label class="col-sm-2 control-label">Title</label>
 
                                             <div class="col-sm-10">
                                                 <p class="form-control-static"> ${task.processVariables['docTitle']}</p>

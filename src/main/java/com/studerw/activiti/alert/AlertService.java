@@ -63,7 +63,7 @@ public class AlertService {
 
     public List<Alert> readActiveAlertsByUser(String userId){
         UserDetails user = this.userService.currentUser();
-        if (StringUtils.equals(user.getUsername(), userId)){
+        if (!StringUtils.equals(user.getUsername(), userId)){
             throw new InvalidAccessException("Alerts may only be accessed by the alert recipient itself");
         }
         return this.alertDao.readActiveAlertsByUserId(userId);

@@ -29,7 +29,7 @@
                 <%--</li>--%>
             </ul>
             <ul class="nav navbar-nav navbar-right">
-                <li><a href="#" class="">Alerts <span class="badge">0</span></a></li>
+                <li id="nav-alerts"><a href="${pageContext.request.contextPath}/alerts.htm">Alerts <span class="badge">0</span></a></li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">${userName} <b class="caret"></b></a>
                     <ul class="dropdown-menu">

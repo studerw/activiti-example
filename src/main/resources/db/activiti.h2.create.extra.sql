@@ -1,4 +1,4 @@
-create table DOCUMENT(
+create table IF NOT EXISTS DOCUMENT(
     ID varchar(255),
     AUTHOR varchar(255),
     TITLE varchar(255),
@@ -10,7 +10,7 @@ create table DOCUMENT(
     primary key (ID)
 );
 
-create table ALERT(
+create table IF NOT EXISTS ALERT(
     ID varchar(255),
     CREATED_BY varchar(255),
     MESSAGE varchar(10000),
