@@ -1,6 +1,5 @@
 package com.studerw.activiti.alert;
 
-import com.studerw.activiti.document.DocumentDao;
 import com.studerw.activiti.model.Alert;
 import com.studerw.activiti.user.InvalidAccessException;
 import com.studerw.activiti.user.UserService;

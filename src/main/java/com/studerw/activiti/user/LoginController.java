@@ -1,10 +1,5 @@
 package com.studerw.activiti.user;
 
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
 import com.google.common.base.Joiner;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
@@ -16,6 +11,10 @@ import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 public class LoginController {

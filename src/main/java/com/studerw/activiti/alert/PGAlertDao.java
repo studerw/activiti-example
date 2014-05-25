@@ -2,7 +2,6 @@ package com.studerw.activiti.alert;
 
 import com.google.common.collect.ImmutableMap;
 import com.studerw.activiti.model.Alert;
-import com.studerw.activiti.model.Alert;
 import com.studerw.activiti.web.PagingCriteria;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

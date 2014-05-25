@@ -1,7 +1,6 @@
 package com.studerw.activiti.alert;
 
 import com.studerw.activiti.model.Alert;
-import com.studerw.activiti.model.Document;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.RowMapper;
 

@@ -1,12 +1,12 @@
 package com.studerw.activiti.document;
 
-import java.sql.Date;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import com.studerw.activiti.model.Document;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.RowMapper;
+
+import java.sql.Date;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * @author studerw

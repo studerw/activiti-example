@@ -1,9 +1,6 @@
 package com.studerw.activiti.document;
 
-import static com.google.common.base.Preconditions.*;
-
 import com.google.common.collect.ImmutableMap;
-import com.studerw.activiti.dao.IBaseDao;
 import com.studerw.activiti.model.Document;
 import com.studerw.activiti.web.PagingCriteria;
 import org.apache.commons.lang3.StringUtils;
@@ -22,6 +19,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * User: studerw

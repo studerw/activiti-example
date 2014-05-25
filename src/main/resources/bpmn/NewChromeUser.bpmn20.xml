@@ -9,7 +9,7 @@
              expressionLanguage="http://www.w3.org/1999/XPath"
              targetNamespace="http://activiti.org/bpmn20"
              xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/DI
-             http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+             http://www.omg.org/spec/BPMN/20100524/MODEL">
     <process id="newChromeUser" name="Approve New Chrome User" isExecutable="true">
         <documentation>This process is initiated when a user enters the system but is not found yet in the Chrome User
             repository. Upon submitting the standard registration information,

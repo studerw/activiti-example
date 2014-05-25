@@ -1,8 +1,8 @@
 package com.studerw.activiti.dao;
 
-import java.util.List;
-
 import com.studerw.activiti.web.PagingCriteria;
+
+import java.util.List;
 
 /**
  * BaseDao interface which all other interfaces should impmlement

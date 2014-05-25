@@ -3,7 +3,6 @@ package com.studerw.activiti.document;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.studerw.activiti.model.Document;
-import com.studerw.activiti.model.UserForm;
 import com.studerw.activiti.user.InvalidAccessException;
 import com.studerw.activiti.user.UserService;
 import com.studerw.activiti.util.Workflow;
@@ -11,7 +10,6 @@ import org.activiti.engine.IdentityService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.identity.Group;
-import org.activiti.engine.identity.User;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.apache.commons.lang3.StringUtils;
@@ -22,7 +20,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * User: studerw

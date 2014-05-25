@@ -3,7 +3,6 @@ package com.studerw.activiti.document;
 import com.studerw.activiti.dao.IBaseDao;
 import com.studerw.activiti.model.Document;
 import com.studerw.activiti.web.PagingCriteria;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 

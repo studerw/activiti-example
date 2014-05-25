@@ -2,11 +2,9 @@ package com.studerw.activiti;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.studerw.activiti.document.DocumentService;
 import com.studerw.activiti.model.Document;
 import com.studerw.activiti.model.TaskForm;
-import com.studerw.activiti.model.UserForm;
 import com.studerw.activiti.task.LocalTaskService;
 import com.studerw.activiti.user.UserService;
 import org.activiti.engine.HistoryService;
@@ -16,9 +14,7 @@ import org.activiti.engine.TaskService;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.identity.Group;
-import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Comment;
-import org.activiti.engine.task.Task;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,8 +28,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import javax.validation.ConstraintViolation;
-import java.util.*;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
