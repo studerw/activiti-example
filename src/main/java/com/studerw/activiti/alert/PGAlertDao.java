@@ -53,7 +53,7 @@ public class PGAlertDao implements AlertDao {
         String id = UUID.randomUUID().toString();
         alert.setId(id);
         String sql = "INSERT INTO Alert (id, created_by, message, priority, user_id,  acknowledged, created_date) " +
-                "VALUES (:id, :created_by, :message, :priority, :user_id, :acknowledged, :createdDate)";
+                "VALUES (:id, :createdBy, :message, :priority, :userId, :acknowledged, :createdDate)";
 
         BeanPropertySqlParameterSource source = new BeanPropertySqlParameterSource(alert);
         int results = this.namedJdbcTemplate.update(sql, source);
@@ -113,7 +113,7 @@ public class PGAlertDao implements AlertDao {
     public void update(Alert alert) {
         checkArgument(StringUtils.isNotBlank(alert.getId()), "alert id cannot be blank");
         String sql = "UPDATE Alert SET created_by=:createdBy, user_id=:userId, message=:message, priority=:priority," +
-                " acknowledged=:acknowledged, created_date=:createdDate WHERE id=:id";
+                " acknowledged=:acknowledged  WHERE id=:id";
 
         BeanPropertySqlParameterSource source = new BeanPropertySqlParameterSource(alert);
         int results = this.namedJdbcTemplate.update(sql, source);
@@ -138,8 +138,12 @@ public class PGAlertDao implements AlertDao {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Alert> readActiveAlertsByUserId(String userId) {
-        String sql = "SELECT * FROM Alert WHERE user_id = :userID AND acknowledged = FALSE ORDER BY created_date ASC";
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        String sql = "SELECT * FROM Alert WHERE user_id = :userId AND acknowledged = FALSE ORDER BY created_date ASC";
+        Map<String, String> params = ImmutableMap.of("userId", userId);
+        List<Alert> alerts = this.namedJdbcTemplate.query(sql, params, new AlertRowMapper());
+        log.debug("got {} active alerts for user {}: ", alerts.size(), userId);
+        return alerts;
     }
 }

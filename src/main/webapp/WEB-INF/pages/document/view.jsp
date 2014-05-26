@@ -48,7 +48,7 @@
 
     <div class="panel panel-default">
         <div class="panel-heading">
-            <h3 class="panel-title">${document.title}</h3>
+            <h3 class="panel-title"><strong>${document.title}</strong></h3>
         </div>
         <div class="panel-body">
             <form:form cssStyle="margin: 20px" cssClass="form-horizontal" method="POST" commandName="document">

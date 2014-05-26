@@ -9,10 +9,32 @@
 
     <tx:annotation-driven transaction-manager="transactionManager" />
 
-    <bean id="dataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource"
-          p:driverClass="${jdbc.driver}" p:url="${jdbc.url}"
+
+    <!--<bean id="dataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource"-->
+          <!--p:driverClass="${jdbc.driver}" p:url="${jdbc.url}"-->
+          <!--p:username="${jdbc.user}"-->
+          <!--p:password="${jdbc.pw}"/>-->
+
+    <!--
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="${jdbc.driver}" />
+        <property name="url" value="${jdbc.url}" />
+        <property name="username" value="${jdbc.user}" />
+        <property name="password" value="${jdbc.pw}" />
+        <property name="defaultAutoCommit" value="false" />
+    </bean>
+    -->
+
+    <bean id="dataSource" class="com.jolbox.bonecp.BoneCPDataSource" destroy-method="close"
+          p:driverClass="${jdbc.driver}" p:jdbcUrl="${jdbc.url}"
           p:username="${jdbc.user}"
-          p:password="${jdbc.pw}"/>
+          p:password="${jdbc.pw}"
+        p:maxConnectionsPerPartition="30"
+        p:minConnectionsPerPartition="10"
+        p:partitionCount="3"
+        p:acquireIncrement="5"
+        p:statementsCacheSize="100"/>
+
 
     <bean id="proxiedDataSource" class="org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy" p:targetDataSource-ref="dataSource"/>
 

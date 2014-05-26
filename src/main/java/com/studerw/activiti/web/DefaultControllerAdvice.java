@@ -2,6 +2,7 @@ package com.studerw.activiti.web;
 
 import com.google.common.collect.Maps;
 import com.studerw.activiti.model.Response;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -35,9 +36,10 @@ public class DefaultControllerAdvice {
     @ExceptionHandler(Exception.class)
     public ModelAndView handleException(Exception ex) {
         log.error("Caught Exception - returning error response: {}", ex.getMessage());
+        log.error("Root cause: {}", ExceptionUtils.getRootCauseMessage(ex));
         ex.printStackTrace();
         Map<String, Object> model = Maps.newHashMap();
-        Response response = new Response(false, ex.getMessage());
+        Response response = new Response(false, ex.getMessage() + "    Root Cause: " + ExceptionUtils.getRootCauseMessage(ex));
         model.put("response", response);
         return new ModelAndView("error", model);
         //return new ResponseEntity<Response>(response, HttpStatus.INTERNAL_SERVER_ERROR);

@@ -75,7 +75,7 @@ public class TaskController {
                           BindingResult result,
                           final RedirectAttributes redirectAttributes,
                           HttpServletRequest request) {
-          log.debug("task approval: {}", taskApproval.toString());
+        log.debug("task approval: {}", taskApproval.toString());
 
         if (result.hasFieldErrors()) {
             redirectAttributes.addFlashAttribute("error", true);
@@ -83,14 +83,7 @@ public class TaskController {
             return "redirect:/tasks.htm";
         }
 
-        try {
-            this.taskService.approveTask(taskApproval);
-        }
-        catch(Exception e){
-            redirectAttributes.addFlashAttribute("error", true);
-            redirectAttributes.addFlashAttribute("errorMsg", e.getMessage());
-            return "redirect:/tasks.htm";
-        }
+        this.taskService.approveTask(taskApproval);
 
         redirectAttributes.addFlashAttribute("msg", "The task has been completed");
         return "redirect:/tasks.htm";

@@ -42,6 +42,9 @@
         <level value="WARN"/>
     </logger>
 
+    <logger name="org.h2">
+        <level value="DEBUG"/>
+    </logger>
 
     <root>
         <level value="WARN"/>

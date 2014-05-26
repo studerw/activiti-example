@@ -53,7 +53,6 @@ public class DocumentWorkflow {
 
     public void rejected(Execution execution) {
         log.debug("doc rejected - process id: " + execution.getProcessInstanceId());
-        log.debug("process id: " + execution.getProcessInstanceId());
         ProcessInstance pi = runtimeService.createProcessInstanceQuery().
                 processInstanceId(execution.getProcessInstanceId()).singleResult();
         String docId = pi.getBusinessKey();
@@ -61,6 +60,8 @@ public class DocumentWorkflow {
         Map<String, Object> vars = runtimeService.getVariables(execution.getId());
         log.debug("setting doc {} with title = {}: state set to REJECTED", doc.getId(), doc.getTitle());
         doc.setState(Document.STATE_REJECTED);
+        String message = String.format("Document titled %s [id=%s] has been rejected by user: ", doc.getTitle(), doc.getId());
+        this.alertService.sendAlert(doc.getAuthor(), Alert.DANGER, message);
         this.docSrvc.updateDocument(doc);
 
         log.debug("document rejected: " + docId);

@@ -7,6 +7,8 @@ import org.activiti.engine.IdentityService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,8 @@ import java.util.List;
  */
 @Service("alertService")
 public class AlertService {
+    private static final Logger log = LoggerFactory.getLogger(AlertService.class);
+
     protected IdentityService identityService;
     protected RuntimeService runtimeService;
     protected TaskService taskService;
@@ -51,7 +55,8 @@ public class AlertService {
         this.alertDao = alertDao;
     }
 
-    public void sendAlert(String to, int priority, String message){
+    public String sendAlert(String to, int priority, String message){
+        log.debug("sending alert to: {} at priority {}", to, priority);
         Alert alert = new Alert();
         UserDetails from = this.userService.currentUser();
         alert.setCreatedBy(from.getUsername());
@@ -59,9 +64,24 @@ public class AlertService {
         alert.setCreatedDate(new Date());
         alert.setUserId(to);
         alert.setAcknowledged(Boolean.FALSE);
+
+        return this.alertDao.create(alert);
+    }
+
+    public void acknowledgeAlert(String alertId, String userId){
+        log.debug("acknowledging alert {} for user {}", alertId, userId);
+        Alert alert = this.alertDao.read(alertId);
+        if (!StringUtils.equals(userId, alert.getUserId())){
+            throw new InvalidAccessException("Only the alert owner may acknowledge an alert");
+        }
+        alert.setAcknowledged(Boolean.TRUE);
+        this.alertDao.update(alert);
+
+
     }
 
     public List<Alert> readActiveAlertsByUser(String userId){
+        log.debug("reading alerts for user: {}", userId);
         UserDetails user = this.userService.currentUser();
         if (!StringUtils.equals(user.getUsername(), userId)){
             throw new InvalidAccessException("Alerts may only be accessed by the alert recipient itself");
