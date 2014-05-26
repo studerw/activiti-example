@@ -3,14 +3,12 @@ package com.studerw.activiti.document;
 import com.studerw.activiti.model.Document;
 import com.studerw.activiti.model.HistoricTask;
 import com.studerw.activiti.task.LocalTaskService;
-import com.studerw.activiti.user.UserService;
+import com.studerw.activiti.web.BaseController;
 import org.activiti.engine.identity.Group;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -20,41 +18,35 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
 @Controller
 @RequestMapping("/document")
-public class DocumentController {
+public class DocumentController extends BaseController {
     private static final Logger log = LoggerFactory.getLogger(DocumentController.class);
 
-    @Autowired
-    UserService userService;
     @Autowired
     DocumentService docService;
     @Autowired
     LocalTaskService localTaskSrvc;
 
     @ModelAttribute
+    @Override
     public void addUserInfo(ModelMap model, HttpServletRequest request) {
-        UserDetails user = userService.currentUser();
-        model.addAttribute("userDetails", user);
-        model.addAttribute("userName", user.getUsername());
+        super.addUserInfo(model, request);
         List<Group> groups = userService.getAssignmentGroups(request.getRemoteUser());
         model.addAttribute("groups", groups);
     }
 
     @InitBinder
     protected void initBinder(WebDataBinder binder) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-        CustomDateEditor editor = new CustomDateEditor(dateFormat, true);
         binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
     }
 
     @RequestMapping(value = "/list.htm", method = RequestMethod.GET)
     public String getDocuments(ModelMap model, HttpServletRequest request) {
-        model.addAttribute("documents", this.docService.getGroupDocumentsByUser(request.getRemoteUser()));
+        model.addAttribute("documents", this.docService.getGroupDocumentsByUser(currentUserName()));
         return "document/list";
     }
 
@@ -66,8 +58,8 @@ public class DocumentController {
 
     @RequestMapping(value = "/add.htm", method = RequestMethod.POST)
     public String submitDocument(@Valid @ModelAttribute Document document,
-                                 @RequestParam(required = false, value = "isSubmit") boolean isSubmit,
                                  BindingResult result,
+                                 @RequestParam(required = false, value = "isSubmit") boolean isSubmit,
                                  final RedirectAttributes redirectAttributes,
                                  HttpServletRequest request) {
         log.debug("submitting document: " + document);
@@ -95,6 +87,7 @@ public class DocumentController {
                                  @RequestParam(required = false, value = "isSubmit") boolean isSubmit,
                                  BindingResult result,
                                  final RedirectAttributes redirectAttributes,
+                                 ModelMap model,
                                  HttpServletRequest request) {
         log.debug("updating document: " + document);
         if (result.hasErrors()) {
@@ -125,10 +118,9 @@ public class DocumentController {
         model.addAttribute("document", doc);
         List<HistoricTask> hts = this.localTaskSrvc.getDocApprovalHistory(id);
         model.addAttribute("historicTasks", hts);
-        String currentUser = this.userService.currentUser().getUsername();
-        if (doc.getAuthor().equals(currentUser) && doc.isEditable()) {
+        if (doc.getAuthor().equals(currentUserName()) && doc.isEditable()) {
             return "document/edit";
-        } else if (doc.getAuthor().equals(currentUser)) {
+        } else if (doc.getAuthor().equals(currentUserName())) {
             model.addAttribute("msg", "The document cannot be edited in its current state.");
         } else {
             model.addAttribute("msg", "Only the original author may edit the document");
@@ -137,9 +129,8 @@ public class DocumentController {
     }
 
     private Document newDocument() {
-        UserDetails user = userService.currentUser();
         Document document = new Document();
-        document.setAuthor(user.getUsername());
+        document.setAuthor(currentUserName());
         document.setCreatedDate(new Date());
         return document;
     }

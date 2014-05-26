@@ -10,9 +10,8 @@ import java.sql.SQLException;
 
 /**
  * @author studerw
- *
  */
-public class DocumentRowMapper implements RowMapper<Document>{
+public class DocumentRowMapper implements RowMapper<Document> {
 
     @Override
     public Document mapRow(final ResultSet rs, final int rowNum) throws SQLException {

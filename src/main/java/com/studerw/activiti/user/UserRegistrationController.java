@@ -63,8 +63,7 @@ public class UserRegistrationController {
         }
         try {
             userService.submitForApproval(userForm);
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", true);
             result.rejectValue("userName", null, e.getMessage());
             redirectAttributes.addFlashAttribute("errors", result.getFieldErrors());
@@ -74,7 +73,6 @@ public class UserRegistrationController {
         redirectAttributes.addFlashAttribute("msg", "A request has been made to the admin to approve your account");
         return "redirect:login.htm";
     }
-
 
 
 }

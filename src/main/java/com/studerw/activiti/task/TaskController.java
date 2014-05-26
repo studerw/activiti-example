@@ -3,7 +3,7 @@ package com.studerw.activiti.task;
 import com.studerw.activiti.model.Response;
 import com.studerw.activiti.model.TaskApproval;
 import com.studerw.activiti.model.TaskForm;
-import com.studerw.activiti.user.UserService;
+import com.studerw.activiti.web.BaseController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +11,6 @@ import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -32,13 +30,11 @@ import java.util.List;
  * Date: 5/18/14
  */
 @Controller
-public class TaskController {
+public class TaskController extends BaseController {
     private static final Logger log = LoggerFactory.getLogger(TaskController.class);
 
     @Autowired
     protected LocalTaskService taskService;
-    @Autowired
-    protected UserService userService;
 
     @InitBinder
     protected void initBinder(WebDataBinder binder) {
@@ -47,12 +43,7 @@ public class TaskController {
 
     @RequestMapping(value = "/tasks.htm", method = RequestMethod.GET)
     public String index(ModelMap model, HttpServletRequest request) {
-        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String userName = request.getRemoteUser();
-        model.addAttribute("message", "Hello world!");
-        model.addAttribute("userName", userName);
-        model.addAttribute("userDetails", userDetails);
-        List<TaskForm> tasks = this.taskService.getTasks(userName);
+        List<TaskForm> tasks = this.taskService.getTasks(currentUserName());
         model.addAttribute("tasks", tasks);
 
         return "tasks";
@@ -61,8 +52,7 @@ public class TaskController {
     @RequestMapping(value = "/tasks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Response<List<TaskForm>>> getTasks(
             HttpServletRequest request) {
-        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String userName = userDetails.getUsername();
+        String userName = currentUserName();
         log.debug("TaskController: tasks for user: " + userName);
         List<TaskForm> tasks = taskService.getTasks(userName);
         log.debug("returning json response of: " + tasks.size() + " for user : " + userName);

@@ -146,4 +146,13 @@ public class PGAlertDao implements AlertDao {
         log.debug("got {} active alerts for user {}: ", alerts.size(), userId);
         return alerts;
     }
+
+    @Transactional
+    @Override
+    public void acknowledgeAlert(String alertId) {
+        String sql = "UPDATE Alert SET acknowledged=:acknowledged  WHERE id=:id";
+        Map<String, Boolean> params = ImmutableMap.of("acknowledged", Boolean.TRUE);
+        int results = this.namedJdbcTemplate.update(sql, params);
+        log.debug("Updated: " + results + " alerts");
+    }
 }

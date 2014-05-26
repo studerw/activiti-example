@@ -12,7 +12,7 @@ import java.util.Date;
  * User: studerw
  * Date: 5/20/14
  */
-public class Document implements Comparable<Document>,Serializable {
+public class Document implements Comparable<Document>, Serializable {
     public final static String STATE_DRAFT = "DRAFT";
     public final static String STATE_APPROVED = "APPROVED";
     public final static String STATE_REJECTED = "REJECTED";
@@ -31,13 +31,13 @@ public class Document implements Comparable<Document>,Serializable {
     private String summary;
     @NotNull
     private String groupId;
-    @NotNull
-    @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm Z")
+    @NotNull @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm Z")
     private Date createdDate;
     @NotNull
     private String state = STATE_DRAFT;
 
-    public Document(){};
+    public Document() {}
+
 
     public String getId() {
         return id;
@@ -139,8 +139,8 @@ public class Document implements Comparable<Document>,Serializable {
         return ObjectUtils.compare(this.createdDate, o.createdDate);
     }
 
-    public boolean isEditable(){
-        return STATE_DRAFT.equals(this.state)|| STATE_REJECTED.equals(this.state);
+    public boolean isEditable() {
+        return STATE_DRAFT.equals(this.state) || STATE_REJECTED.equals(this.state);
     }
 }
 

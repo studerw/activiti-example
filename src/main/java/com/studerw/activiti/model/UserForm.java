@@ -13,12 +13,15 @@ import java.io.Serializable;
  * Date: 5/18/14
  */
 public class UserForm implements Serializable {
-    @NotNull @Size(min=5,max=50)
+    @NotNull
+    @Size(min = 5, max = 50)
     private String userName;
     @JsonIgnore
-    @NotNull @Size(min=8, max=30)
+    @NotNull
+    @Size(min = 8, max = 30)
     private String password;
-    @NotNull @Email
+    @NotNull
+    @Email
     private String email;
     @NotNull
     private String firstName;
@@ -27,7 +30,7 @@ public class UserForm implements Serializable {
     @NotNull
     private String group;
 
-    public UserForm(){};
+    public UserForm() {}
 
     public String getGroup() {
         return group;
@@ -37,7 +40,7 @@ public class UserForm implements Serializable {
         this.group = group;
     }
 
-    public UserForm(String userName, String password, String email, String firstName, String lastName, String group){
+    public UserForm(String userName, String password, String email, String firstName, String lastName, String group) {
         this.userName = userName;
         this.password = password;
         this.email = email;
@@ -45,6 +48,7 @@ public class UserForm implements Serializable {
         this.lastName = lastName;
         this.group = group;
     }
+
     public String getUserName() {
         return userName;
     }

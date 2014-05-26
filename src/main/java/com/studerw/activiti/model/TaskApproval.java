@@ -12,7 +12,7 @@ import javax.validation.constraints.Size;
 public class TaskApproval {
     @NotNull
     String taskId;
-    @Size(max=4000)
+    @Size(max = 4000)
     String comment;
     @NotNull
     Boolean approved;

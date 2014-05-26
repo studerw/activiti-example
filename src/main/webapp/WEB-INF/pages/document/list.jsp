@@ -1,5 +1,9 @@
-f<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <!DOCTYPE html>
 <html lang="en">
@@ -47,7 +51,7 @@ f<%@ page contentType="text/html;charset=UTF-8" language="java" %>
                             <td><a href="${pageContext.request.contextPath}/document/view.htm?id=${doc.id}">${doc.title}</a></td>
                             <td>${doc.author}</td>
                             <td>${doc.groupId}</td>
-                            <td>${doc.createdDate}</td>
+                            <td><spring:eval expression="doc.createdDate"/></td>
                             <td>${doc.state}</td>
                         </tr>
                     </c:forEach>

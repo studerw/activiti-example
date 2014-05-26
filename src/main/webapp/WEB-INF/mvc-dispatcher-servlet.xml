@@ -2,21 +2,24 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:p="http://www.springframework.org/schema/p"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
-<context:component-scan base-package="com.studerw.activiti">
-        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller" />
-        <context:include-filter type="annotation" expression="org.springframework.web.bind.annotation.ControllerAdvice" />
+    <context:component-scan base-package="com.studerw.activiti">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+        <context:include-filter type="annotation"
+                                expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
     </context:component-scan>
 
-    <mvc:annotation-driven content-negotiation-manager="contentNegotiationManager" />
+    <context:property-placeholder location="classpath:spring/app.properties"/>
+
+    <mvc:annotation-driven content-negotiation-manager="contentNegotiationManager"/>
 
     <bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
         <property name="contentNegotiationManager" ref="contentNegotiationManager"/>
-
         <!-- Define the view resolvers explicitly -->
         <property name="viewResolvers">
             <list>
@@ -28,44 +31,23 @@
         </property>
         <property name="defaultViews">
             <list>
-                <bean id="jsonView" class="org.springframework.web.servlet.view.json.MappingJacksonJsonView" />
+                <bean id="jsonView" class="org.springframework.web.servlet.view.json.MappingJacksonJsonView"/>
             </list>
         </property>
     </bean>
 
 
-
     <bean id="contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
-        <property name="favorPathExtension" value="false" />
-        <property name="favorParameter" value="false" />
-        <!--<property name="defaultContentType" value="application/json"/>-->
-        <!--
-        <property name="mediaTypes">
-            <map>
-                <entry key="html" value="text/html" />
-                <entry key="json" value="application/json" />
-                <entry key="xml" value="application/xml" />
-            </map>
-        </property>
-        -->
+        <property name="favorPathExtension" value="false"/>
+        <property name="favorParameter" value="false"/>
     </bean>
 
 
     <mvc:resources order="1" location="/resources/" mapping="/resources/**"/>
-    
+
+    <bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource"
+          p:basename="classpath:messages/messages"/>
+
     <mvc:view-controller path="/test.htm" view-name="test"/>
-    <!--<mvc:interceptors>-->
-        <!--<mvc:interceptor>-->
-            <!--<mvc:mapping path="/**" />-->
-            <!--<bean class="com.studerwderw.activiti.user.UserSessionInterceptor" autowire="byType" />-->
-        <!--</mvc:interceptor>-->
-    <!--</mvc:interceptors>-->
-
-    <context:property-placeholder location="classpath:spring/app.properties" />
-
-    <!--
-     View resolver that delegates to other view resolvers based on the content type
- -->
-
 
 </beans>

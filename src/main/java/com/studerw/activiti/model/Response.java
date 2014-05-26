@@ -5,11 +5,10 @@
 package com.studerw.activiti.model;
 
 /**
- *
  * @author steve.battjer
  */
 public class Response<T> {
-    
+
     private boolean success;
     private String message;
     private T data;
@@ -25,12 +24,12 @@ public class Response<T> {
     public Response() {
     }
 
-    public Response(boolean success, String message){
+    public Response(boolean success, String message) {
         this.success = success;
         this.message = message;
     }
 
-    public Response(boolean success, String message, T data){
+    public Response(boolean success, String message, T data) {
         this.success = success;
         this.message = message;
         this.data = data;

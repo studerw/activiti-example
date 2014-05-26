@@ -35,12 +35,12 @@ public class PGDocumentDao implements DocumentDao {
 
     @Autowired
     @Qualifier("dataSource")
-    public void setDataSource( DataSource datasource){
+    public void setDataSource(DataSource datasource) {
         this.ds = datasource;
         this.namedJdbcTemplate = new NamedParameterJdbcTemplate(this.ds);
     }
 
-    public DataSource getDataSource(){
+    public DataSource getDataSource() {
         return this.ds;
     }
 
@@ -92,7 +92,7 @@ public class PGDocumentDao implements DocumentDao {
     public int getCount() {
         String sql = "SELECT count(*) FROM Document";
         @SuppressWarnings("unchecked")
-        int count  = this.namedJdbcTemplate.queryForObject(sql, Collections.EMPTY_MAP, Integer.class);
+        int count = this.namedJdbcTemplate.queryForObject(sql, Collections.EMPTY_MAP, Integer.class);
         log.debug("Got count: " + count + " of documents");
         return count;
     }
@@ -121,10 +121,10 @@ public class PGDocumentDao implements DocumentDao {
     }
 
     @Override
-    @Transactional(readOnly =  true)
+    @Transactional(readOnly = true)
     public List<Document> readPage(PagingCriteria criteria) {
         log.debug("reading page with criteria: " + criteria);
-        if (criteria == null || criteria.getLimit() == null || criteria.getStart() == null){
+        if (criteria == null || criteria.getLimit() == null || criteria.getStart() == null) {
             log.warn("criteria invalid - reading all instead of subset");
             return readAll();
         }

@@ -12,6 +12,7 @@ import org.springframework.web.util.WebUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 @Deprecated
 public class UserSessionInterceptor implements HandlerInterceptor {
     private static final Logger log = LoggerFactory.getLogger(UserSessionInterceptor.class);

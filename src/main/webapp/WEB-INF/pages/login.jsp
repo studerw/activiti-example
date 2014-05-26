@@ -1,7 +1,10 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -97,11 +100,21 @@
                         <h4 class="modal-title" id="myModalLabel">Current Users</h4>
                     </div>
                     <div class="modal-body">
-                        <ul class="list-group">
+                        <table class="table table-bordered table-striped">
+                            <thead class=" bg-info">
+                            <tr>
+                                <th>User</th>
+                                <th>Groups</th>
+                                <%--<th>Permissions</th>--%>
+                            </tr>
+                            </thead>
                             <c:forEach var="user" items="${users}">
-                                <li class="list-group-item"><strong>${user.key}: </strong> (${user.value})</li>
+                                <tr>
+                                    <td><strong>${user.key}</strong></td>
+                                    <td>${user.value}</td>
+                                </tr>
                             </c:forEach>
-                        </ul>
+                        </table>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

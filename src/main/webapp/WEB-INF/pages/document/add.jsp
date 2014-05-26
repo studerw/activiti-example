@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="s" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <!DOCTYPE html>
@@ -110,7 +110,7 @@
 <jsp:include page="/WEB-INF/pages/fragments/footer.jsp"/>
 <script>
     $(document).ready(function () {
-        $("#title").attr('required', '');
+        //$("#title").attr('required', '');
         $("#content").attr('required', '');
         $("#group").attr('required', '');
         $("#summary").attr('required', '');

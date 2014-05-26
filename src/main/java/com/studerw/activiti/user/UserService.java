@@ -36,8 +36,9 @@ public class UserService {
     public void setTaskService(TaskService taskService) {
         this.taskService = taskService;
     }
+
     @Autowired
-    public void setRuntimeService(RuntimeService runtimeService){
+    public void setRuntimeService(RuntimeService runtimeService) {
         this.runtimeService = runtimeService;
     }
 
@@ -46,17 +47,17 @@ public class UserService {
         this.identityService = identityService;
     }
 
-    public UserDetails currentUser(){
+    public UserDetails currentUser() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return userDetails;
     }
 
-    public void submitForApproval(UserForm userForm){
+    public void submitForApproval(UserForm userForm) {
         User user = identityService.createUserQuery().userId(userForm.getUserName()).singleResult();
-        if (user != null){
+        if (user != null) {
             throw new IllegalArgumentException("User with name: " + userForm.getUserName() + " already exists");
         }
-        Map<String,Object> processVariables = Maps.newHashMap();
+        Map<String, Object> processVariables = Maps.newHashMap();
         processVariables.put("approved", Boolean.FALSE);
         processVariables.put("userForm", userForm);
         ProcessInstance pi = runtimeService.startProcessInstanceByKey(Workflow.PROCESS_ID_USER_APPROVAL, processVariables);
@@ -67,7 +68,7 @@ public class UserService {
     }
 
 
-    public Map<String, List<Group>> userWithAssignmentGroups(){
+    public Map<String, List<Group>> userWithAssignmentGroups() {
         Map<String, List<Group>> userMap = Maps.newHashMap();
         List<User> users = identityService.createUserQuery().list();
         for (User currUser : users) {
@@ -75,7 +76,7 @@ public class UserService {
             List<Group> groups = this.identityService.createGroupQuery().
                     groupMember(currUser.getId()).groupType("assignment").list();
             List<Group> currentGroups = Lists.newArrayList();
-            for(Group group : groups){
+            for (Group group : groups) {
                 log.debug("    " + group.getId() + " - " + group.getType());
                 currentGroups.add(group);
             }
@@ -84,7 +85,7 @@ public class UserService {
         return userMap;
     }
 
-    public Map<String, List<String>> userWithAssignmentGroupStr(){
+    public Map<String, List<String>> userWithAssignmentGroupStr() {
         Map<String, List<String>> userMap = Maps.newHashMap();
         List<User> users = identityService.createUserQuery().list();
         for (User currUser : users) {
@@ -92,7 +93,7 @@ public class UserService {
             List<Group> groups = this.identityService.createGroupQuery().
                     groupMember(currUser.getId()).groupType("assignment").list();
             List<String> currentGroups = Lists.newArrayList();
-            for(Group group : groups){
+            for (Group group : groups) {
                 log.debug("    " + group.getId() + " - " + group.getType());
                 currentGroups.add(group.getId());
             }
@@ -101,14 +102,14 @@ public class UserService {
         return userMap;
     }
 
-    public List<Group> getAssignmentGroups(String userId){
+    public List<Group> getAssignmentGroups(String userId) {
         List<Group> groups = identityService.createGroupQuery().groupMember(userId)
                 .groupType("assignment")
                 .orderByGroupId().asc().list();
         return groups;
     }
 
-    public List<Group> getAllAssignmentGroups(){
+    public List<Group> getAllAssignmentGroups() {
         List<Group> groups = identityService.createGroupQuery()
                 .groupType("assignment")
                 .orderByGroupId().asc().list();

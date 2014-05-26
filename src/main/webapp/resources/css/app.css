@@ -45,3 +45,21 @@ body {
     height: 40px;
     background-color: #f5f5f5;
 }
+
+.alert-dropdown {
+    width: 600px;
+    padding: 0px;
+    margin: 0px;
+}
+
+.alert-dropdown li {
+    width: 600px;
+    padding: 0px;
+    margin: 0px;
+}
+
+.alert-dropdown-div {
+    margin: 0px;
+    padding: 20px;
+}
+

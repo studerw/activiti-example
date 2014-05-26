@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="s" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <!DOCTYPE html>
@@ -47,6 +47,7 @@
 
     <div id="currentDoc" class="panel panel-default">
         <div class="panel-heading">
+            <span class="glyphicon glyphicon-file pull-right"></span>
             <h3 class="panel-title"><<strong>${document.title}</strong></h3>
         </div>
         <div class="panel-body">
@@ -155,7 +156,7 @@
 
                             <td>${hTask.id}</td>
                             <td>${hTask.userId}</td>
-                            <td>${hTask.completedDate}</td>
+                            <td><spring:eval expression="hTask.completedDate"/></td>
                             <td>${hTask.localVars['taskOutcome']}</td>
                             <td>${hTask.comments[0].fullMessage}</td>
                         </tr>

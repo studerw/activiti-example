@@ -7,9 +7,8 @@ import java.util.List;
 /**
  * BaseDao interface which all other interfaces should impmlement
  *
- * @author studerw
- *
  * @param <T>
+ * @author studerw
  */
 public interface IBaseDao<T> {
 
@@ -20,12 +19,14 @@ public interface IBaseDao<T> {
 
     /**
      * Get all objects sorted using their native {@code compares} method.
+     *
      * @return List (possibly empty) of all objects in the backend listed native sort order of type
      */
     public List<T> readAll();
 
     /**
      * Get a page of objects. Versioning of objects is undefined as some backends may not have a concept of versioned rows.
+     *
      * @return List (possibly empty) of all objects in the backend listed by their native sort order.
      */
     public List<T> readPage(PagingCriteria criteria);
@@ -33,8 +34,9 @@ public interface IBaseDao<T> {
     /**
      * If the object to create already has an ID set, an {@link IllegalArgumentException} will be thrown as it is the responsibility
      * of the DAO implementation classes to deal with the ID for its own persistence backend.
-     *
+     * <p/>
      * <p>The object passed into the method will have its ID set by the time the call returns.</p>
+     *
      * @param obj without an ID
      * @return ID of newly created object
      */
@@ -48,10 +50,10 @@ public interface IBaseDao<T> {
     public void createWithId(T obj);
 
     /**
-     *
      * persist updates to a given Object.
      * If the object to create already does not already have an ID set, an {@link IllegalArgumentException} will be thrown
      * as it is the responsibility of the DAO implementation classes to deal with the ID for its own persistence backend.
+     *
      * @param obj
      */
     public void update(T obj);
@@ -59,6 +61,7 @@ public interface IBaseDao<T> {
     /**
      * Remove a Object with passed ID.
      * Implementations shouldn't cascade deletes, and instead should let service methods use multiple daos
+     *
      * @param id Object ID
      */
     public void delete(String id);
@@ -66,8 +69,8 @@ public interface IBaseDao<T> {
     /**
      * @param id of object ID
      * @return Object associated with given primary key ID.
-     *
-     * An unchecked excpetion will be thrown if the object with the given id does not exist.
+     *         <p/>
+     *         An unchecked excpetion will be thrown if the object with the given id does not exist.
      */
     public T read(String id);
 

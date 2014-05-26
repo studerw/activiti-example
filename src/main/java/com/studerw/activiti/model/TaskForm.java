@@ -27,12 +27,11 @@ public class TaskForm {
     int priority;
     String processDefinitionId;
     String processInstanceId;
-    Map<String,Object> processVariables;
+    Map<String, Object> processVariables;
     boolean suspended;
 
 
-
-    public TaskForm(){}
+    public TaskForm() {}
 
     public static TaskForm fromTask(Task task) throws InvocationTargetException, IllegalAccessException {
         TaskForm taskForm = new TaskForm();

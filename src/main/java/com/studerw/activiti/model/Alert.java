@@ -19,12 +19,11 @@ import java.util.Date;
  * User: studerw
  * Date: 5/20/14
  */
-public class Alert implements Comparable<Alert>,Serializable {
-    public final static int PRIMARY = 1;
-    public final static int SUCCESS = 2;
-    public final static int INFO    = 3;
-    public final static int WARNING = 4;
-    public final static int DANGER  = 5;
+public class Alert implements Comparable<Alert>, Serializable {
+    public final static int SUCCESS = 1;
+    public final static int INFO = 2;
+    public final static int WARNING = 3;
+    public final static int DANGER = 4;
 
     @NotNull
     String id;
@@ -34,16 +33,17 @@ public class Alert implements Comparable<Alert>,Serializable {
     private String userId;
     @NotNull
     private String message;
-    @NotNull @Min(1) @Max(5)
+    @NotNull @Min(1) @Max(4)
     private Integer priority;
-    @NotNull
-    @DateTimeFormat(pattern = "yyyy/MM/dd")
+    @NotNull @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm Z")
     private Date createdDate;
-    private Boolean acknowledged;
+    private Boolean acknowledged = Boolean.FALSE;
 
-    public Alert(){};
+    public Alert() {
+    }
 
-    public Alert(String createdBy, String userId, String message, Integer priority, Date createdDate, Boolean acknowledged){
+    public Alert(String id, String createdBy, String userId, String message, Integer priority, Date createdDate, Boolean acknowledged) {
+        this.id = id;
         this.createdBy = createdBy;
         this.userId = userId;
         this.message = message;

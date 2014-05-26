@@ -9,11 +9,11 @@ package com.studerw.activiti.user;
 public class InvalidAccessException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 
-    public InvalidAccessException(String message){
+    public InvalidAccessException(String message) {
         super(message);
     }
 
-    public InvalidAccessException(String message, Throwable t){
+    public InvalidAccessException(String message, Throwable t) {
         super(message, t);
     }
 

@@ -1,6 +1,8 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="s" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <!DOCTYPE html>
@@ -48,6 +50,7 @@
 
     <div class="panel panel-default">
         <div class="panel-heading">
+            <span class="glyphicon glyphicon-file pull-right"></span>
             <h3 class="panel-title"><strong>${document.title}</strong></h3>
         </div>
         <div class="panel-body">
@@ -100,7 +103,7 @@
                     <label for="createdDate" class="col-sm-2 control-label">Created Date</label>
 
                     <div class="col-sm-10">
-                        <form:input cssClass="form-control" id="createdDate" path="createdDate" readonly="true"/>
+                        <form:input cssClass="form-control"  id="createdDate" path="createdDate" readonly="true"/>
                     </div>
                 </div>
                 <div class="form-group">
@@ -142,7 +145,7 @@
 
                             <td>${hTask.id}</td>
                             <td>${hTask.userId}</td>
-                            <td>${hTask.completedDate}</td>
+                            <td><spring:eval expression="hTask.completedDate"/></td>
                             <td>${hTask.localVars['taskOutcome']}</td>
                             <td>${hTask.comments[0].fullMessage}</td>
                         </tr>

@@ -2,8 +2,8 @@ package com.studerw.activiti.web;
 
 /**
  * Simple pojo used for paging result sets.
- * @author studerw
  *
+ * @author studerw
  */
 public class PagingCriteria {
 
@@ -11,9 +11,10 @@ public class PagingCriteria {
     protected Integer limit;
     protected Integer page;
 
-    public PagingCriteria(){}
+    public PagingCriteria() {
+    }
 
-    public PagingCriteria(Integer start, Integer limit, Integer page){
+    public PagingCriteria(Integer start, Integer limit, Integer page) {
         this.start = start;
         this.limit = limit;
         this.page = page;
@@ -22,18 +23,23 @@ public class PagingCriteria {
     public Integer getStart() {
         return this.start;
     }
+
     public void setStart(Integer start) {
         this.start = start;
     }
+
     public Integer getLimit() {
         return this.limit;
     }
+
     public void setLimit(Integer limit) {
         this.limit = limit;
     }
+
     public Integer getPage() {
         return this.page;
     }
+
     public void setPage(Integer page) {
         this.page = page;
     }
