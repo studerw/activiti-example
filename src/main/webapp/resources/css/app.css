@@ -1,4 +1,4 @@
-html {
+    html {
     position: relative;
     min-height: 100%;
 }
@@ -6,6 +6,7 @@ html {
 body {
     padding-top: 50px;
     margin-bottom: 60px;
+
 }
 /*deprecated*/
 .start-template {
@@ -24,7 +25,7 @@ body {
 }
 
 .errorblock {
-    margin: 0 auto;
+    margin: 20px auto;
     color: #E64B58;
     background-color: #ffEEEE;
     border: 1px solid #ff0000;

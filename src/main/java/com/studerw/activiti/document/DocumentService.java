@@ -110,12 +110,13 @@ public class DocumentService {
             identityService.setAuthenticatedUserId(userDetails.getUsername());
             ProcessInstance current = this.getCurrentProcess(docId);
             if (current == null) {
-                current = runtimeService.startProcessInstanceByKey(Workflow.PROCESS_ID_DOC_APPROVAL, doc.getId(), processVariables);
+                current = runtimeService.startProcessInstanceByKey(Workflow.PROCESS_ID_DOC_APPROVAL, doc.getId());
             }
             Task task = taskService.createTaskQuery().processInstanceId(current.getProcessInstanceId()).singleResult();
             taskService.setAssignee(task.getId(), userDetails.getUsername());
             this.docDao.update(doc);
             taskService.setVariableLocal(task.getId(), "taskOutcome", "Submitted for Approval");
+            taskService.setVariables(task.getId(), processVariables);
             taskService.complete(task.getId());
         } finally {
             identityService.setAuthenticatedUserId(null);

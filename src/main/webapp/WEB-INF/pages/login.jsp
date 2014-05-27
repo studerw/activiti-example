@@ -25,29 +25,23 @@
             </button>
             <a class="navbar-brand brand" href="#">Activiti Example</a>
         </div>
-            </div>
+    </div>
 </div>
 
 <div class="container">
     <div class="start-template" style="width: 500px; margin: 10px auto;">
-        <div class="centered">
-            <c:if test="${error == true}">
-                <div class="panel panel-default">
-                    <div class="panel-body">
-                        <div class="bg-danger">
-                            <p>Your login attempt was not successful.</p>
+        <c:if test="${error == true}">
+            <div class="errorblock">
+                <p>Your login attempt was not successful.</p>
 
-                            <p> Cause: ${sessionScope["SPRING_SECURITY_LAST_EXCEPTION"].message}</p>
-                        </div>
-                    </div>
-                </div>
-            </c:if>
-            <c:if test="${not empty msg}">
-                <div class="flash">
-                   <p><strong>${msg}</strong></p>
-                </div>
-            </c:if>
-        </div>
+                <p> Cause: ${sessionScope["SPRING_SECURITY_LAST_EXCEPTION"].message}</p>
+            </div>
+        </c:if>
+        <c:if test="${not empty msg}">
+            <div class="flash">
+                <p><strong>${msg}</strong></p>
+            </div>
+        </c:if>
 
         <div class="panel panel-default">
             <div class="panel-heading">
@@ -66,6 +60,7 @@
                     </div>
                     <div class="form-group">
                         <label for="j_password" class="col-sm-2 control-label">Password</label>
+
                         <div class="col-sm-10">
                             <input type="password" class="form-control" id="j_password" name="j_password"
                                    placeholder="Password" required>

@@ -4,7 +4,6 @@
 
 <link href="${pageContext.request.contextPath}/resources/css/bootstrap.css" rel="stylesheet" >
 <link href="${pageContext.request.contextPath}/resources/css/app.css" rel="stylesheet" >
-
 <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
 <!--[if lt IE 9]>
 <script src="${pageContext.request.contextPath}/resources/js/html5shiv.js"></script>
