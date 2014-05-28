@@ -49,23 +49,39 @@
                 <p><strong>${msg}</strong></p>
             </div>
         </c:if>
+
+        <div id="groupSelForm">
+            <div class="form-group">
+                <label for="groupSel" class="">Group</label>
+                <select class="form-control" id="groupSel">
+                    <option value="">Please Choose a Group</option>
+                    <c:forEach var="group" items="${groups}">
+                        <option value="${group.id}">${group.name}</option>
+                    </c:forEach>
+                </select>
+            </div>
+        </div>
+
     </div>
 
+</div>
+
+</div>
 
 
-    <jsp:include page="fragments/footer.jsp"/>
+<jsp:include page="fragments/footer.jsp"/>
 
-    <script src="${pageContext.request.contextPath}/resources/js/json2.js"></script>
-    <script src="${pageContext.request.contextPath}/resources/js/underscore.js"></script>
-    <script src="${pageContext.request.contextPath}/resources/js/backbone.js"></script>
-    <%--<script src="${pageContext.request.contextPath}/resources/js/app/tasks/main.js"></script>--%>
-    <script>
-        (function ($) {
-            $(document).ready(function () {
-                $('li#nav-workflows').addClass('active');
-            });
-        })(jQuery);
-    </script>
+<script src="${pageContext.request.contextPath}/resources/js/json2.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/underscore.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/backbone.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/app/workflow/main.js"></script>
+<script>
+    (function ($) {
+        $(document).ready(function () {
+            $('li#nav-workflows').addClass('active');
+        });
+    })(jQuery);
+</script>
 
 </body>
 </html>

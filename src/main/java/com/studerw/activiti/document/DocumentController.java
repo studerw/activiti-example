@@ -31,10 +31,10 @@ public class DocumentController extends BaseController {
     @Autowired
     LocalTaskService localTaskSrvc;
 
-    @ModelAttribute
     @Override
-    public void addUserInfo(ModelMap model, HttpServletRequest request) {
-        super.addUserInfo(model, request);
+    @ModelAttribute
+    public void addModelInfo(ModelMap model, HttpServletRequest request) {
+        super.addModelInfo(model, request);
         List<Group> groups = userService.getAssignmentGroups(request.getRemoteUser());
         model.addAttribute("groups", groups);
     }

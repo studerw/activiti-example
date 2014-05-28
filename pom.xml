@@ -278,7 +278,7 @@
                 <configuration>
                     <path>/activiti-example</path>
                     <port>9090</port>
-                    <useTestClasspath>true</useTestClasspath>
+                    <useTestClasspath>false</useTestClasspath>
                     <contextReloadable>true</contextReloadable>
                     <!--<tomcatUsers>${project.basedir}/src/main/resources/tomcat/tomcat-users.xml</tomcatUsers>-->
                     <systemProperties>

@@ -18,7 +18,7 @@ public class BaseController {
     protected UserService userService;
 
     @ModelAttribute
-    public void addUserInfo(ModelMap model, HttpServletRequest request) {
+    public void addModelInfo(ModelMap model, HttpServletRequest request) {
         UserDetails user = userService.currentUser();
         model.addAttribute("userDetails", user);
         model.addAttribute("userName", user.getUsername());

@@ -1,6 +1,6 @@
 <div id="footer">
     <div class="container">
-        <p class="text-muted text-center"> Chrome 2014</p>
+        <p class="text-muted text-center">Activiti Example 2014</p>
     </div>
 </div>
 

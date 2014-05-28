@@ -28,6 +28,7 @@ import java.util.Map;
 @Service("userService")
 public class UserService {
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
+    public static final String SYSTEM_USER = "SYSTEM";
     protected IdentityService identityService;
     protected RuntimeService runtimeService;
     protected TaskService taskService;

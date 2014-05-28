@@ -5,9 +5,9 @@ package com.studerw.activiti.util;
  * Date: 5/24/14
  */
 public class Workflow {
-    public static final String PROCESS_ID_DOC_APPROVAL = "docApproval";
+    public static final String PROCESS_ID_DOC_APPROVAL = "docApprovalWithSubProcess";
     public static final String PROCESS_NAME_DOC_APPROVAL = "Approve Document Workflow";
-    public static final String TASK_ID_DOC_APPROVAL = "approveDocTask";
+    public static final String TASK_ID_DOC_APPROVAL = "approveDocUserTask1";
     public static final String TASK_NAME_DOC_APPROVAL = "Approve Document";
 
     public static final String PROCESS_ID_USER_APPROVAL = "newChromeUser";

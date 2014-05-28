@@ -55,6 +55,34 @@ public class AlertService {
         this.alertDao = alertDao;
     }
 
+    /**
+     * Send an alert using the general <em>System User</em> as the sender
+     * @param to
+     * @param priority
+     * @param message
+     * @return
+     */
+    public String sendSystemAlert(String to, int priority, String message){
+        log.debug("sending system alert to: {} at priority {}", to, priority);
+        Alert alert = new Alert();
+        alert.setCreatedBy(UserService.SYSTEM_USER);
+        alert.setPriority(priority);
+        alert.setCreatedDate(new Date());
+        alert.setUserId(to);
+        alert.setAcknowledged(Boolean.FALSE);
+        alert.setMessage(message);
+
+        return this.alertDao.create(alert);
+
+    }
+
+    /**
+     * Send an alert using the current logged in user as the sender
+     * @param to
+     * @param priority
+     * @param message
+     * @return
+     */
     public String sendAlert(String to, int priority, String message) {
         log.debug("sending alert to: {} at priority {}", to, priority);
         Alert alert = new Alert();
@@ -79,6 +107,12 @@ public class AlertService {
         this.alertDao.update(alert);
     }
 
+    /**
+     *
+     * @param userId
+     * @return a list of alerts, sorted ascending by creation date, for a given user.
+     * Only the actual user him/herself can obtain his/her own alerts
+     */
     public List<Alert> readActiveAlertsByUser(String userId) {
         log.debug("reading alerts for user: {}", userId);
         UserDetails user = this.userService.currentUser();

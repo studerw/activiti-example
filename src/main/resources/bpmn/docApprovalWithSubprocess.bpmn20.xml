@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://activiti.org/bpmn20">
+  <process id="docApprovalWithSubProcess" name="Approve Document Workflow" isExecutable="true">
+    <documentation>This process is initiated when a document is created.</documentation>
+    <startEvent id="startevent1" name="Start" activiti:initiator="initiator"></startEvent>
+    <serviceTask id="publishDocServiceTask" name="Publish Approved Document" activiti:expression="${documentWorkflow.publish(execution)}"></serviceTask>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow6" sourceRef="publishDocServiceTask" targetRef="endevent1"></sequenceFlow>
+    <userTask id="submitDocUserTask" name="Submit Document for Approval"></userTask>
+    <sequenceFlow id="flow7" sourceRef="startevent1" targetRef="submitDocUserTask"></sequenceFlow>
+    <subProcess id="approvalSubProcess" name="Document Approval Subprocess">
+      <startEvent id="approvalSubProcessStartEvent" name="Start Approval SubProcess"></startEvent>
+      <endEvent id="approvalSubProcessEndEvent" name="End Approval SubProcess"></endEvent>
+      <userTask id="approveDocUserTask1" name="Approve Document">
+          <extensionElements>
+              <activiti:taskListener event="create" expression="${documentWorkflow.setAssignee(execution, task)}"/>
+          </extensionElements>
+      </userTask>
+      <endEvent id="rejectedErrorEndEvent" name="ErrorEnd">
+        <errorEventDefinition errorRef="errorDocRejected"></errorEventDefinition>
+      </endEvent>
+      <sequenceFlow id="flow30" sourceRef="approvalSubProcessStartEvent" targetRef="approveDocUserTask1"></sequenceFlow>
+      <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
+      <sequenceFlow id="flow31" sourceRef="approveDocUserTask1" targetRef="exclusivegateway1"></sequenceFlow>
+      <sequenceFlow id="docRejectedSubFlow" name="Doc Rejected" sourceRef="exclusivegateway1" targetRef="rejectedErrorEndEvent">
+          <extensionElements>
+              <activiti:executionListener event="take" expression="${documentWorkflow.rejected(execution)}"></activiti:executionListener>
+          </extensionElements>
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${approved == false}]]></conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="docApprovedSubFlow" name="Doc Approved" sourceRef="exclusivegateway1" targetRef="approvalSubProcessEndEvent">
+          <extensionElements>
+              <activiti:executionListener event="take" expression="${documentWorkflow.approved(execution)}"></activiti:executionListener>
+          </extensionElements>
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${approved == true}]]></conditionExpression>
+      </sequenceFlow>
+    </subProcess>
+    <sequenceFlow id="flow20" sourceRef="submitDocUserTask" targetRef="approvalSubProcess"></sequenceFlow>
+    <boundaryEvent id="rejectedErrorBoundaryEvent" name="Rejected Error Event" attachedToRef="approvalSubProcess">
+      <errorEventDefinition errorRef="errorDocRejected"></errorEventDefinition>
+    </boundaryEvent>
+    <sequenceFlow id="flow28" sourceRef="approvalSubProcess" targetRef="publishDocServiceTask"></sequenceFlow>
+    <sequenceFlow id="flow29" name="Doc Rejected" sourceRef="rejectedErrorBoundaryEvent" targetRef="submitDocUserTask"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_docApprovalWithSubProcess">
+    <bpmndi:BPMNPlane bpmnElement="docApprovalWithSubProcess" id="BPMNPlane_docApprovalWithSubProcess">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="168.0" y="140.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="publishDocServiceTask" id="BPMNShape_publishDocServiceTask">
+        <omgdc:Bounds height="92.0" width="105.0" x="780.0" y="222.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="815.0" y="362.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="submitDocUserTask" id="BPMNShape_submitDocUserTask">
+        <omgdc:Bounds height="91.0" width="111.0" x="130.0" y="216.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="approvalSubProcess" id="BPMNShape_approvalSubProcess">
+        <omgdc:Bounds height="230.0" width="454.0" x="297.0" y="147.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="approvalSubProcessStartEvent" id="BPMNShape_approvalSubProcessStartEvent">
+        <omgdc:Bounds height="35.0" width="35.0" x="330.0" y="226.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="approvalSubProcessEndEvent" id="BPMNShape_approvalSubProcessEndEvent">
+        <omgdc:Bounds height="35.0" width="35.0" x="640.0" y="226.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="approveDocUserTask1" id="BPMNShape_approveDocUserTask1">
+        <omgdc:Bounds height="111.0" width="105.0" x="400.0" y="188.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="rejectedErrorEndEvent" id="BPMNShape_rejectedErrorEndEvent">
+        <omgdc:Bounds height="35.0" width="35.0" x="553.0" y="330.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="550.0" y="224.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="rejectedErrorBoundaryEvent" id="BPMNShape_rejectedErrorBoundaryEvent">
+        <omgdc:Bounds height="30.0" width="30.0" x="480.0" y="333.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="832.0" y="314.0"></omgdi:waypoint>
+        <omgdi:waypoint x="832.0" y="362.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+        <omgdi:waypoint x="185.0" y="175.0"></omgdi:waypoint>
+        <omgdi:waypoint x="185.0" y="216.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow30" id="BPMNEdge_flow30">
+        <omgdi:waypoint x="365.0" y="243.0"></omgdi:waypoint>
+        <omgdi:waypoint x="400.0" y="243.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow31" id="BPMNEdge_flow31">
+        <omgdi:waypoint x="505.0" y="243.0"></omgdi:waypoint>
+        <omgdi:waypoint x="550.0" y="244.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="docRejectedSubFlow" id="BPMNEdge_docRejectedSubFlow">
+        <omgdi:waypoint x="570.0" y="264.0"></omgdi:waypoint>
+        <omgdi:waypoint x="570.0" y="330.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="100.0" x="857.0" y="460.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="docApprovedSubFlow" id="BPMNEdge_docApprovedSubFlow">
+        <omgdi:waypoint x="590.0" y="244.0"></omgdi:waypoint>
+        <omgdi:waypoint x="640.0" y="243.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="100.0" x="857.0" y="340.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow20" id="BPMNEdge_flow20">
+        <omgdi:waypoint x="241.0" y="261.0"></omgdi:waypoint>
+        <omgdi:waypoint x="297.0" y="262.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow28" id="BPMNEdge_flow28">
+        <omgdi:waypoint x="751.0" y="262.0"></omgdi:waypoint>
+        <omgdi:waypoint x="780.0" y="268.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow29" id="BPMNEdge_flow29">
+        <omgdi:waypoint x="495.0" y="363.0"></omgdi:waypoint>
+        <omgdi:waypoint x="494.0" y="479.0"></omgdi:waypoint>
+        <omgdi:waypoint x="185.0" y="479.0"></omgdi:waypoint>
+        <omgdi:waypoint x="185.0" y="307.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="64.0" x="279.0" y="442.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

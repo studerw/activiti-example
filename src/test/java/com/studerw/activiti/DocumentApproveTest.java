@@ -42,7 +42,7 @@ import static org.junit.Assert.assertTrue;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"classpath:spring/testAppContext.xml"})
-public class DocumentApproveProcessTest {
+public class DocumentApproveTest {
     private static final Logger log = Logger.getLogger(ActivitiSpringTest.class);
     @Autowired
     RuntimeService runtimeService;

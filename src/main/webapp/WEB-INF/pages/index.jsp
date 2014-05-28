@@ -20,33 +20,47 @@
 <div class="container">
 
     <div class="start-template">
+        <c:if test="${not empty alerts}">
+            <div class="alert alert-warning">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <p>You currently have ${fn:length(alerts)} alert(s) not yet acknowledged.</p>
+            </div>
+        </c:if>
+        <c:if test="${taskCount gt 0}">
+            <div class="alert alert-warning">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <p>There are ${taskCount}  <a href="${pageContext.request.contextPath}/tasks.htm" class="alert-link">task(s) </a> assigned to you or one of your groups waiting to be completed</p>
+            </div>
+        </c:if>
         <div class="jumbotron">
             <h2>Activiti Example</h2>
-            <p class="lead">Cras justo odio, dapibus ac facilisis in, egestas eget quam. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
-            <p><a class="btn btn-lg btn-success" href="#" role="button">Approve It Today</a></p>
+            <p class="lead">Proof of concept showing user and group management, document creation and approval workflows, alerting and task management, and general workflow creation.</p>
+            <p>The application uses the <a href="http://activiti.org/">Activiti</a> Open Source Workflow Management API</p>
+            <p><a class="btn btn-lg btn-success" href="http://activiti.org/" role="button">See More</a></p>
         </div>
 
         <div class="row marketing">
             <div class="col-lg-6">
-                <h4>Subheading</h4>
-                <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
+                <h4><a href="${pageContext.request.contextPath}/document/list.htm" class="">Documents</a></h4>
+                <p>Create, View, and Edit Group Documents.</p>
 
-                <h4>Subheading</h4>
-                <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
+                <h4><a href="${pageContext.request.contextPath}/tasks.htm" class="">Tasks</a></h4>
+                <p>View and complete group and assigned tasks</p>
 
-                <h4>Subheading</h4>
-                <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
             </div>
 
             <div class="col-lg-6">
-                <h4>Subheading</h4>
-                <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
+                <h4><a href="${pageContext.request.contextPath}/workflows.htm" class="">Workflows</a></h4>
+                <p>View and edit group document approval workflows</p>
 
-                <h4>Subheading</h4>
-                <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
+                <h4> <a href="http://activiti.org/">Activiti</a></h4>
+                <ul class="list-group">
+                    <li><a href="https://github.com/Activiti/Activiti">GitHub Codebase</a></li>
+                    <li><a href="http://forums.activiti.org/forums/activiti-users">User Forums</a></li>
+                    <li><a href="http://www.activiti.org/userguide/">User Guide</a></li>
+                    <li><a href="http://activiti.org/javadocs/">Javadoc API</a></li>
+                </ul>
 
-                <h4>Subheading</h4>
-                <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
             </div>
         </div>
 
