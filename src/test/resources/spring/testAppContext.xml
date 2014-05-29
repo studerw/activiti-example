@@ -22,7 +22,7 @@
     <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
 
     <jdbc:embedded-database id="dataSource" type="H2">
-        <jdbc:script location="classpath:db/activiti.h2.complete.sql"/>
+        <jdbc:script location="classpath:db/h2/activiti.h2.complete.sql"/>
     </jdbc:embedded-database>
 
     <tx:annotation-driven transaction-manager="transactionManager" />

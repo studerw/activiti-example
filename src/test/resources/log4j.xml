@@ -22,7 +22,7 @@
         </layout>
     </appender>
 
-    <logger name="com.studerw.activiti">
+    <logger name="com.studerw">
         <level value="DEBUG"/>
     </logger>
 

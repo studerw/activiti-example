@@ -20,3 +20,9 @@ create table IF NOT EXISTS ALERT(
     ACKNOWLEDGED boolean,
     primary key (ID)
 );
+
+create table IF NOT EXISTS WORKFLOW(
+    ID varchar(255),
+    GROUP_ID varchar(255),
+    CONTENT varchar(100000)
+);

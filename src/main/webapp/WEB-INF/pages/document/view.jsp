@@ -51,6 +51,7 @@
     <div class="panel panel-default">
         <div class="panel-heading">
             <span class="glyphicon glyphicon-file pull-right"></span>
+
             <h3 class="panel-title"><strong>${document.title}</strong></h3>
         </div>
         <div class="panel-body">
@@ -103,7 +104,7 @@
                     <label for="createdDate" class="col-sm-2 control-label">Created Date</label>
 
                     <div class="col-sm-10">
-                        <form:input cssClass="form-control"  id="createdDate" path="createdDate" readonly="true"/>
+                        <form:input cssClass="form-control" id="createdDate" path="createdDate" readonly="true"/>
                     </div>
                 </div>
                 <div class="form-group">
@@ -122,6 +123,18 @@
     </div>
     <hr/>
     <c:if test="${not empty historicTasks}">
+        <c:if test="${document.state  ne 'DRAFT' && document.state ne 'PUBLISHED'}">
+            <div id="diagram" class="center-block">
+                <h4>Default Document Approval Workflow</h4>
+
+                <p>
+                    <img class="img-responsive img-rounded proc-diagram"
+                         src="${pageContext.request.contextPath}/workflow/document/${document.id}/diagram"
+                         alt="Workflow Process Diagram">
+                </p>
+            </div>
+        </c:if>
+
         <div id="historicTasks" class="panel panel-info">
             <div class="panel-heading">
                 <span class="glyphicon glyphicon-time pull-right"></span>

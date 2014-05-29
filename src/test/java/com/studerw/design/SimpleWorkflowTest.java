@@ -81,7 +81,6 @@ public class SimpleWorkflowTest {
         InputStream processDiagram = repositoryService
                 .getProcessDiagram(processInstance.getProcessDefinitionId());
         FileUtils.copyInputStreamToFile(processDiagram, new File("target/diagram.png"));
-
         // 7. Save resulting BPMN xml to a file
         InputStream processBpmn = repositoryService
                 .getResourceAsStream(deployment.getId(), "dynamic-model.bpmn");

@@ -6,17 +6,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <jsp:include page="fragments/head.jsp"/>
+    <jsp:include page="../fragments/head.jsp"/>
     <title>Workflow</title>
     <style type="text/css">
         .panel-task {
             margin: 15px 0;
         }
+        div#diagram{
+            margin: 20px auto;
+        }
     </style>
 </head>
 
 <body>
-<jsp:include page="fragments/navbar-top.jsp"/>
+<jsp:include page="../fragments/navbar-top.jsp"/>
 
 <div class="container">
 
@@ -62,6 +65,16 @@
             </div>
         </div>
 
+        <hr/>
+
+        <div id="diagram" class="center-block">
+            <h4>Default Document Approval Workflow</h4>
+            <p>
+                <img class="img-responsive img-rounded proc-diagram" src="${pageContext.request.contextPath}/workflow/diagrams/${defaultDocProcId}"
+                     alt="Workflow Process Diagram">
+            </p>
+        </div>
+
     </div>
 
 </div>
@@ -69,11 +82,11 @@
 </div>
 
 
-<jsp:include page="fragments/footer.jsp"/>
+<jsp:include page="../fragments/footer.jsp"/>
 
-<script src="${pageContext.request.contextPath}/resources/js/json2.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/underscore.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/backbone.js"></script>
+<%--<script src="${pageContext.request.contextPath}/resources/js/json2.js"></script>--%>
+<%--<script src="${pageContext.request.contextPath}/resources/js/underscore.js"></script>--%>
+<%--<script src="${pageContext.request.contextPath}/resources/js/backbone.js"></script>--%>
 <script src="${pageContext.request.contextPath}/resources/js/app/workflow/main.js"></script>
 <script>
     (function ($) {

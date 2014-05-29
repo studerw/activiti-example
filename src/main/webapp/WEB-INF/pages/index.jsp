@@ -50,7 +50,7 @@
             </div>
 
             <div class="col-lg-6">
-                <h4><a href="${pageContext.request.contextPath}/workflows.htm" class="">Workflows</a></h4>
+                <h4><a href="${pageContext.request.contextPath}/workflow/index.htm" class="">Workflows</a></h4>
                 <p>View and edit group document approval workflows</p>
 
                 <h4> <a href="http://activiti.org/">Activiti</a></h4>

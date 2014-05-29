@@ -64,3 +64,12 @@ body {
     padding: 20px;
 }
 
+/*img#process-diagram-img{*/
+    /*width: 1024px;*/
+    /*height: 768px;*/
+/*}*/
+
+img.proc-diagram{
+    padding:20px;
+    border:2px solid #021a40;
+}

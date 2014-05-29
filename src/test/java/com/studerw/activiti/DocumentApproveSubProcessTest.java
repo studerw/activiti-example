@@ -7,14 +7,17 @@ import com.studerw.activiti.model.Document;
 import com.studerw.activiti.model.TaskForm;
 import com.studerw.activiti.task.LocalTaskService;
 import com.studerw.activiti.user.UserService;
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.IdentityService;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
+import org.activiti.bpmn.model.BpmnModel;
+import org.activiti.engine.*;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.identity.Group;
+import org.activiti.engine.impl.RepositoryServiceImpl;
+import org.activiti.engine.impl.bpmn.diagram.ProcessDiagramGenerator;
+import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.task.Comment;
+import org.activiti.engine.task.Task;
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,6 +31,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -58,9 +64,11 @@ public class DocumentApproveSubProcessTest {
     DocumentService documentService;
     @Autowired
     LocalTaskService localTaskService;
+    @Autowired
+    RepositoryService repoSrvc;
 
     @Test
-    public void testDocApprovalFlow() throws InterruptedException {
+    public void testDocApprovalFlow() throws InterruptedException, IOException {
         setSpringSecurity("kermit");
         Document doc = new Document();
         doc.setGroupId("engineering");
@@ -74,10 +82,21 @@ public class DocumentApproveSubProcessTest {
         log.debug("new doc id: " + docId);
         this.documentService.submitForApproval(docId);
 
+
+
         setSpringSecurity("fozzie");
         List<TaskForm> tasks = this.localTaskService.getTasks("fozzie");
         assertTrue(tasks.size() == 1);
+        TaskForm currentTask = tasks.get(0);
         log.debug("got task: " + tasks.get(0).getName());
+
+        //http://forums.activiti.org/content/process-diagram-highlighting-current-process
+        RepositoryServiceImpl impl = (RepositoryServiceImpl)repoSrvc;
+        ProcessDefinitionEntity pde = (ProcessDefinitionEntity) impl.getDeployedProcessDefinition(currentTask.getProcessDefinitionId());
+        BpmnModel bpmnModel = repoSrvc.getBpmnModel(pde.getId());
+        InputStream in = ProcessDiagramGenerator.generateDiagram(bpmnModel, "png", runtimeService.getActiveActivityIds(currentTask.getProcessInstanceId()));
+        FileUtils.copyInputStreamToFile(in, new File("target/current-diagram.png"));
+
         localTaskService.approveTask(true, "task approved blah blah blah", tasks.get(0).getId());
         HistoricProcessInstance pi = historyService.createHistoricProcessInstanceQuery().
                 includeProcessVariables().processInstanceBusinessKey(docId).singleResult();
