@@ -65,6 +65,11 @@ public class SimpleWorkflowTest {
                 .addBpmnModel("dynamic-model.bpmn", model).name("Dynamic process deployment")
                 .deploy();
 
+        // 3. Deploy the process to the engine
+        deployment = this.repositoryService.createDeployment()
+                .addBpmnModel("dynamic-model.bpmn", model).name("Dynamic process deployment")
+                .deploy();
+
         // 4. Start a process instance
         ProcessInstance processInstance = runtimeService
                 .startProcessInstanceByKey("my-process");

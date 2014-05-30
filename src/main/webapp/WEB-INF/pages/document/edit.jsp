@@ -157,6 +157,7 @@
                     <thead>
                     <tr>
                         <td>Task ID</td>
+                        <td>Description</td>
                         <td>User</td>
                         <td>Date Completed</td>
                         <td>Action</td>
@@ -168,6 +169,7 @@
                         <tr>
 
                             <td>${hTask.id}</td>
+                            <td>${hTask.name}</td>
                             <td>${hTask.userId}</td>
                             <td><spring:eval expression="hTask.completedDate"/></td>
                             <td>${hTask.localVars['taskOutcome']}</td>

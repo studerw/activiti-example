@@ -5,6 +5,7 @@ import com.studerw.activiti.model.Response;
 import com.studerw.activiti.model.TaskForm;
 import com.studerw.activiti.util.Workflow;
 import com.studerw.activiti.web.BaseController;
+import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.engine.identity.Group;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -58,18 +59,21 @@ public class WorkflowController extends BaseController {
     @RequestMapping(value = "/approvals/{group}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Response<String>>approvalsByGroupPost(@RequestBody List<Approval> approvals,
                         @PathVariable(value="group") String group,
-                        HttpServletRequest request) {
+                        HttpServletRequest request) throws InterruptedException {
 
         log.debug(approvals.toString());
+        BpmnModel model = this.workflowBldr.documentApprove(approvals, group);
+        this.workflowSrvc.updateGroupDocApproveWorkflow(model, group);
+
+        //wait for the model diagram to catch up (maybe)
+        Thread.sleep(1000);
         Response res = new Response(true, group);
         return new ResponseEntity<Response<String>>(res, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/approvals/{group}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Response<List<Approval>>> approvalsByGroup(ModelMap model,
-                                                                     @PathVariable(value="group") String group,
+    public ResponseEntity<Response<List<Approval>>> approvalsByGroup(@PathVariable(value="group") String group,
                                                                      HttpServletRequest request) {
-
         String groupId = group;
         if(!workflowSrvc.groupDocApproveWorkflowExists(group)){
             groupId = null;
@@ -109,5 +113,4 @@ public class WorkflowController extends BaseController {
         responseHeaders.set("Content-Type", "image/png");
         return new ResponseEntity<byte[]>(bytes, responseHeaders, HttpStatus.OK);
     }
-
 }

@@ -34,14 +34,11 @@ public class GroupApprovalWorkflowInitiator {
         for(Group group: groups){
             if (!workflowSrvc.groupDocApproveWorkflowExists(group.getId())){
                 log.info("Creating default doc approval workflow deployment for group {}", group.getId());
-                String modelName = String.format("%s-doc-approve-model.bpmn", group.getId());
-                String deployName = String.format("Group %s Document Approve", group.getId());
                 Approval approval = new Approval();
                 approval.getCandidateGroups().add(group.getId());
+
                 BpmnModel model = workflowBldr.documentApprove(Lists.newArrayList(approval), group.getId());
-                Deployment deployment = this.repoSrvc.createDeployment()
-                        .addBpmnModel(modelName, model).name(deployName)
-                        .deploy();
+                workflowSrvc.updateGroupDocApproveWorkflow(model, group.getId());
 
             }
         }

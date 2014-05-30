@@ -16,6 +16,15 @@ import java.util.Map;
 public class TaskForm {
     String id;
     String owner;
+
+    public String getTaskDefinitionKey() {
+        return taskDefinitionKey;
+    }
+
+    public void setTaskDefinitionKey(String taskDefinitionKey) {
+        this.taskDefinitionKey = taskDefinitionKey;
+    }
+
     String delegate;
     String category;
     @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm Z")
@@ -29,6 +38,7 @@ public class TaskForm {
     String processInstanceId;
     Map<String, Object> processVariables;
     boolean suspended;
+    String taskDefinitionKey;
 
 
     public TaskForm() {}
@@ -168,6 +178,7 @@ public class TaskForm {
                 .add("processInstanceId", processInstanceId)
                 .add("processVariables", processVariables)
                 .add("suspended", suspended)
+                .add("taskDefinitionKey", taskDefinitionKey)
                 .toString();
     }
 }

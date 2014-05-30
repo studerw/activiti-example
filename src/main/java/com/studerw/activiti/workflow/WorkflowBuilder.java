@@ -154,7 +154,6 @@ public class WorkflowBuilder {
         Collection<FlowElement> flowElements = sub.getFlowElements();
         List<UserTask> userTasks = Lists.newArrayList();
         for (FlowElement el : flowElements) {
-            log.debug(el.getClass().getName() + " -- " + el.getId());
             if (el.getClass().equals(org.activiti.bpmn.model.UserTask.class)) {
                 userTasks.add((UserTask) (el));
             }
@@ -164,6 +163,7 @@ public class WorkflowBuilder {
         int i = 1;
         for (UserTask userTask : userTasks) {
             approvals.add(fromUserTask(userTask, i));
+            i++;
         }
         return approvals;
     }
@@ -207,8 +207,8 @@ public class WorkflowBuilder {
         sub.addFlowElement(errorEnd);
 
         UserTask userTask = new UserTask();
-        userTask.setId("approveDocUserTask1");
-        userTask.setName(Workflow.TASK_NAME_DOC_APPROVAL);
+        userTask.setId(Workflow.TASK_ID_DOC_APPROVAL);
+        userTask.setName("Approve Document (1 / 1)");
         ActivitiListener taskListener = new ActivitiListener();
         taskListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
         taskListener.setImplementation("${documentWorkflow.setAssignee(execution, task)}");

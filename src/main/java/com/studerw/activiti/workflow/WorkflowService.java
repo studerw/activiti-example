@@ -7,6 +7,7 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.impl.RepositoryServiceImpl;
 import org.activiti.engine.impl.bpmn.diagram.ProcessDiagramGenerator;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.apache.commons.io.FileUtils;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 
 /**
  * User: studerw
@@ -69,5 +71,15 @@ public class WorkflowService {
         String key = Workflow.PROCESS_ID_DOC_APPROVAL + "-" + group;
         ProcessDefinition pd = this.repoSrvc.createProcessDefinitionQuery().processDefinitionKey(key).latestVersion().singleResult();
         return pd != null;
+    }
+
+    public void updateGroupDocApproveWorkflow(BpmnModel model, String group){
+        String modelName = String.format("%s-doc-approve-model.bpmn", group);
+        String deployName = String.format("Group %s Document Approve", group);
+
+        log.info("updating doc approval for group: {}", group);
+        Deployment deployment = this.repoSrvc.createDeployment()
+                .addBpmnModel(modelName, model).name(deployName)
+                .deploy();
     }
 }

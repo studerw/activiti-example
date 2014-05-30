@@ -142,8 +142,9 @@ public class LocalTaskService {
     }
 
     boolean isDocAuthor(Task task, String userId) {
+        log.debug("********** " + task.getTaskDefinitionKey() + " ********");
         //is not docApprove Task
-        if (!Workflow.TASK_NAME_DOC_APPROVAL.equals(task.getName())) {
+        if (!StringUtils.startsWithIgnoreCase(task.getTaskDefinitionKey(), Workflow.TASK_ID_DOC_APPROVAL)) {
             return false;
         }
         String author = (String) task.getProcessVariables().get("initiator");

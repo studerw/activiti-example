@@ -67,7 +67,7 @@
                                 <c:when test="${task.name eq 'Approve New User Account'}">
                                     <span class="glyphicon glyphicon-user pull-right"></span>
                                 </c:when>
-                                <c:when test="${task.name eq 'Approve Document'}">
+                                <c:when test="${fn:startsWith(task.taskDefinitionKey, 'approveDocUserTask')}">
                                     <span class="glyphicon glyphicon-paperclip pull-right"></span>
                                 </c:when>
                                 <c:otherwise>
@@ -134,7 +134,7 @@
                                             </div>
                                         </div>
                                     </c:if>
-                                    <c:if test="${task.name eq 'Approve Document'}">
+                                    <c:if test="${fn:startsWith(task.taskDefinitionKey, 'approveDocUserTask')}">
                                         <div class="form-group">
                                             <label class="col-sm-2 control-label">Document</label>
 

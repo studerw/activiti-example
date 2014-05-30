@@ -46,7 +46,7 @@ public class DocumentWorkflow {
         Document doc = this.docSrvc.getDocument(docId);
         Map<String, Object> vars = runtimeService.getVariables(execution.getId());
         log.debug("setting doc {} with title = {}: state set to APPROVED", doc.getId(), doc.getTitle());
-        doc.setState(Document.STATE_APPROVED);
+        //doc.setState(Document.STATE_APPROVED);
         String message = String.format("Document entitled '%s'  has been approved. ", doc.getTitle());
         this.alertService.sendAlert(doc.getAuthor(), Alert.SUCCESS, message);
         docSrvc.updateDocument(doc);

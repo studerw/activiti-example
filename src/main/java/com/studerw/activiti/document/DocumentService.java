@@ -110,7 +110,8 @@ public class DocumentService {
             identityService.setAuthenticatedUserId(userDetails.getUsername());
             ProcessInstance current = this.getCurrentProcess(docId);
             if (current == null) {
-                current = runtimeService.startProcessInstanceByKey(Workflow.PROCESS_ID_DOC_APPROVAL, doc.getId());
+                String key = Workflow.PROCESS_ID_DOC_APPROVAL + "-" + doc.getGroupId();
+                current = runtimeService.startProcessInstanceByKey(key, doc.getId());
             }
             Task task = taskService.createTaskQuery().processInstanceId(current.getProcessInstanceId()).singleResult();
             taskService.setAssignee(task.getId(), userDetails.getUsername());

@@ -1,5 +1,4 @@
 (function ($) {
-
     function acknowledgeAlert(alertId) {
         $.ajax({
             type: 'DELETE',

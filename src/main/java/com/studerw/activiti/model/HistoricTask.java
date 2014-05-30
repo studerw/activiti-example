@@ -92,7 +92,4 @@ public class HistoricTask implements Comparable<HistoricTask> {
         return ObjectUtils.compare(this.completedDate, o.completedDate);
     }
 
-    boolean isDocApprovalType() {
-        return Workflow.TASK_NAME_DOC_APPROVAL.equals(this.name);
-    }
 }

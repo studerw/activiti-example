@@ -88,7 +88,7 @@ function addNewApprovalRow(pos) {
 }
 
 function removeApprovalRow(pos) {
-    if (APP.approvals.length < 2){
+    if (APP.approvals.length < 2) {
         alert("At least one approval is required");
         return;
     }
@@ -110,6 +110,7 @@ function removeApprovalRow(pos) {
 }
 
 function getGroups() {
+    $.blockUI();
     $.ajax({
         type: 'GET',
         dataType: 'json',
@@ -135,6 +136,7 @@ function getGroups() {
 }
 
 function getUsers() {
+    $.blockUI();
     $.ajax({
         type: 'GET',
         dataType: 'json',
@@ -160,6 +162,7 @@ function getUsers() {
 }
 
 function updateApprovals(group) {
+    $.blockUI();
     $.ajax({
         type: 'GET',
         dataType: 'json',
@@ -171,10 +174,8 @@ function updateApprovals(group) {
             if (!data.success) {
                 alert("There was an error updating the workflow");
             }
-            console.dir(data);
             APP.approvals = data.data;
             updateApprovalsTpl(APP.approvals);
-
         },
         error: function (error) {
             alert("There was an error updating the workflow");
@@ -182,18 +183,18 @@ function updateApprovals(group) {
     });
 }
 
-function updateApprovalsTpl(){
+function updateApprovalsTpl() {
     $('#approvals-panel').html(APP.approvalsTpl({
         approvals: APP.approvals,
         groups: APP.groups,
         users: APP.users
     }));
-    $('.chosen-select', '#approvals-panel').chosen({}).change(function(){
+    $('.chosen-select', '#approvals-panel').chosen({}).change(function () {
         console.dir($(this).val());
         var pos = parseInt($(this).attr('data-position'));
         var temp = $(this).val();
         var tempArray = _.isArray(temp) ? temp : [temp];
-        if ($(this).hasClass('candidate-groups')){
+        if ($(this).hasClass('candidate-groups')) {
             APP.approvals[pos - 1].candidateGroups = tempArray;
         }
         else {
@@ -212,7 +213,8 @@ function updateApprovalsTpl(){
     });
 }
 
-function submitApprovals(){
+function submitApprovals() {
+    $.blockUI();
     $.ajax(SERVLET_CONTEXT + '/workflow/approvals/' + APP.currentGroup, {
         type: 'PUT',
         dataType: 'json',
@@ -223,12 +225,15 @@ function submitApprovals(){
         },
         success: function (data) {
             console.dir(data);
+            var newSrc = SERVLET_CONTEXT + '/workflow/diagrams/' + DOC_APPROVAL_ROOT_ID + '-' + APP.currentGroup;
+            var rand = _.random(1, 100000000);
+            newSrc = newSrc + '?rand=' + rand
+            $('#proc-main-diagram').attr('src', newSrc);
             if (!data.success) {
                 alert("There was an error getting the app users");
             }
             else {
-                APP.users = data.data;
-                console.dir(APP.users);
+                updateApprovals(APP.currentGroup);
             }
 
         },
@@ -240,11 +245,11 @@ function submitApprovals(){
 }
 
 $(function () {
-    //change page when group is selected
+    $(document).ajaxStop($.unblockUI);
     getGroups();
     getUsers();
-    $('#updateButton').on('click', function(){
-       submitApprovals();
+    $('#update-button').on('click', function () {
+        submitApprovals();
     });
     $('#groupSel').change(function () {
         APP.currentGroup = $(this).val();
@@ -252,11 +257,13 @@ $(function () {
         if (APP.currentGroup !== '' && APP.currentGroup !== null) {
             $('#approvals').removeClass('hidden');
             var newSrc = SERVLET_CONTEXT + '/workflow/diagrams/' + DOC_APPROVAL_ROOT_ID + '-' + APP.currentGroup;
+            var rand = _.random(1, 100000000);
+            newSrc = newSrc + '?rand=' + rand
             $('#proc-main-diagram').attr('src', newSrc);
             updateApprovals(APP.currentGroup);
             $('#groupTitle').text(APP.currentGroup);
         }
-        else{
+        else {
             $('#approvals').addClass('hidden');
             var newSrc = SERVLET_CONTEXT + '/workflow/diagrams/' + DOC_APPROVAL_ROOT_ID;
             $('#proc-main-diagram').attr('src', newSrc);
@@ -269,8 +276,8 @@ $(function () {
         '.chosen-select': {},
         '.chosen-select-deselect': {allow_single_deselect: true},
         '.chosen-select-no-single': {disable_search_threshold: 10},
-        '.chosen-select-no-results': {no_results_text: 'Oops, nothing found!'},
-        '.chosen-select-width': {width: "95%"}
+        '.chosen-select-no-results': {no_results_text: 'Oops, nothing found!'}
+//        '.chosen-select-width': {width: "95%"}
     }
     for (var selector in config) {
         $(selector).chosen(config[selector]);
