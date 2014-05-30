@@ -1,10 +1,12 @@
 package com.studerw.activiti.workflow;
 
+import com.studerw.activiti.model.Approval;
 import com.studerw.activiti.model.Response;
 import com.studerw.activiti.util.Workflow;
 import com.studerw.activiti.web.BaseController;
 import org.activiti.engine.identity.Group;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +49,15 @@ public class WorkflowController extends BaseController {
 
 
     @RequestMapping(value = "/index.htm", method = RequestMethod.GET)
-    public String index(ModelMap model, HttpServletRequest request) {
+    public String index(ModelMap model,
+                        @RequestParam(value="group", required=false) String group,
+                        HttpServletRequest request) {
+
+        boolean isDefault = StringUtils.isBlank(group) || !workflowSrvc.groupWorkflowExists(group);
+        model.addAttribute("isDefault", isDefault);
+
+        List<Approval> approvals = workflowBldr.getDocApprovalsByGroup(isDefault ? null : group);
+        model.addAttribute("approvals", approvals);
         return "workflow/index";
     }
 

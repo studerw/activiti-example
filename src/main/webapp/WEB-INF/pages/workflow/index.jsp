@@ -17,7 +17,6 @@
         }
     </style>
 </head>
-
 <body>
 <jsp:include page="../fragments/navbar-top.jsp"/>
 
@@ -52,14 +51,14 @@
                 <p><strong>${msg}</strong></p>
             </div>
         </c:if>
-
+        <h4>${param.group}</h4>
         <div id="groupSelForm">
             <div class="form-group">
                 <label for="groupSel" class="">Group</label>
                 <select class="form-control" id="groupSel">
                     <option value="">Please Choose a Group</option>
                     <c:forEach var="group" items="${groups}">
-                        <option value="${group.id}">${group.name}</option>
+                        <option <c:if test="${group.id eq param.group}"> selected </c:if> value="${group.id}">${group.name}</option>
                     </c:forEach>
                 </select>
             </div>
@@ -67,12 +66,65 @@
 
         <hr/>
 
+        <c:choose>
+            <c:when test="${isDefault}">
+                <h4>Default Document Approval Workflow</h4>
+            </c:when>
+            <c:otherwise>
+                <h4>${param.group} Document Approval Workflow</h4>
+            </c:otherwise>
+        </c:choose>
+
         <div id="diagram" class="center-block">
-            <h4>Default Document Approval Workflow</h4>
             <p>
                 <img class="img-responsive img-rounded proc-diagram" src="${pageContext.request.contextPath}/workflow/diagrams/${defaultDocProcId}"
                      alt="Workflow Process Diagram">
             </p>
+        </div>
+
+        <div id="approvals" class="panel panel-info">
+            <div class="panel-heading">
+                <span class="glyphicon glyphicon-thumbs-up pull-right"></span>
+
+                <h3 class="panel-title">Approvals</h3>
+            </div>
+            <div class="panel-body">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <td>Position</td>
+                        <td>Candidate Groups</td>
+                        <td>Candidate Users</td>
+                        <td>Edit</td>
+                        <td>Delete</td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <c:forEach var="approval" items="${approvals}">
+                        <tr>
+                            <td>${approval.position}</td>
+                            <td>${approval.candidateGroups}</td>
+                            <td>${approval.candidateUsers}</td>
+                            <td>
+                                <c:if test="${not empty param.group}">
+                                    <button type="button" class="btn btn-default">
+                                        <span class="glyphicon glyphicon-edit"></span>
+                                    </button>
+                                </c:if>
+                            </td>
+
+                            <td>
+                                <c:if test="${not empty param.group}">
+                                    <button type="button" class="btn btn-default">
+                                        <span class="glyphicon glyphicon-trash"></span>
+                                    </button>
+                                </c:if>
+                            </td>
+                        </tr>
+                    </c:forEach>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
     </div>

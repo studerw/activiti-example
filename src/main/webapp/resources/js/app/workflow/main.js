@@ -1,7 +1,6 @@
-$(function() {
-    $('#groupSel').change(function() {
-        if ($(this).val() !== '') {
-            console.log($(this).val());
-        }
+$(function () {
+    $('#groupSel').change(function () {
+        console.log($(this).val());
+        window.location = SERVLET_CONTEXT + '/workflow/index.htm?group=' + $(this).val();
     });
 });

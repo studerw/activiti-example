@@ -63,4 +63,8 @@ public class WorkflowService {
         log.debug("Got bytes of size: " + bytes.length);
         return bytes;
     }
+
+    public boolean groupWorkflowExists(String group){
+        return false;
+    }
 }

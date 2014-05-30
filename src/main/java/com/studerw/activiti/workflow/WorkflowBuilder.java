@@ -1,13 +1,21 @@
 package com.studerw.activiti.workflow;
 
 import com.google.common.collect.Lists;
+import com.studerw.activiti.model.Approval;
 import com.studerw.activiti.util.Workflow;
 import org.activiti.bpmn.BpmnAutoLayout;
 import org.activiti.bpmn.model.*;
 import org.activiti.bpmn.model.Process;
 import org.activiti.engine.*;
+import org.activiti.engine.repository.ProcessDefinition;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * User: studerw
@@ -15,13 +23,13 @@ import org.springframework.stereotype.Service;
  */
 @Service("workflowBuilder")
 public class WorkflowBuilder {
-
+    private static final Logger log = LoggerFactory.getLogger(WorkflowBuilder.class);
     @Autowired
     RuntimeService runtimeService;
     @Autowired
     RepositoryService repositoryService;
 
-    BpmnModel defaultDocumentApprove(){
+    public BpmnModel defaultDocumentApprove() {
         BpmnModel model = new BpmnModel();
         org.activiti.bpmn.model.Process process = new Process();
         process.setId(Workflow.PROCESS_ID_DOC_APPROVAL);
@@ -72,6 +80,38 @@ public class WorkflowBuilder {
         new BpmnAutoLayout(model).execute();
 
         return model;
+    }
+
+    /**
+     * @param group - If null is passed, the default document approval workflow will be used.
+     * @return a sorted list of approvals contained in the workflow associated with the given group
+     */
+    public List<Approval> getDocApprovalsByGroup(String group) {
+        String base = Workflow.PROCESS_ID_DOC_APPROVAL;
+        String procId = StringUtils.isBlank(group) ? base : "-" + group;
+        log.debug("building approval list for procDef: " + procId);
+        ProcessDefinition pd =
+                this.repositoryService.createProcessDefinitionQuery().processDefinitionKey(procId).latestVersion().singleResult();
+        BpmnModel model = this.repositoryService.getBpmnModel(pd.getId());
+        Process process = model.getProcesses().get(0);
+
+        SubProcess sub = (SubProcess) process.getFlowElement(Workflow.SUB_PROC_DOC_APPROVAL);
+        log.debug(sub.getName());
+        Collection<FlowElement> flowElements = sub.getFlowElements();
+        List<UserTask> userTasks = Lists.newArrayList();
+        for (FlowElement el : flowElements) {
+            log.debug(el.getClass().getName() + " -- " + el.getId());
+            if (el.getClass().equals(org.activiti.bpmn.model.UserTask.class)) {
+                userTasks.add((UserTask) (el));
+            }
+        }
+
+        List<Approval> approvals = Lists.newArrayList();
+        int i = 1;
+        for (UserTask userTask : userTasks) {
+            approvals.add(fromUserTask(userTask, i));
+        }
+        return approvals;
     }
 
     protected SequenceFlow createSequenceFlow(String from, String to) {
@@ -160,4 +200,15 @@ public class WorkflowBuilder {
 
     }
 
+    protected Approval fromUserTask(UserTask userTask, int position) {
+        Approval approval = new Approval();
+        approval.setPosition(position);
+        approval.setCandidateGroups(Lists.newArrayList(userTask.getCandidateGroups()));
+        approval.setCandidateUsers(Lists.newArrayList(userTask.getCandidateUsers()));
+        approval.setName(userTask.getName());
+        approval.setId(userTask.getId());
+
+        return approval;
+
+    }
 }
