@@ -1,5 +1,6 @@
 package com.studerw.activiti.workflow;
 
+import com.studerw.activiti.util.Workflow;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
@@ -64,7 +65,9 @@ public class WorkflowService {
         return bytes;
     }
 
-    public boolean groupWorkflowExists(String group){
-        return false;
+    public boolean groupDocApproveWorkflowExists(String group){
+        String key = Workflow.PROCESS_ID_DOC_APPROVAL + "-" + group;
+        ProcessDefinition pd = this.repoSrvc.createProcessDefinitionQuery().processDefinitionKey(key).latestVersion().singleResult();
+        return pd != null;
     }
 }

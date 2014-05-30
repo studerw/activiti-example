@@ -125,7 +125,8 @@
     <c:if test="${not empty historicTasks}">
         <c:if test="${document.state  ne 'DRAFT' && document.state ne 'PUBLISHED'}">
             <div id="diagram" class="center-block">
-                <h4>Default Document Approval Workflow</h4>
+                <h3>Document Approval Workflow
+                <small>${document.groupId}</small></h3>
 
                 <p>
                     <img class="img-responsive img-rounded proc-diagram"

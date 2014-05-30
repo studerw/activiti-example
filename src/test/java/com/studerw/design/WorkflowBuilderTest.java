@@ -61,7 +61,7 @@ public class WorkflowBuilderTest {
     public void testBuildDefault()  {
         BpmnModel model = workflowBldr.defaultDocumentApprove();
         Process process = model.getProcesses().get(0);
-        SubProcess sub = (SubProcess)process.getFlowElement(Workflow.SUB_PROC_DOC_APPROVAL);
+        SubProcess sub = (SubProcess)process.getFlowElement(Workflow.SUB_PROC_ID_DOC_APPROVAL);
         log.debug(sub.getName());
         Collection<FlowElement> flowElements  = sub.getFlowElements();
         List<UserTask> userTasks = Lists.newArrayList();
@@ -79,10 +79,35 @@ public class WorkflowBuilderTest {
             i++;
             approval.setCandidateGroups(Lists.newArrayList(uTask.getCandidateGroups()));
             approval.setCandidateUsers(Lists.newArrayList(uTask.getCandidateUsers()));
-
-
         }
     }
 
 
+    @Test
+    public void testBuildWF() throws IOException {
+        List<Approval> approvals = Lists.newArrayList();
+
+        Approval approval = new Approval();
+        approval.getCandidateGroups().add("engineering");
+        approvals.add(approval);
+
+        Approval approval2 = new Approval();
+        approval2.getCandidateUsers().add("kermit");
+        approvals.add(approval2);
+
+        BpmnModel model = workflowBldr.documentApprove(approvals, "engineering");
+
+        InputStream in = ProcessDiagramGenerator.generatePngDiagram(model);
+        FileUtils.copyInputStreamToFile(in, new File("target/some_group_diagram.png"));
+        IOUtils.closeQuietly(in);
+    }
+
+    @Test
+    public void testBuildDefaultWF() throws IOException {
+        BpmnModel model = workflowBldr.defaultDocumentApprove();
+
+        InputStream in = ProcessDiagramGenerator.generatePngDiagram(model);
+        FileUtils.copyInputStreamToFile(in, new File("target/default_diagram.png"));
+        IOUtils.closeQuietly(in);
+    }
 }

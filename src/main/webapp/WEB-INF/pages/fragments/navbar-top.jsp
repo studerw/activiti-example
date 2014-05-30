@@ -18,7 +18,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand brand" href="#">Activiti Example</a>
+            <a class="navbar-brand brand" href="${pageContext.request.contextPath}/index.htm">Activiti Example</a>
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">

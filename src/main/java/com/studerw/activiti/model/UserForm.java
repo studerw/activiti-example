@@ -1,6 +1,7 @@
 package com.studerw.activiti.model;
 
 import com.google.common.base.Objects;
+import org.activiti.engine.identity.User;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.hibernate.validator.constraints.Email;
 
@@ -115,5 +116,17 @@ public class UserForm implements Serializable {
                 .add("lastName", lastName)
                 .add("group", group)
                 .toString();
+    }
+
+    public static UserForm fromUser(User user){
+        UserForm userForm = new UserForm();
+        userForm.setUserName(user.getId());
+        userForm.setPassword(user.getPassword());
+        userForm.setFirstName(user.getFirstName());
+        userForm.setLastName(user.getLastName());
+        userForm.setEmail(user.getEmail());
+
+        return userForm;
+
     }
 }

@@ -2,6 +2,7 @@ package com.studerw.activiti.workflow;
 
 import com.studerw.activiti.model.Approval;
 import com.studerw.activiti.model.Response;
+import com.studerw.activiti.model.TaskForm;
 import com.studerw.activiti.util.Workflow;
 import com.studerw.activiti.web.BaseController;
 import org.activiti.engine.identity.Group;
@@ -50,25 +51,36 @@ public class WorkflowController extends BaseController {
 
     @RequestMapping(value = "/index.htm", method = RequestMethod.GET)
     public String index(ModelMap model,
-                        @RequestParam(value="group", required=false) String group,
                         HttpServletRequest request) {
-
-        boolean isDefault = StringUtils.isBlank(group) || !workflowSrvc.groupWorkflowExists(group);
-        model.addAttribute("isDefault", isDefault);
-
-        List<Approval> approvals = workflowBldr.getDocApprovalsByGroup(isDefault ? null : group);
-        model.addAttribute("approvals", approvals);
         return "workflow/index";
     }
 
-    /*
-    @RequestMapping(value = "/index.htm", method = RequestMethod.GET)
-    public String indexByGroup(ModelMap model,
-                            @RequestParam(value="group", required=true) String group,
-                            HttpServletRequest request) {
-        return "workflows";
+    @RequestMapping(value = "/approvals/{group}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Response<String>>approvalsByGroupPost(@RequestBody List<Approval> approvals,
+                        @PathVariable(value="group") String group,
+                        HttpServletRequest request) {
+
+        log.debug(approvals.toString());
+        Response res = new Response(true, group);
+        return new ResponseEntity<Response<String>>(res, HttpStatus.OK);
     }
-    */
+
+    @RequestMapping(value = "/approvals/{group}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Response<List<Approval>>> approvalsByGroup(ModelMap model,
+                                                                     @PathVariable(value="group") String group,
+                                                                     HttpServletRequest request) {
+
+        String groupId = group;
+        if(!workflowSrvc.groupDocApproveWorkflowExists(group)){
+            groupId = null;
+        }
+
+        List<Approval> approvals = workflowBldr.getDocApprovalsByGroup(groupId);
+        log.debug("returning json response of {} approvals",  approvals.size());
+        Response res = new Response(true, groupId,  approvals);
+        return new ResponseEntity<Response<List<Approval>>>(res, HttpStatus.OK);
+    }
+
 
     @RequestMapping(value = "/diagrams/{id}", method = RequestMethod.GET)
     public ResponseEntity<byte[]> getDiagram(

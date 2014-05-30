@@ -16,6 +16,9 @@
             margin: 20px auto;
         }
     </style>
+    <script type="text/javascript">
+        var DOC_APPROVAL_ROOT_ID = '${defaultDocProcId}';
+    </script>
 </head>
 <body>
 <jsp:include page="../fragments/navbar-top.jsp"/>
@@ -25,7 +28,6 @@
     <div class="start-template">
         <div class="page-header">
             <span class="glyphicon glyphicon-cog pull-right"></span>
-
             <h2>Workflows</h2>
         </div>
 
@@ -58,7 +60,7 @@
                 <select class="form-control" id="groupSel">
                     <option value="">Please Choose a Group</option>
                     <c:forEach var="group" items="${groups}">
-                        <option <c:if test="${group.id eq param.group}"> selected </c:if> value="${group.id}">${group.name}</option>
+                        <option value="${group.id}">${group.name}</option>
                     </c:forEach>
                 </select>
             </div>
@@ -66,65 +68,32 @@
 
         <hr/>
 
-        <c:choose>
-            <c:when test="${isDefault}">
-                <h4>Default Document Approval Workflow</h4>
-            </c:when>
-            <c:otherwise>
-                <h4>${param.group} Document Approval Workflow</h4>
-            </c:otherwise>
-        </c:choose>
+        <div class="page-header">
+            <span class="glyphicon glyphicon-paperclip pull-right"></span>
+            <h3>Document Approval Workflow
+            <small id="groupTitle">Default</small></h3>
+        </div>
+
 
         <div id="diagram" class="center-block">
             <p>
-                <img class="img-responsive img-rounded proc-diagram" src="${pageContext.request.contextPath}/workflow/diagrams/${defaultDocProcId}"
+                <img id="proc-main-diagram" class="img-responsive img-rounded proc-diagram" src="${pageContext.request.contextPath}/workflow/diagrams/${defaultDocProcId}"
                      alt="Workflow Process Diagram">
             </p>
         </div>
 
-        <div id="approvals" class="panel panel-info">
+        <div id="approvals" class="panel panel-info hidden">
             <div class="panel-heading">
                 <span class="glyphicon glyphicon-thumbs-up pull-right"></span>
 
                 <h3 class="panel-title">Approvals</h3>
             </div>
-            <div class="panel-body">
-                <table class="table table-striped">
-                    <thead>
-                    <tr>
-                        <td>Position</td>
-                        <td>Candidate Groups</td>
-                        <td>Candidate Users</td>
-                        <td>Edit</td>
-                        <td>Delete</td>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <c:forEach var="approval" items="${approvals}">
-                        <tr>
-                            <td>${approval.position}</td>
-                            <td>${approval.candidateGroups}</td>
-                            <td>${approval.candidateUsers}</td>
-                            <td>
-                                <c:if test="${not empty param.group}">
-                                    <button type="button" class="btn btn-default">
-                                        <span class="glyphicon glyphicon-edit"></span>
-                                    </button>
-                                </c:if>
-                            </td>
+            <div class="panel-body" id="approvals-panel">
 
-                            <td>
-                                <c:if test="${not empty param.group}">
-                                    <button type="button" class="btn btn-default">
-                                        <span class="glyphicon glyphicon-trash"></span>
-                                    </button>
-                                </c:if>
-                            </td>
-                        </tr>
-                    </c:forEach>
-                    </tbody>
-                </table>
             </div>
+            <p class="pull-right">
+                <button id="update-button" type="button" style="margin-top: 20px" class="btn btn-primary">Update Workflow</button>
+            </p>
         </div>
 
     </div>
@@ -136,9 +105,10 @@
 
 <jsp:include page="../fragments/footer.jsp"/>
 
-<%--<script src="${pageContext.request.contextPath}/resources/js/json2.js"></script>--%>
-<%--<script src="${pageContext.request.contextPath}/resources/js/underscore.js"></script>--%>
+<script src="${pageContext.request.contextPath}/resources/js/json2.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/underscore.js"></script>
 <%--<script src="${pageContext.request.contextPath}/resources/js/backbone.js"></script>--%>
+<script src="${pageContext.request.contextPath}/resources/js/chosen_v1.1.0/chosen.jquery.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/app/workflow/main.js"></script>
 <script>
     (function ($) {

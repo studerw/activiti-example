@@ -110,6 +110,15 @@ public class UserService {
         return groups;
     }
 
+    public List<UserForm> getAllUsers(){
+        List<User> users = this.identityService.createUserQuery().orderByUserId().asc().list();
+        List<UserForm> userForms = Lists.newArrayList();
+        for(User user : users){
+            userForms.add(UserForm.fromUser(user));
+        }
+        return userForms;
+    }
+
     public List<Group> getAllAssignmentGroups() {
         List<Group> groups = identityService.createGroupQuery()
                 .groupType("assignment")
