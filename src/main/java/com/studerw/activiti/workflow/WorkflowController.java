@@ -66,7 +66,6 @@ public class WorkflowController extends BaseController {
         this.workflowSrvc.updateGroupDocApproveWorkflow(model, group);
 
         //wait for the model diagram to catch up (maybe)
-        Thread.sleep(1000);
         Response res = new Response(true, group);
         return new ResponseEntity<Response<String>>(res, HttpStatus.OK);
     }

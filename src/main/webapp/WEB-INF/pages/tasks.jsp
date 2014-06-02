@@ -11,8 +11,8 @@
     <jsp:include page="fragments/head.jsp"/>
     <title>Tasks</title>
     <style type="text/css">
-        .panel-task {
-            margin: 15px 0;
+        div.panel.panel-default.panel-task {
+            margin-bottom: 30px;
         }
     </style>
 </head>
