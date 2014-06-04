@@ -54,4 +54,11 @@ public class UserController extends BaseController {
         Response res = new Response(true, "groups",  groups);
         return new ResponseEntity<Response<List<Group>>>(res, HttpStatus.OK);
     }
+
+    @RequestMapping(value = "/users.htm", method = RequestMethod.GET)
+    public String getDocuments(ModelMap model, HttpServletRequest request) {
+        return "users";
+    }
+
+
 }

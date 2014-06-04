@@ -22,10 +22,10 @@
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-                <li id="nav-home"><a href="${pageContext.request.contextPath}/index.htm">Home</a></li>
                 <li id="nav-docs"><a href="${pageContext.request.contextPath}/document/list.htm">Documents</a></li>
                 <li id="nav-tasks"><a href="${pageContext.request.contextPath}/tasks.htm">Tasks</a></li>
                 <li id="nav-workflows"><a href="${pageContext.request.contextPath}/workflow/index.htm">Workflows</a></li>
+                <li id="nav-users"><a href="${pageContext.request.contextPath}/users.htm">Users</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown" id="nav-alerts">
