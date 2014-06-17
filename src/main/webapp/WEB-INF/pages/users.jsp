@@ -80,6 +80,10 @@
     (function ($) {
         $(document).ready(function () {
             $('li#nav-users').addClass('active');
+            $( document ).ajaxError(function( event, jqxhr, settings, exception ) {
+                    alert('here');
+                    console.dir(arguments);
+            });
         });
     })(jQuery);
 </script>

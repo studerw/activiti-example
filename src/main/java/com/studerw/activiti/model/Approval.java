@@ -15,6 +15,9 @@ public class Approval implements Comparable<Approval>{
 
     private String id;
     private String name;
+    private Integer position;
+    private List<String> candidateUsers = Lists.newArrayList();
+    private List<String> candidateGroups = Lists.newArrayList();
 
     public String getName() {
         return name;
@@ -23,10 +26,6 @@ public class Approval implements Comparable<Approval>{
     public void setName(String name) {
         this.name = name;
     }
-
-    private Integer position;
-    List<String> candidateUsers = Lists.newArrayList();
-    List<String> candidateGroups = Lists.newArrayList();
 
     public String getId() {
         return id;

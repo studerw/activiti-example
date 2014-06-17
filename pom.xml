@@ -287,6 +287,19 @@
                     </systemProperties>
                 </configuration>
             </plugin>
+                <plugin>
+                    <groupId>org.jboss.as.plugins</groupId>
+                    <artifactId>jboss-as-maven-plugin</artifactId>
+                    <version>7.5.Final</version>
+                    <configuration>
+                        <filename>${project.build.finalName}.${project.packaging}</filename>
+                        <hostname>127.0.0.1</hostname>
+                        <port>9999</port>
+                        <name>/activiti-example</name>
+                        <username>root</username>
+                        <password>password</password>
+                    </configuration>
+                </plugin>
 
         </plugins>
     </build>

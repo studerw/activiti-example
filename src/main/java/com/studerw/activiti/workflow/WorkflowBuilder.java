@@ -287,8 +287,11 @@ public class WorkflowBuilder {
         int i = 1;
         for (Approval approval : approvals) {
             UserTask userTask = new UserTask();
+            if (StringUtils.isBlank(approval.getName())){
+                approval.setName(String.format("Approve Document (%d / %d)", i, approvals.size()));
+            }
             userTask.setId(String.format("approveDocUserTask_%d", i));
-            userTask.setName(String.format("Approve Document (%d / %d)", i, approvals.size()));
+            userTask.setName(approval.getName());
             if (!approval.getCandidateGroups().isEmpty()) {
                 userTask.setCandidateGroups(approval.getCandidateGroups());
             }

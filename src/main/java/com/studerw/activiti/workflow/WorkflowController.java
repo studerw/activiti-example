@@ -1,5 +1,6 @@
 package com.studerw.activiti.workflow;
 
+import com.google.common.collect.Lists;
 import com.studerw.activiti.model.Approval;
 import com.studerw.activiti.model.Response;
 import com.studerw.activiti.model.TaskForm;
@@ -110,6 +111,8 @@ public class WorkflowController extends BaseController {
 
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("Content-Type", "image/png");
+        List<Integer> integers = Lists.newArrayList();
         return new ResponseEntity<byte[]>(bytes, responseHeaders, HttpStatus.OK);
+
     }
 }

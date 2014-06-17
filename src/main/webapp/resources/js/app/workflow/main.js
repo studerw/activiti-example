@@ -44,7 +44,11 @@ APP.approvalsTpl = _.template(
                          <% }); %>\
                         </select>\
                     </td> \
-                    <td> <%= approval.name %></td>\
+                    <td> \
+                       <div class="form-group"> \
+                            <input type="text" class="form-control approval-name" id="approval-name-<%= approval.name %>" data-position="<%= approval.position %>" placeholder="Description" value="<%= approval.name %>"/>\
+                        </div>\
+                    </td>\
                     <td> \
                         <button type="button" class="btn btn-default add-button" data-position="<%= approval.position %>" data-id="<%= approval.id %>"> \
                             <span class="glyphicon glyphicon-plus"></span> \
@@ -74,12 +78,11 @@ function addNewApprovalRow(pos) {
                 candidateGroups: [],
                 candidateUsers: [],
                 id: 'approveDocUserTask_' + newPos,
-                name: 'Approve Document (' + newPos + ' / ' + (list.length + 1) + ')'
+                name: 'Approve Document'
             });
         }
         if (approval.position > pos) {
             approval.position += 1;
-            approval.name = 'Approve Document (' + approval.position + ' / ' + (list.length + 1) + ')';
             newList.push(approval);
         }
     });
@@ -89,24 +92,13 @@ function addNewApprovalRow(pos) {
 
 function removeApprovalRow(pos) {
     if (APP.approvals.length < 2) {
-        alert("At least one approval is required");
+        bootbox.alert("At least one approval is required.", function() {});
         return;
     }
-    var newList = [];
+    APP.approvals.splice(pos -1, 1);
     _.each(APP.approvals, function (approval, index, list) {
-        if (approval.position < pos) {
-            approval.name = 'Approve Document (' + approval.position + ' / ' + (list.length - 1) + ')';
-            newList.push(approval);
-        }
-
-        if (approval.position > pos) {
-            approval.position -= 1;
-            approval.name = 'Approve Document (' + approval.position + ' / ' + (list.length - 1) + ')';
-            newList.push(approval);
-        }
+        approval.position = index + 1;
     });
-    console.dir(newList);
-    APP.approvals = newList;
 }
 
 function getGroups() {
@@ -190,7 +182,7 @@ function updateApprovalsTpl() {
         users: APP.users
     }));
     $('.chosen-select', '#approvals-panel').chosen({}).change(function () {
-        console.dir($(this).val());
+//        console.dir($(this).val());
         var pos = parseInt($(this).attr('data-position'));
         var temp = $(this).val();
         var tempArray = _.isArray(temp) ? temp : [temp];
@@ -200,6 +192,10 @@ function updateApprovalsTpl() {
         else {
             APP.approvals[pos - 1].candidateUsers = tempArray;
         }
+    });
+    $('input.approval-name', '#approvals-panel').on('blur', function(){
+        var pos = parseInt($(this).attr('data-position'));
+        APP.approvals[pos - 1].name = $(this).val();
     });
     $('button.add-button', '#approvals-panel').on('click', function () {
         var pos = $(this).attr('data-position');
