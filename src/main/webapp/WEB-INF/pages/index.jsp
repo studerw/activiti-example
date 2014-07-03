@@ -29,7 +29,7 @@
         <c:if test="${taskCount gt 0}">
             <div class="alert alert-warning">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                <p>There are ${taskCount} <a href="${pageContext.request.contextPath}/tasks.htm" class="alert-link">task(s) </a>
+                <p>There are ${taskCount} <a href="${pageContext.request.contextPath}/tasks.htm" class="alert-link">&nbsp; task(s) </a>
                     assigned to you or one of your groups waiting to be completed</p>
             </div>
         </c:if>

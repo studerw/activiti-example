@@ -247,7 +247,7 @@
     </dependencies>
 
     <build>
-        <finalName>activiti-test</finalName>
+        <finalName>activiti-example</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

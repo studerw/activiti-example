@@ -110,7 +110,11 @@
                                 </tr>
                             </c:forEach>
                         </table>
+                        <p>All passwords are, by default, the same as the username (e.g. kermit/kermit)
+                        <br/>
+                        New Users will have whatever password is set when registering.</p>
                     </div>
+
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                     </div>
