@@ -34,6 +34,10 @@
         <level value="WARN"/>
     </logger>
 
+    <logger name="org.springframework.security">
+        <level value="DEBUG"/>
+    </logger>
+
     <logger name="org.activiti">
         <level value="INFO"/>
     </logger>

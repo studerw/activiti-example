@@ -5,6 +5,8 @@ import com.studerw.activiti.model.Approval;
 import com.studerw.activiti.util.Workflow;
 import com.studerw.activiti.workflow.WorkflowBuilder;
 import org.activiti.bpmn.BpmnAutoLayout;
+import org.activiti.bpmn.constants.BpmnXMLConstants;
+import org.activiti.bpmn.converter.BpmnXMLConverter;
 import org.activiti.bpmn.model.*;
 import org.activiti.bpmn.model.Process;
 import org.activiti.engine.*;
@@ -77,6 +79,7 @@ public class WorkflowBuilderTest {
             Approval approval = new Approval();
             approval.setPosition(i);
             i++;
+
             approval.setCandidateGroups(Lists.newArrayList(uTask.getCandidateGroups()));
             approval.setCandidateUsers(Lists.newArrayList(uTask.getCandidateUsers()));
         }
@@ -105,7 +108,9 @@ public class WorkflowBuilderTest {
     @Test
     public void testBuildDefaultWF() throws IOException {
         BpmnModel model = workflowBldr.defaultDocumentApprove();
-
+        BpmnXMLConverter converter = new BpmnXMLConverter();
+        byte[] bytes = converter.convertToXML(model);
+        System.out.println(new String(bytes, "UTF-8"));
         InputStream in = ProcessDiagramGenerator.generatePngDiagram(model);
         FileUtils.copyInputStreamToFile(in, new File("target/default_diagram.png"));
         IOUtils.closeQuietly(in);
