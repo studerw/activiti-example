@@ -295,7 +295,7 @@
                         <filename>${project.build.finalName}.${project.packaging}</filename>
                         <hostname>127.0.0.1</hostname>
                         <port>9999</port>
-                        <name>/activiti-example</name>
+                        <name>activiti-example.war</name>
                         <username>root</username>
                         <password>password</password>
                     </configuration>
