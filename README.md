@@ -13,6 +13,7 @@ Login in as any of the users - the password is the same name as the user (e.g. k
 
 Createa a document and submit for approval.
 
-Then logout, and login and as another user in the same group as that which the document was created.
+Then logout, and login and as another user in the same group as that which the document was created. You can
+view the list of users by clicking the 'users' button on the bottom righ of the form.
 
 View your tasks and see that there is a new document waiting to be approved. Approve or deny. Log back in as the original author.
