@@ -5,11 +5,14 @@ create table ACT_GE_PROPERTY (
     primary key (NAME_)
 );
 
-insert into ACT_GE_PROPERTY values ('schema.version', '5.15.1', 1);
+insert into ACT_GE_PROPERTY
+values ('schema.version', '5.17.0.2', 1);
 
-insert into ACT_GE_PROPERTY values ('schema.history', 'create(5.15.1)', 1);
+insert into ACT_GE_PROPERTY
+values ('schema.history', 'create(5.17.0.2)', 1);
 
-insert into ACT_GE_PROPERTY values ('next.dbid', '1', 1);
+insert into ACT_GE_PROPERTY
+values ('next.dbid', '1', 1);
 
 create table ACT_GE_BYTEARRAY (
     ID_ varchar(64),
@@ -63,6 +66,8 @@ create table ACT_RU_EXECUTION (
     SUSPENSION_STATE_ integer,
     CACHED_ENT_STATE_ integer,
     TENANT_ID_ varchar(255) default '',
+    NAME_ varchar(255),
+    LOCK_TIME_ timestamp,
     primary key (ID_)
 );
 
@@ -99,6 +104,7 @@ create table ACT_RE_PROCDEF (
     DGRM_RESOURCE_NAME_ varchar(4000),
     DESCRIPTION_ varchar(4000),
     HAS_START_FORM_KEY_ bit,
+    HAS_GRAPHICAL_NOTATION_ bit,
     SUSPENSION_STATE_ integer,
     TENANT_ID_ varchar(255) default '',
     primary key (ID_)
@@ -123,6 +129,7 @@ create table ACT_RU_TASK (
     CATEGORY_ varchar(255),
     SUSPENSION_STATE_ integer,
     TENANT_ID_ varchar(255) default '',
+    FORM_KEY_ varchar(255),
     primary key (ID_)
 );
 
@@ -169,6 +176,21 @@ create table ACT_RU_EVENT_SUBSCR (
     primary key (ID_)
 );
 
+create table ACT_EVT_LOG (
+    LOG_NR_ identity,
+    TYPE_ varchar(64),
+    PROC_DEF_ID_ varchar(64),
+    PROC_INST_ID_ varchar(64),
+    EXECUTION_ID_ varchar(64),
+    TASK_ID_ varchar(64),
+    TIME_STAMP_ timestamp not null,
+    USER_ID_ varchar(255),
+    DATA_ longvarbinary,
+    LOCK_OWNER_ varchar(255),
+    LOCK_TIME_ timestamp,
+    IS_PROCESSED_ bit default 0
+);
+
 create index ACT_IDX_EXEC_BUSKEY on ACT_RU_EXECUTION(BUSINESS_KEY_);
 create index ACT_IDX_TASK_CREATE on ACT_RU_TASK(CREATE_TIME_);
 create index ACT_IDX_IDENT_LNK_USER on ACT_RU_IDENTITYLINK(USER_ID_);
@@ -178,126 +200,103 @@ create index ACT_IDX_VARIABLE_TASK_ID on ACT_RU_VARIABLE(TASK_ID_);
 create index ACT_IDX_ATHRZ_PROCEDEF on ACT_RU_IDENTITYLINK(PROC_DEF_ID_);
 
 alter table ACT_GE_BYTEARRAY
-    add constraint ACT_FK_BYTEARR_DEPL
-    foreign key (DEPLOYMENT_ID_)
-    references ACT_RE_DEPLOYMENT;
+add constraint ACT_FK_BYTEARR_DEPL
+foreign key (DEPLOYMENT_ID_)
+references ACT_RE_DEPLOYMENT;
 
 alter table ACT_RE_PROCDEF
-    add constraint ACT_UNIQ_PROCDEF
-    unique (KEY_,VERSION_, TENANT_ID_);
+add constraint ACT_UNIQ_PROCDEF
+unique (KEY_,VERSION_, TENANT_ID_);
 
 alter table ACT_RU_EXECUTION
-    add constraint ACT_FK_EXE_PROCINST
-    foreign key (PROC_INST_ID_)
-    references ACT_RU_EXECUTION;
+add constraint ACT_FK_EXE_PROCINST
+foreign key (PROC_INST_ID_)
+references ACT_RU_EXECUTION;
 
 alter table ACT_RU_EXECUTION
-    add constraint ACT_FK_EXE_PARENT
-    foreign key (PARENT_ID_)
-    references ACT_RU_EXECUTION;
+add constraint ACT_FK_EXE_PARENT
+foreign key (PARENT_ID_)
+references ACT_RU_EXECUTION;
 
 alter table ACT_RU_EXECUTION
-    add constraint ACT_FK_EXE_SUPER
-    foreign key (SUPER_EXEC_)
-    references ACT_RU_EXECUTION;
+add constraint ACT_FK_EXE_SUPER
+foreign key (SUPER_EXEC_)
+references ACT_RU_EXECUTION;
 
 alter table ACT_RU_EXECUTION
-    add constraint ACT_FK_EXE_PROCDEF
-    foreign key (PROC_DEF_ID_)
-    references ACT_RE_PROCDEF (ID_);
+add constraint ACT_FK_EXE_PROCDEF
+foreign key (PROC_DEF_ID_)
+references ACT_RE_PROCDEF (ID_);
 
 alter table ACT_RU_IDENTITYLINK
-    add constraint ACT_FK_TSKASS_TASK
-    foreign key (TASK_ID_)
-    references ACT_RU_TASK;
+add constraint ACT_FK_TSKASS_TASK
+foreign key (TASK_ID_)
+references ACT_RU_TASK;
 
 alter table ACT_RU_IDENTITYLINK
-    add constraint ACT_FK_ATHRZ_PROCEDEF
-    foreign key (PROC_DEF_ID_)
-    references ACT_RE_PROCDEF;
+add constraint ACT_FK_ATHRZ_PROCEDEF
+foreign key (PROC_DEF_ID_)
+references ACT_RE_PROCDEF;
 
 alter table ACT_RU_IDENTITYLINK
-    add constraint ACT_FK_IDL_PROCINST
-    foreign key (PROC_INST_ID_)
-    references ACT_RU_EXECUTION (ID_);
+add constraint ACT_FK_IDL_PROCINST
+foreign key (PROC_INST_ID_)
+references ACT_RU_EXECUTION (ID_);
 
 alter table ACT_RU_TASK
-    add constraint ACT_FK_TASK_EXE
-    foreign key (EXECUTION_ID_)
-    references ACT_RU_EXECUTION;
+add constraint ACT_FK_TASK_EXE
+foreign key (EXECUTION_ID_)
+references ACT_RU_EXECUTION;
 
 alter table ACT_RU_TASK
-    add constraint ACT_FK_TASK_PROCINST
-    foreign key (PROC_INST_ID_)
-    references ACT_RU_EXECUTION;
+add constraint ACT_FK_TASK_PROCINST
+foreign key (PROC_INST_ID_)
+references ACT_RU_EXECUTION;
 
 alter table ACT_RU_TASK
-  add constraint ACT_FK_TASK_PROCDEF
-  foreign key (PROC_DEF_ID_)
-  references ACT_RE_PROCDEF;
+add constraint ACT_FK_TASK_PROCDEF
+foreign key (PROC_DEF_ID_)
+references ACT_RE_PROCDEF;
 
 alter table ACT_RU_VARIABLE
-    add constraint ACT_FK_VAR_EXE
-    foreign key (EXECUTION_ID_)
-    references ACT_RU_EXECUTION;
+add constraint ACT_FK_VAR_EXE
+foreign key (EXECUTION_ID_)
+references ACT_RU_EXECUTION;
 
 alter table ACT_RU_VARIABLE
-    add constraint ACT_FK_VAR_PROCINST
-    foreign key (PROC_INST_ID_)
-    references ACT_RU_EXECUTION;
+add constraint ACT_FK_VAR_PROCINST
+foreign key (PROC_INST_ID_)
+references ACT_RU_EXECUTION;
 
 alter table ACT_RU_VARIABLE
-    add constraint ACT_FK_VAR_BYTEARRAY
-    foreign key (BYTEARRAY_ID_)
-    references ACT_GE_BYTEARRAY;
+add constraint ACT_FK_VAR_BYTEARRAY
+foreign key (BYTEARRAY_ID_)
+references ACT_GE_BYTEARRAY;
 
 alter table ACT_RU_JOB
-    add constraint ACT_FK_JOB_EXCEPTION
-    foreign key (EXCEPTION_STACK_ID_)
-    references ACT_GE_BYTEARRAY;
+add constraint ACT_FK_JOB_EXCEPTION
+foreign key (EXCEPTION_STACK_ID_)
+references ACT_GE_BYTEARRAY;
 
 alter table ACT_RU_EVENT_SUBSCR
-    add constraint ACT_FK_EVENT_EXEC
-    foreign key (EXECUTION_ID_)
-    references ACT_RU_EXECUTION;
+add constraint ACT_FK_EVENT_EXEC
+foreign key (EXECUTION_ID_)
+references ACT_RU_EXECUTION;
 
 alter table ACT_RE_MODEL
-    add constraint ACT_FK_MODEL_SOURCE
-    foreign key (EDITOR_SOURCE_VALUE_ID_)
-    references ACT_GE_BYTEARRAY (ID_);
+add constraint ACT_FK_MODEL_SOURCE
+foreign key (EDITOR_SOURCE_VALUE_ID_)
+references ACT_GE_BYTEARRAY (ID_);
 
 alter table ACT_RE_MODEL
-    add constraint ACT_FK_MODEL_SOURCE_EXTRA
-    foreign key (EDITOR_SOURCE_EXTRA_VALUE_ID_)
-    references ACT_GE_BYTEARRAY (ID_);
+add constraint ACT_FK_MODEL_SOURCE_EXTRA
+foreign key (EDITOR_SOURCE_EXTRA_VALUE_ID_)
+references ACT_GE_BYTEARRAY (ID_);
 
 alter table ACT_RE_MODEL
-    add constraint ACT_FK_MODEL_DEPLOYMENT
-    foreign key (DEPLOYMENT_ID_)
-    references ACT_RE_DEPLOYMENT (ID_);
-
-create table DOCUMENT(
-    ID varchar(255),
-    AUTHOR varchar(255),
-    TITLE varchar(255),
-    SUMMARY varchar(10000),
-    CONTENT  varchar(10000),
-    GROUP_ID varchar(255),
-    CREATED_DATE timestamp,
-    STATE_ varchar(255),
-    primary key (ID)
-);
-
-create table ALERT(
-    ID varchar(255),
-    CREATED_BY varchar(255),
-    MESSAGE varchar(10000),
-    PRIORITY  int,
-    USER_ID varchar(255),
-    CREATED_DATE timestamp,
-    ACKNOWLEDGED boolean,
-    primary key (ID)
-);
+add constraint ACT_FK_MODEL_DEPLOYMENT
+foreign key (DEPLOYMENT_ID_)
+references ACT_RE_DEPLOYMENT (ID_);
 
 create table ACT_HI_PROCINST (
     ID_ varchar(64) not null,
@@ -313,6 +312,7 @@ create table ACT_HI_PROCINST (
     SUPER_PROCESS_INSTANCE_ID_ varchar(64),
     DELETE_REASON_ varchar(4000),
     TENANT_ID_ varchar(255) default '',
+    NAME_ varchar(255),
     primary key (ID_),
     unique (PROC_INST_ID_)
 );
@@ -420,6 +420,7 @@ create table ACT_HI_ATTACHMENT (
     PROC_INST_ID_ varchar(64),
     URL_ varchar(4000),
     CONTENT_ID_ varchar(64),
+    TIME_ timestamp,
     primary key (ID_)
 );
 create table ACT_HI_IDENTITYLINK (
@@ -443,6 +444,7 @@ create index ACT_IDX_HI_DETAIL_NAME on ACT_HI_DETAIL(NAME_);
 create index ACT_IDX_HI_DETAIL_TASK_ID on ACT_HI_DETAIL(TASK_ID_);
 create index ACT_IDX_HI_PROCVAR_PROC_INST on ACT_HI_VARINST(PROC_INST_ID_);
 create index ACT_IDX_HI_PROCVAR_NAME_TYPE on ACT_HI_VARINST(NAME_, VAR_TYPE_);
+create index ACT_IDX_HI_PROCVAR_TASK_ID on ACT_HI_VARINST(TASK_ID_);
 create index ACT_IDX_HI_ACT_INST_PROCINST on ACT_HI_ACTINST(PROC_INST_ID_, ACT_ID_);
 create index ACT_IDX_HI_IDENT_LNK_USER on ACT_HI_IDENTITYLINK(USER_ID_);
 create index ACT_IDX_HI_IDENT_LNK_TASK on ACT_HI_IDENTITYLINK(TASK_ID_);
@@ -488,11 +490,35 @@ create table ACT_ID_INFO (
 );
 
 alter table ACT_ID_MEMBERSHIP
-    add constraint ACT_FK_MEMB_GROUP
-    foreign key (GROUP_ID_)
-    references ACT_ID_GROUP;
+add constraint ACT_FK_MEMB_GROUP
+foreign key (GROUP_ID_)
+references ACT_ID_GROUP;
 
 alter table ACT_ID_MEMBERSHIP
-    add constraint ACT_FK_MEMB_USER
-    foreign key (USER_ID_)
-    references ACT_ID_USER;
+add constraint ACT_FK_MEMB_USER
+foreign key (USER_ID_)
+references ACT_ID_USER;
+
+create table IF NOT EXISTS DOCUMENT(
+    ID varchar(255),
+    AUTHOR varchar(255),
+    TITLE varchar(255),
+    SUMMARY varchar(10000),
+    CONTENT  varchar(10000),
+    GROUP_ID varchar(255),
+    CREATED_DATE timestamp,
+    STATE_ varchar(255),
+    primary key (ID)
+);
+
+create table IF NOT EXISTS ALERT(
+    ID varchar(255),
+    CREATED_BY varchar(255),
+    MESSAGE varchar(10000),
+    PRIORITY  int,
+    USER_ID varchar(255),
+    CREATED_DATE timestamp,
+    ACKNOWLEDGED boolean,
+    primary key (ID)
+);
+

@@ -1,8 +1,8 @@
 package com.studerw.activiti.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.base.Objects;
 import org.activiti.engine.identity.User;
-import org.codehaus.jackson.annotate.JsonIgnore;
 import org.hibernate.validator.constraints.Email;
 
 import javax.validation.constraints.NotNull;
@@ -17,21 +17,27 @@ public class UserForm implements Serializable {
     @NotNull
     @Size(min = 5, max = 50)
     private String userName;
+
     @JsonIgnore
     @NotNull
     @Size(min = 8, max = 30)
     private String password;
+
     @NotNull
     @Email
     private String email;
+
     @NotNull
     private String firstName;
+
     @NotNull
     private String lastName;
+
     @NotNull
     private String group;
 
-    public UserForm() {}
+    public UserForm() {
+    }
 
     public String getGroup() {
         return group;
@@ -118,7 +124,7 @@ public class UserForm implements Serializable {
                 .toString();
     }
 
-    public static UserForm fromUser(User user){
+    public static UserForm fromUser(User user) {
         UserForm userForm = new UserForm();
         userForm.setUserName(user.getId());
         userForm.setPassword(user.getPassword());

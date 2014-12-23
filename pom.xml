@@ -9,11 +9,24 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.version>3.2.11.RELEASE</spring.version>
-        <activiti-version>5.15.1</activiti-version>
+        <spring.version>4.0.8.RELEASE</spring.version>
+        <activiti-version>5.17.0</activiti-version>
+        <jackson.version>2.4.3</jackson.version>
         <slf4j.version>1.7.5</slf4j.version>
-        <spring.security.version>3.2.4.RELEASE</spring.security.version>
+        <spring.security.version>3.2.5.RELEASE</spring.security.version>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-framework-bom</artifactId>
+                <version>${spring.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -133,19 +146,19 @@
 
         <!-- Object Serialization -->
         <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-mapper-asl</artifactId>
-            <version>1.9.13</version>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-core-asl</artifactId>
-            <version>1.9.13</version>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-xc</artifactId>
-            <version>1.9.13</version>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
         </dependency>
 
         <!-- Database -->
@@ -264,7 +277,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.14.1</version>
                     <configuration>
-                        <skipTests>true</skipTests>
+                        <!--<skipTests>true</skipTests>-->
                         <excludes>
                             <exclude></exclude>
                         </excludes>

@@ -13,6 +13,8 @@
 
 package com.studerw.activiti.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.RepositoryService;
@@ -25,8 +27,6 @@ import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.Model;
 import org.activiti.engine.runtime.Job;
 import org.activiti.engine.task.Task;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.node.ObjectNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

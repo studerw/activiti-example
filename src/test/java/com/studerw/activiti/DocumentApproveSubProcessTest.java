@@ -13,10 +13,9 @@ import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.identity.Group;
 import org.activiti.engine.impl.RepositoryServiceImpl;
-import org.activiti.engine.impl.bpmn.diagram.ProcessDiagramGenerator;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.task.Comment;
-import org.activiti.engine.task.Task;
+import org.activiti.image.impl.DefaultProcessDiagramGenerator;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.junit.Test;
@@ -50,20 +49,28 @@ import static org.junit.Assert.assertTrue;
 @ContextConfiguration({"classpath:spring/testAppContext.xml"})
 public class DocumentApproveSubProcessTest {
     private static final Logger log = Logger.getLogger(ActivitiSpringTest.class);
+
     @Autowired
     RuntimeService runtimeService;
+
     @Autowired
     TaskService taskService;
+
     @Autowired
     HistoryService historyService;
+
     @Autowired
     IdentityService identityService;
+
     @Autowired
     UserService userService;
+
     @Autowired
     DocumentService documentService;
+
     @Autowired
     LocalTaskService localTaskService;
+
     @Autowired
     RepositoryService repoSrvc;
 
@@ -83,7 +90,6 @@ public class DocumentApproveSubProcessTest {
         this.documentService.submitForApproval(docId);
 
 
-
         setSpringSecurity("fozzie");
         List<TaskForm> tasks = this.localTaskService.getTasks("fozzie");
         assertTrue(tasks.size() == 1);
@@ -91,10 +97,10 @@ public class DocumentApproveSubProcessTest {
         log.debug("got task: " + tasks.get(0).getName());
 
         //http://forums.activiti.org/content/process-diagram-highlighting-current-process
-        RepositoryServiceImpl impl = (RepositoryServiceImpl)repoSrvc;
+        RepositoryServiceImpl impl = (RepositoryServiceImpl) repoSrvc;
         ProcessDefinitionEntity pde = (ProcessDefinitionEntity) impl.getDeployedProcessDefinition(currentTask.getProcessDefinitionId());
         BpmnModel bpmnModel = repoSrvc.getBpmnModel(pde.getId());
-        InputStream in = ProcessDiagramGenerator.generateDiagram(bpmnModel, "png", runtimeService.getActiveActivityIds(currentTask.getProcessInstanceId()));
+        InputStream in = new DefaultProcessDiagramGenerator().generateDiagram(bpmnModel, "png", runtimeService.getActiveActivityIds(currentTask.getProcessInstanceId()));
         FileUtils.copyInputStreamToFile(in, new File("target/current-diagram.png"));
 
         localTaskService.approveTask(true, "task approved blah blah blah", tasks.get(0).getId());
@@ -111,7 +117,7 @@ public class DocumentApproveSubProcessTest {
         List<Comment> comments = taskService.getTaskComments(approval.getId());
     }
 
-    private void setSpringSecurity(String userName){
+    private void setSpringSecurity(String userName) {
         List<Group> groups = this.identityService.createGroupQuery().groupMember(userName).groupType("security-role").list();
         List<String> groupStr = Lists.newArrayList();
         for (Group g : groups) {

@@ -7,7 +7,7 @@ To run:
 mvn tomcat7:run
 
 Access the site:
-http://localhost:9090/activiti-example/
+http://127.0.0.1:9090/activiti-example/
 
 Login in as any of the users - the password is the same name as the user (e.g. kermit/kermit).
 
