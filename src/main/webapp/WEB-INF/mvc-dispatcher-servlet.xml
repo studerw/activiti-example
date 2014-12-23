@@ -31,7 +31,7 @@
         </property>
         <property name="defaultViews">
             <list>
-                <bean id="jsonView" class="org.springframework.web.servlet.view.json.MappingJacksonJsonView"/>
+                <bean id="jsonView" class="org.springframework.web.servlet.view.json.MappingJackson2JsonView"/>
             </list>
         </property>
     </bean>
