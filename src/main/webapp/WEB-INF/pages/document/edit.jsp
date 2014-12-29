@@ -20,7 +20,7 @@
         <ol class="breadcrumb">
             <li><a href="${pageContext.request.contextPath}/index.htm">Home</a></li>
             <li><a href="${pageContext.request.contextPath}/document/list.htm">Documents</a></li>
-            <li class="active">Doc ${document.id}</li>
+            <li class="active">${document.title}</li>
         </ol>
 
         <c:if test="${error == true}">
@@ -51,7 +51,7 @@
         <div class="panel-heading">
             <span class="glyphicon glyphicon-file pull-right"></span>
 
-            <h3 class="panel-title"><<strong>${document.title}</strong></h3>
+            <h3 class="panel-title"><strong>${document.title}</strong></h3>
         </div>
         <div class="panel-body">
 
