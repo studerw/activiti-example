@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:c="http://www.springframework.org/schema/c"
        xmlns:tx="http://www.springframework.org/schema/tx"
        xmlns:jdbc="http://www.springframework.org/schema/jdbc"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
@@ -25,22 +26,19 @@
     </bean>
     -->
 
-    <bean id="dataSource" class="com.jolbox.bonecp.BoneCPDataSource" destroy-method="close"
-          p:driverClass="${jdbc.driver}" p:jdbcUrl="${jdbc.url}"
-          p:username="${jdbc.user}"
+    <bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig"
+          p:driverClassName="${jdbc.driver}"
+          p:jdbcUrl="${jdbc.url}"
           p:password="${jdbc.pw}"
-        p:maxConnectionsPerPartition="30"
-        p:minConnectionsPerPartition="10"
-        p:partitionCount="3"
-        p:acquireIncrement="5"
-        p:statementsCacheSize="100"/>
+          p:username="${jdbc.user}" />
 
+    <bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource" c:configuration-ref="hikariConfig"/>
 
     <bean id="proxiedDataSource" class="org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy" p:targetDataSource-ref="dataSource"/>
 
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager" p:dataSource-ref="dataSource"/>
 
-    <jdbc:initialize-database data-source="dataSource" enabled="${jdbc.initialize}">
+    <jdbc:initialize-database data-source="dataSource">
         <jdbc:script location="${jdbc.initialize.location}"/>
     </jdbc:initialize-database>
 </beans>
