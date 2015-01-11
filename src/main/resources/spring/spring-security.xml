@@ -6,8 +6,9 @@
     http://www.springframework.org/schema/security
     http://www.springframework.org/schema/security/spring-security-3.2.xsd">
 
+    <!--<debug/>-->
+
     <beans:bean id="activitiAuthenticationProvider" class="com.studerw.activiti.security.ActivitiAuthenticationProvider" />
-    <debug/>
 
     <http auto-config="true" use-expressions="true" disable-url-rewriting="true" >
         <session-management session-fixation-protection="newSession">

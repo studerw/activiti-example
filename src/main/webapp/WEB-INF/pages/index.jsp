@@ -85,13 +85,12 @@
     </div>
 
 </div>
-</div>
 
 <jsp:include page="/WEB-INF/pages/fragments/footer.jsp"/>
 <script>
     (function ($) {
         $(document).ready(function () {
-            $('li#nav-home').addClass('active');
+            $('a.navbar-brand').addClass('navbar-brand-active');
         });
     })(jQuery);
 </script>

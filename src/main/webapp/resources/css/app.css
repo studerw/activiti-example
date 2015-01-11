@@ -73,3 +73,7 @@ img.proc-diagram{
     padding:20px;
     border:2px solid #021a40;
 }
+
+.navbar-inverse .navbar-brand-active {
+    color:#fff;
+}
