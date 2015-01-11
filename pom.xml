@@ -296,7 +296,7 @@
                     <contextReloadable>true</contextReloadable>
                     <!--<tomcatUsers>${project.basedir}/src/main/resources/tomcat/tomcat-users.xml</tomcatUsers>-->
                     <systemProperties>
-                        <JAVA_OPTS>-Xms512m -Xmx1024m -XX:MaxPermSize=1024m</JAVA_OPTS>
+                        <JAVA_OPTS>-Xms512m -Xmx1024m -XX:MaxPermSize=2048m</JAVA_OPTS>
                         <log4j.debug>true</log4j.debug>
                     </systemProperties>
                 </configuration>

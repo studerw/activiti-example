@@ -7,7 +7,10 @@
 <html lang="en">
 <head>
     <jsp:include page="../fragments/head.jsp"/>
+    <link href="${pageContext.request.contextPath}/resources/css/bootstrap-choosen.css" rel="stylesheet" >
+
     <title>Workflow</title>
+
     <style type="text/css">
         .panel-task {
             margin: 15px 0;
@@ -100,15 +103,12 @@
 
 </div>
 
-</div>
-
-
 <jsp:include page="../fragments/footer.jsp"/>
 
 <script src="${pageContext.request.contextPath}/resources/js/json2.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/underscore.js"></script>
 <%--<script src="${pageContext.request.contextPath}/resources/js/backbone.js"></script>--%>
-<script src="${pageContext.request.contextPath}/resources/js/chosen_v1.1.0/chosen.jquery.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/chosen_v1.3.0/chosen.jquery.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/app/workflow/main.js"></script>
 <script>
     (function ($) {
