@@ -10,28 +10,26 @@
 
     <beans:bean id="activitiAuthenticationProvider" class="com.studerw.activiti.security.ActivitiAuthenticationProvider" />
 
+    <!-- These urls require no security -->
+    <http pattern="/login.htm" security="none" />
+    <http pattern="/error" security="none"/>
+    <http pattern="/noerror" security="none"/>
+    <http pattern="/noerrornoview" security="none"/>
+    <http pattern="/loginfailed.htm" security="none"/>
+    <http pattern="/resources/**" security="none"/>
+    <http pattern="/userRegistration.htm/**" security="none"/>
+    <http pattern="/test.htm/**" security="none"/>
+
     <http auto-config="true" use-expressions="true" disable-url-rewriting="true" >
         <session-management session-fixation-protection="newSession">
             <concurrency-control max-sessions="2" error-if-maximum-exceeded="true" />
         </session-management>
 
-        <intercept-url pattern="/login.htm" access="permitAll" />
-        <intercept-url pattern="/error" access="permitAll" />
-        <intercept-url pattern="/noerror" access="permitAll" />
-        <intercept-url pattern="/noerrornoview" access="permitAll" />
-        <intercept-url pattern="/loginfailed.htm" access="permitAll" />
-        <intercept-url pattern="/resources/**" access="permitAll" />
-        <intercept-url pattern="/userRegistration.htm/**" access="permitAll" />
-        <intercept-url pattern="/test.htm/**" access="permitAll" />
         <intercept-url pattern="/**" access="hasAnyRole('user, admin')" />
-
 
         <form-login login-page="/login.htm" always-use-default-target="true" default-target-url="/"
                     authentication-failure-url="/loginfailed.htm" />
-
-
     </http>
-
 
     <authentication-manager alias="authenticationManager">
         <authentication-provider ref="activitiAuthenticationProvider"/>

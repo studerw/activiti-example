@@ -75,7 +75,7 @@ public class TaskController extends BaseController {
 
         this.taskService.approveTask(taskApproval);
 
-        redirectAttributes.addFlashAttribute("msg", "The task has been completed");
+        redirectAttributes.addFlashAttribute("msg", "The task has been completed.");
         return "redirect:/tasks.htm";
     }
 
