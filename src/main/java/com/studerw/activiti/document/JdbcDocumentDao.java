@@ -26,7 +26,7 @@ import static com.google.common.base.Preconditions.checkArgument;
  * User: studerw
  * Date: 5/20/14
  *
- * Implementation of Document
+ * Default implementation of {@link com.studerw.activiti.document.DocumentDao} that uses standard JDBC / Spring.
  */
 @Repository
 @Component("docDao")

@@ -38,7 +38,6 @@ public class AlertController extends BaseController {
         public ResponseEntity<Response> acknowledgeAlert(
                         @PathVariable("id") String alertId,
                         HttpServletRequest request) {
-            String userName = currentUserName();
             log.debug("acknowledging alert {}", alertId);
             this.alertService.acknowledgeAlert(alertId, this.currentUserName());
             Response res = new Response(true, "Alert acknowledged");

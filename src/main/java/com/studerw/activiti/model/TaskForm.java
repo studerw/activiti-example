@@ -14,8 +14,31 @@ import java.util.Map;
  * Date: 5/18/14
  */
 public class TaskForm {
-    String id;
-    String owner;
+    private String id;
+    private String owner;
+    private String delegate;
+    private String category;
+    @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm Z")
+    private Date createTime;
+    private String description;
+    private String executionId;
+    private String name;
+    private String assignee;
+    private int priority;
+    private String processDefinitionId;
+    private String processInstanceId;
+    private Map<String, Object> processVariables;
+    private boolean suspended;
+    private String taskDefinitionKey;
+
+    public TaskForm() {
+    }
+
+    public static TaskForm fromTask(Task task) throws InvocationTargetException, IllegalAccessException {
+        TaskForm taskForm = new TaskForm();
+        BeanUtils.copyProperties(taskForm, task);
+        return taskForm;
+    }
 
     public String getTaskDefinitionKey() {
         return taskDefinitionKey;
@@ -23,30 +46,6 @@ public class TaskForm {
 
     public void setTaskDefinitionKey(String taskDefinitionKey) {
         this.taskDefinitionKey = taskDefinitionKey;
-    }
-
-    String delegate;
-    String category;
-    @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm Z")
-    Date createTime;
-    String description;
-    String executionId;
-    String name;
-    String assignee;
-    int priority;
-    String processDefinitionId;
-    String processInstanceId;
-    Map<String, Object> processVariables;
-    boolean suspended;
-    String taskDefinitionKey;
-
-
-    public TaskForm() {}
-
-    public static TaskForm fromTask(Task task) throws InvocationTargetException, IllegalAccessException {
-        TaskForm taskForm = new TaskForm();
-        BeanUtils.copyProperties(taskForm, task);
-        return taskForm;
     }
 
     public String getId() {

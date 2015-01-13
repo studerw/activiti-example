@@ -23,6 +23,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * {@link org.springframework.security.authentication.AuthenticationProvider} using the standard JDBC tables
+ * used by Activiti.
+ */
 @Service("activitiAuthenticationProvider")
 public class ActivitiAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
 

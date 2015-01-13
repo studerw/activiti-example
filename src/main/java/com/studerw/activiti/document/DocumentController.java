@@ -72,8 +72,8 @@ public class DocumentController extends BaseController {
             this.docService.submitForApproval(docId);
         }
         if (isSubmit) {
-            redirectAttributes.addFlashAttribute("msg", "Your Document has been submitted for approval.<br/>" +
-                    "You will receive alerts when it has been reviewed");
+            redirectAttributes.addFlashAttribute("msg", "<p>Your Document has been submitted for approval.<p/>" +
+                    "<p>You will receive alerts when it has been reviewed.</p>");
         } else {
             redirectAttributes.addFlashAttribute("msg", "Your Document has been Saved");
         }
@@ -99,10 +99,10 @@ public class DocumentController extends BaseController {
             this.docService.submitForApproval(document.getId());
         }
         if (isSubmit) {
-            redirectAttributes.addFlashAttribute("msg", "Your Document has been submitted for approval.<br/>" +
-                    "You will receive alerts when it has been reviewed");
+            redirectAttributes.addFlashAttribute("msg", "<p>Your Document has been submitted for approval.<p/>" +
+                    "<p>You will receive alerts when it has been reviewed.</p>");
         } else {
-            redirectAttributes.addFlashAttribute("msg", "Your Document has been Saved");
+            redirectAttributes.addFlashAttribute("msg", "<p>Your Document has been Saved</p>");
         }
 
         return "redirect:/document/list.htm";
@@ -121,9 +121,9 @@ public class DocumentController extends BaseController {
         if (doc.getAuthor().equals(currentUserName()) && doc.isEditable()) {
             return "document/edit";
         } else if (doc.getAuthor().equals(currentUserName())) {
-            model.addAttribute("msg", "The document cannot be edited in its current state.");
+            model.addAttribute("msg", "<p>The document cannot be edited in its current state</p>.");
         } else {
-            model.addAttribute("msg", "Only the original author may edit the document");
+            model.addAttribute("msg", "<p>Only the original author may edit the document</p>");
         }
         return "document/view";
     }

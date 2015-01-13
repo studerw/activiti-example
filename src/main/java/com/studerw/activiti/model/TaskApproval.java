@@ -10,12 +10,12 @@ import javax.validation.constraints.Size;
  * Date: 5/19/14
  */
 public class TaskApproval {
-    @NotNull
-    String taskId;
     @Size(max = 4000)
-    String comment;
+    private String comment;
     @NotNull
-    Boolean approved;
+    private Boolean approved;
+    @NotNull
+    private String taskId;
 
     public TaskApproval() {
     }

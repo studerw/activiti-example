@@ -9,19 +9,15 @@ import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.image.ProcessDiagramGenerator;
 import org.activiti.image.impl.DefaultProcessDiagramGenerator;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Date;
 
 /**
  * User: studerw
@@ -36,7 +32,6 @@ public class WorkflowService {
     RepositoryService repoSrvc;
 
     /**
-     *
      * @param processId the process <strong>Definition</strong> Id - NOT the process Instance Id.
      * @return png image of diagram - nothing highlighted since this is the process definition - not a specific instance.
      */
@@ -44,7 +39,7 @@ public class WorkflowService {
         ProcessDefinition pd =
                 this.repoSrvc.createProcessDefinitionQuery().processDefinitionKey(processId).latestVersion().singleResult();
         log.debug("Getting process diagram for processId: " + pd.getId());
-            BpmnModel model = repoSrvc.getBpmnModel(pd.getId());
+        BpmnModel model = repoSrvc.getBpmnModel(pd.getId());
         InputStream in = new DefaultProcessDiagramGenerator().generatePngDiagram(model);
         byte[] bytes = IOUtils.toByteArray(in);
         IOUtils.closeQuietly(in);
@@ -58,7 +53,7 @@ public class WorkflowService {
         ProcessInstance pi =
                 runtimeService.createProcessInstanceQuery().processInstanceBusinessKey(docId).singleResult();
 
-        RepositoryServiceImpl impl = (RepositoryServiceImpl)repoSrvc;
+        RepositoryServiceImpl impl = (RepositoryServiceImpl) repoSrvc;
         ProcessDefinitionEntity pde = (ProcessDefinitionEntity) impl.getDeployedProcessDefinition(pi.getProcessDefinitionId());
         BpmnModel bpmnModel = repoSrvc.getBpmnModel(pde.getId());
         InputStream in = new DefaultProcessDiagramGenerator().generateDiagram(bpmnModel, "png", runtimeService.getActiveActivityIds(pi.getProcessInstanceId()));
@@ -68,13 +63,13 @@ public class WorkflowService {
         return bytes;
     }
 
-    public boolean groupDocApproveWorkflowExists(String group){
+    public boolean groupDocApproveWorkflowExists(String group) {
         String key = Workflow.PROCESS_ID_DOC_APPROVAL + "-" + group;
         ProcessDefinition pd = this.repoSrvc.createProcessDefinitionQuery().processDefinitionKey(key).latestVersion().singleResult();
         return pd != null;
     }
 
-    public void updateGroupDocApproveWorkflow(BpmnModel model, String group){
+    public void updateGroupDocApproveWorkflow(BpmnModel model, String group) {
         String modelName = String.format("%s-doc-approve-model.bpmn", group);
         String deployName = String.format("Group %s Document Approve", group);
 

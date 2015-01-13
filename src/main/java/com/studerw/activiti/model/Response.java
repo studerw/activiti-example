@@ -4,11 +4,7 @@
  */
 package com.studerw.activiti.model;
 
-/**
- * @author steve.battjer
- */
 public class Response<T> {
-
     private boolean success;
     private String message;
     private T data;

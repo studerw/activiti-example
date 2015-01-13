@@ -26,7 +26,7 @@ public class Alert implements Comparable<Alert>, Serializable {
     public final static int DANGER = 4;
 
     @NotNull
-    String id;
+    private String id;
     @NotNull
     private String createdBy;
     @NotNull
@@ -110,7 +110,7 @@ public class Alert implements Comparable<Alert>, Serializable {
 
     @Override
     public int compareTo(Alert o) {
-        return this.createdDate.compareTo(o.createdDate);  //To change body of implemented methods use File | Settings | File Templates.
+        return this.createdDate.compareTo(o.createdDate);
     }
 
 

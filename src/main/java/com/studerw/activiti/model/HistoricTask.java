@@ -1,7 +1,6 @@
 package com.studerw.activiti.model;
 
 import com.google.common.base.Objects;
-import com.studerw.activiti.util.Workflow;
 import org.activiti.engine.task.Comment;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -16,17 +15,15 @@ import java.util.Map;
  */
 public class HistoricTask implements Comparable<HistoricTask> {
 
-    String id;
-    String name;
-    String userId;
-    List<Comment> comments;
-    Map<String, Object> localVars;
+    private String id;
+    private String name;
+    private String userId;
+    private List<Comment> comments;
+    private Map<String, Object> localVars;
     @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm Z")
-    Date completedDate;
+    private Date completedDate;
 
     //String taskOutcome;
-
-
     public String getId() {
         return id;
     }

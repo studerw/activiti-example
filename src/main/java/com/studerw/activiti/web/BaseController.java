@@ -13,10 +13,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 public class BaseController {
-    @Autowired
-    protected AlertService alertService;
-    @Autowired
-    protected UserService userService;
+    @Autowired protected AlertService alertService;
+    @Autowired protected UserService userService;
 
     @Value("${jdbc.type}")
     protected String jdbcType;
@@ -26,6 +24,7 @@ public class BaseController {
         UserDetails user = userService.currentUser();
         model.addAttribute("userDetails", user);
         model.addAttribute("userName", user.getUsername());
+        //add the jdbcType (e.g. Postgres, H2) to the footer for dev purposes.
         model.addAttribute("jdbcType", jdbcType);
         List<Alert> alerts = alertService.readActiveAlertsByUser(user.getUsername());
         model.addAttribute("alerts", alerts);

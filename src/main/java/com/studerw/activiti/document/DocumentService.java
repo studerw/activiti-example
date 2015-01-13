@@ -130,13 +130,13 @@ public class DocumentService {
      * @param docId
      * @return the associated ProcessInstance or null if one does not exist
      */
-    ProcessInstance getCurrentProcess(String docId) {
+    private ProcessInstance getCurrentProcess(String docId) {
         List<ProcessInstance> instances =
                 runtimeService.createProcessInstanceQuery().processInstanceBusinessKey(docId).list();
         if (instances.size() == 0) {
             return null;
         } else if (instances.size() > 1) {
-            throw new RuntimeException("More than one process found for document: " + docId + " - zero or one should have been found.");
+            throw new IllegalStateException("More than one process found for document: " + docId + " - zero or one should have been found.");
         } else {
             return instances.get(0);
         }

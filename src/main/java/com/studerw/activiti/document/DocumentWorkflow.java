@@ -20,21 +20,24 @@ import java.util.Map;
 /**
  * User: studerw
  * Date: 5/18/14
+ *
+ * Workflow methods for Document Approval, Reject, etc. Most likely embedded as bean services
+ * within the BPMN workflow definitions.
  */
 @Service("documentWorkflow")
 public class DocumentWorkflow {
     private static final Logger log = LoggerFactory.getLogger(DocumentWorkflow.class);
 
     @Autowired
-    IdentityService identityService;
+    protected IdentityService identityService;
     @Autowired
-    RuntimeService runtimeService;
+    protected RuntimeService runtimeService;
     @Autowired
-    DocumentService docSrvc;
+    protected DocumentService docSrvc;
     @Autowired
-    AlertService alertService;
+    protected AlertService alertService;
     @Autowired
-    TaskService taskService;
+    protected TaskService taskService;
 
 
     public void approved(DelegateExecution execution) {
@@ -65,7 +68,7 @@ public class DocumentWorkflow {
         this.alertService.sendAlert(doc.getAuthor(), Alert.DANGER, message);
         this.docSrvc.updateDocument(doc);
 
-        log.debug("document rejected: " + docId);
+        log.info("document rejected: " + docId);
     }
 
     public void publish(Execution execution) {

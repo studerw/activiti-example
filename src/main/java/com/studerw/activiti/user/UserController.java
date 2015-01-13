@@ -48,7 +48,6 @@ public class UserController extends BaseController {
 
     @RequestMapping(value = "/groups", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Response<List<Group>>> getGroups(HttpServletRequest request) {
-
         List<Group> groups = userService.getAllAssignmentGroups();
         log.debug("returning json response of {} groups",  groups.size());
         Response res = new Response(true, "groups",  groups);

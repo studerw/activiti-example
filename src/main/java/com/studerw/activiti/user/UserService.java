@@ -48,6 +48,11 @@ public class UserService {
         this.identityService = identityService;
     }
 
+    /**
+     *
+     * @return a {@link org.springframework.security.core.userdetails.UserDetails} using Spring Security.
+     * Note that this method will return null if called outside of a HTTP request (e.g. from within a task thread}.
+     */
     public UserDetails currentUser() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return userDetails;
@@ -68,7 +73,12 @@ public class UserService {
         log.debug("beginning user registration workflow with instance id: " + pi.getId());
     }
 
-
+    /**
+     *
+     * @return a Map keyed by {@code UserId (e.g. kermit, gonzo, etc.} associated
+     * with a List of {@code assignemnt} {@link org.activiti.engine.identity.Group Groups}.
+     * @see UserService#userWithAssignmentGroups()
+     */
     public Map<String, List<Group>> userWithAssignmentGroups() {
         Map<String, List<Group>> userMap = Maps.newHashMap();
         List<User> users = identityService.createUserQuery().list();
@@ -86,6 +96,11 @@ public class UserService {
         return userMap;
     }
 
+    /**
+     *
+     * @return a Map keyed by {@code UserId (e.g. kermit, gonzo, etc.} associated
+     * with a List of {@code assignemnt} groups as Strings (e.g. {engineering, management, etc.}.
+     */
     public Map<String, List<String>> userWithAssignmentGroupStr() {
         Map<String, List<String>> userMap = Maps.newHashMap();
         List<User> users = identityService.createUserQuery().list();
@@ -103,6 +118,12 @@ public class UserService {
         return userMap;
     }
 
+    /**
+     *
+     * @param userId
+     * @return List of all {@link org.activiti.engine.identity.Group Groups} of type {@code assignment}
+     * to which the given user belongs.
+     */
     public List<Group> getAssignmentGroups(String userId) {
         List<Group> groups = identityService.createGroupQuery().groupMember(userId)
                 .groupType("assignment")
@@ -110,6 +131,11 @@ public class UserService {
         return groups;
     }
 
+    /**
+     *
+     * @return List of all {@link org.activiti.engine.identity.User Users} converted to
+     * {@link com.studerw.activiti.model.UserForm UserForms}
+     */
     public List<UserForm> getAllUsers(){
         List<User> users = this.identityService.createUserQuery().orderByUserId().asc().list();
         List<UserForm> userForms = Lists.newArrayList();
@@ -119,6 +145,9 @@ public class UserService {
         return userForms;
     }
 
+    /**
+     * @return List of {@link org.activiti.engine.identity.Group Groups} with type of {@code assignment}.
+     */
     public List<Group> getAllAssignmentGroups() {
         List<Group> groups = identityService.createGroupQuery()
                 .groupType("assignment")
