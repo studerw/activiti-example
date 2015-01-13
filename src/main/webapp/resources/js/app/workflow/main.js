@@ -102,7 +102,6 @@ function removeApprovalRow(pos) {
 }
 
 function getGroups() {
-    $.blockUI();
     $.ajax({
         type: 'GET',
         dataType: 'json',
@@ -128,7 +127,6 @@ function getGroups() {
 }
 
 function getUsers() {
-    $.blockUI();
     $.ajax({
         type: 'GET',
         dataType: 'json',
@@ -154,7 +152,6 @@ function getUsers() {
 }
 
 function updateApprovals(group) {
-    $.blockUI();
     $.ajax({
         type: 'GET',
         dataType: 'json',
@@ -210,7 +207,6 @@ function updateApprovalsTpl() {
 }
 
 function submitApprovals() {
-    $.blockUI();
     $.ajax(SERVLET_CONTEXT + '/workflow/approvals/' + APP.currentGroup, {
         type: 'PUT',
         dataType: 'json',
@@ -241,7 +237,7 @@ function submitApprovals() {
 }
 
 $(function () {
-    $(document).ajaxStop($.unblockUI);
+    $(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
     getGroups();
     getUsers();
     $('#update-button').on('click', function () {
@@ -253,6 +249,7 @@ $(function () {
         if (APP.currentGroup !== '' && APP.currentGroup !== null) {
             $('#approvals').removeClass('hidden');
             var newSrc = SERVLET_CONTEXT + '/workflow/diagrams/' + DOC_APPROVAL_ROOT_ID + '-' + APP.currentGroup;
+            //need to add random param to avoid caching of the image
             var rand = _.random(1, 100000000);
             newSrc = newSrc + '?rand=' + rand
             $('#proc-main-diagram').attr('src', newSrc);
