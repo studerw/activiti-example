@@ -1,30 +1,24 @@
 package com.studerw.activiti.user;
 
-import com.studerw.activiti.model.Approval;
 import com.studerw.activiti.model.Response;
 import com.studerw.activiti.model.UserForm;
-import com.studerw.activiti.util.Workflow;
 import com.studerw.activiti.web.BaseController;
-import com.studerw.activiti.workflow.WorkflowBuilder;
-import com.studerw.activiti.workflow.WorkflowService;
 import org.activiti.engine.identity.Group;
-import org.activiti.engine.identity.User;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.util.List;
 
 @Controller

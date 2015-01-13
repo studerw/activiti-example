@@ -3,13 +3,10 @@ package com.studerw.activiti.workflow;
 import com.google.common.collect.Lists;
 import com.studerw.activiti.model.Approval;
 import com.studerw.activiti.model.Response;
-import com.studerw.activiti.model.TaskForm;
 import com.studerw.activiti.util.Workflow;
 import com.studerw.activiti.web.BaseController;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.engine.identity.Group;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
 @Controller

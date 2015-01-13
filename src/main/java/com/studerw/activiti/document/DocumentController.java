@@ -121,9 +121,9 @@ public class DocumentController extends BaseController {
         if (doc.getAuthor().equals(currentUserName()) && doc.isEditable()) {
             return "document/edit";
         } else if (doc.getAuthor().equals(currentUserName())) {
-            model.addAttribute("msg", "<p>The document cannot be edited in its current state</p>.");
+            model.addAttribute("msg", "The document cannot be edited in its current state.");
         } else {
-            model.addAttribute("msg", "<p>Only the original author may edit the document</p>");
+            model.addAttribute("msg", "Only the original author may edit the document.");
         }
         return "document/view";
     }

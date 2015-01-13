@@ -1,7 +1,6 @@
 package com.studerw.activiti.alert;
 
 import com.studerw.activiti.model.Response;
-import com.studerw.activiti.model.TaskForm;
 import com.studerw.activiti.web.BaseController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 @Controller
 public class AlertController extends BaseController {

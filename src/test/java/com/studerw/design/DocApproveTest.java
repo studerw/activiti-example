@@ -9,7 +9,6 @@ import org.activiti.bpmn.model.Process;
 import org.activiti.engine.*;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Task;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.junit.Test;
@@ -20,9 +19,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.File;
 import java.io.InputStream;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * User: studerw
