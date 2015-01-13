@@ -25,11 +25,13 @@ import static com.google.common.base.Preconditions.checkArgument;
 /**
  * User: studerw
  * Date: 5/20/14
+ *
+ * Implementation of Document
  */
 @Repository
 @Component("docDao")
-public class PGDocumentDao implements DocumentDao {
-    private static final Logger log = LoggerFactory.getLogger(PGDocumentDao.class);
+public class JdbcDocumentDao implements DocumentDao {
+    private static final Logger log = LoggerFactory.getLogger(JdbcDocumentDao.class);
     protected DataSource ds;
     protected NamedParameterJdbcTemplate namedJdbcTemplate;
 

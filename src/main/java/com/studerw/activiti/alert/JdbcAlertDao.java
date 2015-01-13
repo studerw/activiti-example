@@ -28,8 +28,8 @@ import static com.google.common.base.Preconditions.checkArgument;
  */
 @Repository
 @Component("alertDao")
-public class PGAlertDao implements AlertDao {
-    private static final Logger log = LoggerFactory.getLogger(PGAlertDao.class);
+public class JdbcAlertDao implements AlertDao {
+    private static final Logger log = LoggerFactory.getLogger(JdbcAlertDao.class);
     protected DataSource ds;
     protected NamedParameterJdbcTemplate namedJdbcTemplate;
 
