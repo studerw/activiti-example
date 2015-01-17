@@ -19,4 +19,4 @@ activiti.h2.db
 activiti.lock.db
 activiti_db.h2.db
 activiti_db.lock.db
-
+**/app.properties

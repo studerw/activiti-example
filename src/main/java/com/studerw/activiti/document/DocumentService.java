@@ -2,6 +2,7 @@ package com.studerw.activiti.document;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.studerw.activiti.model.DocState;
 import com.studerw.activiti.model.Document;
 import com.studerw.activiti.user.InvalidAccessException;
 import com.studerw.activiti.user.UserService;
@@ -97,7 +98,7 @@ public class DocumentService {
         if (!StringUtils.equals(userDetails.getUsername(), doc.getAuthor())) {
             throw new InvalidAccessException("Only the author of a doc can submit for approval");
         }
-        doc.setState(Document.STATE_WAITING_FOR_APPROVAL);
+        doc.setState(DocState.WAITING_FOR_APPROVAL);
 
         //Workflow
         //TODO check author and currentUser

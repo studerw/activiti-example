@@ -7,7 +7,8 @@ import org.activiti.engine.TaskService;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.identity.Group;
 import org.activiti.engine.identity.User;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,8 +25,7 @@ import static org.junit.Assert.assertNotNull;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"classpath:spring/testAppContext.xml"})
 public class ActivitiSpringTest {
-
-    private static final Logger log = Logger.getLogger(ActivitiSpringTest.class);
+    private static final Logger log = LogManager.getLogger(ActivitiSpringTest.class);
 
     @Autowired RuntimeService runtimeService;
 

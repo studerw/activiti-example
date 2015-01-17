@@ -3,7 +3,8 @@ package com.studerw.activiti;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.identity.Group;
 import org.activiti.engine.identity.User;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ import static org.junit.Assert.*;
 @ContextConfiguration({"classpath:spring/testAppContext.xml"})
 //@TransactionConfiguration(defaultRollback=true)
 public class IdentityServiceTest {
-    private static final Logger log = Logger.getLogger(IdentityServiceTest.class);
+    private static final Logger log = LogManager.getLogger(IdentityServiceTest.class);
     @Autowired
     IdentityService identityService;
 
@@ -48,7 +49,7 @@ public class IdentityServiceTest {
         for (User user2 : users2) {
             log.debug(user2.getId());
             List<Group> groups = this.identityService.createGroupQuery().groupMember(user2.getId()).groupType("security-role").list();
-            for(Group group : groups){
+            for (Group group : groups) {
                 log.debug("    " + group.getId() + " - " + group.getType());
             }
         }
@@ -63,12 +64,12 @@ public class IdentityServiceTest {
     }
 
     @Test
-    public void testGroups(){
+    public void testGroups() {
         List<User> users2 = identityService.createUserQuery().list();
         for (User user2 : users2) {
             log.debug(user2.getId());
             List<Group> groups = this.identityService.createGroupQuery().groupMember(user2.getId()).groupType("security-role").list();
-            for(Group group : groups){
+            for (Group group : groups) {
                 log.debug("    " + group.getId() + " - " + group.getType());
             }
         }

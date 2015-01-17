@@ -64,7 +64,7 @@ public class WorkflowService {
     }
 
     public boolean groupDocApproveWorkflowExists(String group) {
-        String key = Workflow.PROCESS_ID_DOC_APPROVAL + "-" + group;
+        String key = getApprovalKeyByGroup(group);
         ProcessDefinition pd = this.repoSrvc.createProcessDefinitionQuery().processDefinitionKey(key).latestVersion().singleResult();
         return pd != null;
     }
@@ -77,5 +77,9 @@ public class WorkflowService {
         Deployment deployment = this.repoSrvc.createDeployment()
                 .addBpmnModel(modelName, model).name(deployName)
                 .deploy();
+    }
+
+    public static String getApprovalKeyByGroup(String group){
+        return String.format("%s-%s",Workflow.PROCESS_ID_DOC_APPROVAL, group);
     }
 }

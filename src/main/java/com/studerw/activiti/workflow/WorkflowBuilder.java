@@ -25,15 +25,14 @@ import java.util.List;
 @Service("workflowBuilder")
 public class WorkflowBuilder {
     private static final Logger log = LoggerFactory.getLogger(WorkflowBuilder.class);
-    @Autowired
-    RuntimeService runtimeService;
-    @Autowired
-    RepositoryService repositoryService;
+    @Autowired RuntimeService runtimeService;
+    @Autowired RepositoryService repositoryService;
+    @Autowired WorkflowService workflowService;
 
     public BpmnModel documentApprove(List<Approval> approvals, String group) {
         BpmnModel model = new BpmnModel();
-        org.activiti.bpmn.model.Process process = new Process();
-        process.setId(Workflow.PROCESS_ID_DOC_APPROVAL + "-" + group);
+        Process process = new Process();
+        process.setId(WorkflowService.getApprovalKeyByGroup(group));
         process.setName(Workflow.PROCESS_NAME_DOC_APPROVAL);
         model.addProcess(process);
 
@@ -138,7 +137,7 @@ public class WorkflowBuilder {
     }
 
     /**
-     * @param group - If null is passed, the default document approval workflow will be used.
+     * @param group - If no {@code Group} is passed, the default document approval workflow will be used.
      * @return a sorted list of approvals contained in the workflow associated with the given group
      */
     public List<Approval> getDocApprovalsByGroup(String group) {
@@ -281,14 +280,13 @@ public class WorkflowBuilder {
         if (approvals.isEmpty()) {
             sub.addFlowElement(createSequenceFlow(start.getId(), end.getId()));
             return sub;
-        }
-        else {
+        } else {
             sub.addFlowElement(createSequenceFlow(start.getId(), "approveDocUserTask_1"));
         }
         int i = 1;
         for (Approval approval : approvals) {
             UserTask userTask = new UserTask();
-            if (StringUtils.isBlank(approval.getName())){
+            if (StringUtils.isBlank(approval.getName())) {
                 approval.setName(String.format("Approve Document (%d / %d)", i, approvals.size()));
             }
             userTask.setId(String.format("approveDocUserTask_%d", i));
@@ -349,7 +347,6 @@ public class WorkflowBuilder {
             sub.addFlowElement(approvedFlow);
             i++;
         }
-
         return sub;
 
     }
@@ -363,6 +360,5 @@ public class WorkflowBuilder {
         approval.setId(userTask.getId());
 
         return approval;
-
     }
 }

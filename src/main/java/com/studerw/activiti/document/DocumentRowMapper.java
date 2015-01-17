@@ -1,5 +1,6 @@
 package com.studerw.activiti.document;
 
+import com.studerw.activiti.model.DocState;
 import com.studerw.activiti.model.Document;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.RowMapper;
@@ -30,7 +31,7 @@ public class DocumentRowMapper implements RowMapper<Document> {
         document.setContent(content);
         document.setSummary(summary);
         document.setGroupId(groupId);
-        document.setState(state);
+        document.setState(DocState.valueOf(state));
         document.setCreatedDate(createdDate);
         return document;
 

@@ -15,7 +15,8 @@ import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.identity.Group;
 import org.activiti.engine.task.Comment;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +44,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"classpath:spring/testAppContext.xml"})
 public class DocumentApproveTest {
-    private static final Logger log = Logger.getLogger(ActivitiSpringTest.class);
+    private static final Logger log = LogManager.getLogger(ActivitiSpringTest.class);
     @Autowired
     RuntimeService runtimeService;
     @Autowired
@@ -92,7 +93,7 @@ public class DocumentApproveTest {
         List<Comment> comments = taskService.getTaskComments(approval.getId());
     }
 
-    private void setSpringSecurity(String userName){
+    private void setSpringSecurity(String userName) {
         List<Group> groups = this.identityService.createGroupQuery().groupMember(userName).groupType("security-role").list();
         List<String> groupStr = Lists.newArrayList();
         for (Group g : groups) {

@@ -6,7 +6,8 @@ import com.google.common.collect.Lists;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.identity.Group;
 import org.activiti.engine.identity.User;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,10 +30,8 @@ import java.util.List;
  */
 @Service("activitiAuthenticationProvider")
 public class ActivitiAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
-
-    private static final Logger log = Logger.getLogger(ActivitiAuthenticationProvider.class);
-
-    protected IdentityService identityService;
+    private static final Logger log = LoggerFactory.getLogger(ActivitiAuthenticationProvider.class);
+        protected IdentityService identityService;
 
     @Autowired
     public void setIdentityService(IdentityService identityService) {

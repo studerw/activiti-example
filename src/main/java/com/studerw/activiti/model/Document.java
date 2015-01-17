@@ -13,11 +13,6 @@ import java.util.Date;
  * Date: 5/20/14
  */
 public class Document implements Comparable<Document>, Serializable {
-    public final static String STATE_DRAFT = "DRAFT";
-    public final static String STATE_APPROVED = "APPROVED";
-    public final static String STATE_REJECTED = "REJECTED";
-    public final static String STATE_WAITING_FOR_APPROVAL = "WAITING FOR APPROVAL";
-    public final static String STATE_PUBLISHED = "PUBLISHED";
 
     @NotNull
     String id = "TEMP";
@@ -34,7 +29,7 @@ public class Document implements Comparable<Document>, Serializable {
     @NotNull @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm Z")
     private Date createdDate;
     @NotNull
-    private String state = STATE_DRAFT;
+    private DocState state = DocState.DRAFT;
 
     public Document() {}
 
@@ -95,11 +90,11 @@ public class Document implements Comparable<Document>, Serializable {
         this.createdDate = createdDate;
     }
 
-    public String getState() {
+    public DocState getState() {
         return state;
     }
 
-    public void setState(String state) {
+    public void setState(DocState state) {
         this.state = state;
     }
 
@@ -140,7 +135,8 @@ public class Document implements Comparable<Document>, Serializable {
     }
 
     public boolean isEditable() {
-        return STATE_DRAFT.equals(this.state) || STATE_REJECTED.equals(this.state);
+        return DocState.DRAFT.equals(this.state) || DocState.REJECTED.equals(this.state)
+                || DocState.WAITING_FOR_COLLABORATION.equals(this.state);
     }
 }
 

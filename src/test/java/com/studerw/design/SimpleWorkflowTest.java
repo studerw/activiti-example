@@ -8,7 +8,8 @@ import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"classpath:spring/testAppContext.xml"})
 public class SimpleWorkflowTest {
-    private static final Logger log = Logger.getLogger(SimpleWorkflowTest.class);
+    private static final Logger log = LogManager.getLogger(SimpleWorkflowTest.class);
     @Autowired
     RuntimeService runtimeService;
     @Autowired

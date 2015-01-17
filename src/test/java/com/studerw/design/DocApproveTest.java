@@ -10,7 +10,8 @@ import org.activiti.engine.*;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,7 @@ import java.io.InputStream;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"classpath:spring/testAppContext.xml"})
 public class DocApproveTest {
-    private static final Logger log = Logger.getLogger(DocApproveTest.class);
+    private static final Logger log = LogManager.getLogger(DocApproveTest.class);
     @Autowired
     RuntimeService runtimeService;
     @Autowired

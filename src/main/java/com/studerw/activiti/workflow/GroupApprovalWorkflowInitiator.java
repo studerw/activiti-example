@@ -15,6 +15,7 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 
 /**
+ * This bean initiates the default workflows for each group upon system startup.
  * User: studerw
  * Date: 5/30/14
  */

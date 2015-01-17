@@ -12,7 +12,8 @@ import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.image.impl.DefaultProcessDiagramGenerator;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,19 +33,13 @@ import java.util.List;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"classpath:spring/testAppContext.xml"})
 public class WorkflowBuilderTest {
-    private static final Logger log = Logger.getLogger(WorkflowBuilderTest.class);
-
-    @Autowired RuntimeService runtimeService;
-
-    @Autowired TaskService taskService;
-
-    @Autowired HistoryService historyService;
-
-    @Autowired IdentityService identityService;
-
-    @Autowired RepositoryService repositoryService;
-
+    private static final Logger log = LogManager.getLogger(WorkflowBuilderTest.class);
     @Autowired public WorkflowBuilder workflowBldr;
+    @Autowired RuntimeService runtimeService;
+    @Autowired TaskService taskService;
+    @Autowired HistoryService historyService;
+    @Autowired IdentityService identityService;
+    @Autowired RepositoryService repositoryService;
 
     @Test
     public void testRepoService() throws IOException {

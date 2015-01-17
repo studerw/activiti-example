@@ -2,6 +2,7 @@ package com.studerw.activiti.document;
 
 import com.studerw.activiti.alert.AlertService;
 import com.studerw.activiti.model.Alert;
+import com.studerw.activiti.model.DocState;
 import com.studerw.activiti.model.Document;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.RuntimeService;
@@ -63,7 +64,7 @@ public class DocumentWorkflow {
         Document doc = this.docSrvc.getDocument(docId);
         Map<String, Object> vars = runtimeService.getVariables(execution.getId());
         log.debug("setting doc {} with title = {}: state set to REJECTED", doc.getId(), doc.getTitle());
-        doc.setState(Document.STATE_REJECTED);
+        doc.setState(DocState.REJECTED);
         String message = String.format("Document entitled '%s' has been rejected", doc.getTitle(), doc.getId());
         this.alertService.sendAlert(doc.getAuthor(), Alert.DANGER, message);
         this.docSrvc.updateDocument(doc);
@@ -78,7 +79,7 @@ public class DocumentWorkflow {
                 processInstanceId(execution.getProcessInstanceId()).singleResult();
         String docId = pi.getBusinessKey();
         Document doc = this.docSrvc.getDocument(docId);
-        doc.setState(Document.STATE_PUBLISHED);
+        doc.setState(DocState.REJECTED);
         String message = String.format("Document entitled '%s' has been successfully published ", doc.getTitle());
         this.alertService.sendAlert(doc.getAuthor(), Alert.SUCCESS, message);
         this.docSrvc.updateDocument(doc);

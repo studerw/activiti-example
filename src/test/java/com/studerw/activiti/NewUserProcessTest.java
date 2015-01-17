@@ -11,7 +11,8 @@ import org.activiti.engine.TaskService;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Comment;
 import org.activiti.engine.task.Task;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,7 +34,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"classpath:spring/testAppContext.xml"})
 public class NewUserProcessTest {
-    private static final Logger log = Logger.getLogger(NewUserProcessTest.class);
+    private static final Logger log = LogManager.getLogger(NewUserProcessTest.class);
     @Autowired
     RuntimeService runtimeService;
     @Autowired
@@ -70,7 +71,7 @@ public class NewUserProcessTest {
 
         Task task = taskService.createTaskQuery().taskCandidateGroup("admin").
                 //includeProcessVariables().
-                singleResult();
+                        singleResult();
         assertNotNull(task);
         TaskForm taskForm = TaskForm.fromTask(task);
         log.debug(taskForm);
