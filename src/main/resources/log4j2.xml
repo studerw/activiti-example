@@ -24,7 +24,7 @@
 
         <Root level="WARN">
             <AppenderRef ref="Console"/>
-            <!--<AppenderRef ref="A1"/>-->
+            <AppenderRef ref="A1"/>
         </Root>
     </Loggers>
 </configuration>

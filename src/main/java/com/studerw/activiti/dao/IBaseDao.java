@@ -70,7 +70,7 @@ public interface IBaseDao<T> {
      * @param id of object ID
      * @return Object associated with given primary key ID.
      *         <p/>
-     *         An unchecked excpetion will be thrown if the object with the given id does not exist.
+     *         An unchecked exception will be thrown if the object with the given id does not exist.
      */
     public T read(String id);
 

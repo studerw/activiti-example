@@ -6,17 +6,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <jsp:include page="../fragments/head.jsp"/>
-    <title>Add Document</title>
+    <jsp:include page="../../fragments/head.jsp"/>
+    <title>New Invoice</title>
 
 </head>
 
 <body>
-<jsp:include page="../fragments/navbar-top.jsp"/>
+<jsp:include page="../../fragments/navbar-top.jsp"/>
 <div class="container">
     <div class="start-template">
         <div class="page-header">
-            <h2>New Document
+            <h2>New Invoice
                 <small>${userName}</small>
             </h2>
         </div>
@@ -25,18 +25,22 @@
             <div class="panel-heading">
                 <span class="glyphicon glyphicon-paperclip pull-right"></span>
 
-                <h3 class="panel-title">New Document</h3>
+                <h3 class="panel-title">Invoice</h3>
             </div>
             <div class="panel-body">
-                <form:form cssStyle="margin: 20px" cssClass="form-horizontal" method="POST" commandName="document"
-                           action="${pageContext.request.contextPath}/document/add.htm">
+                <form:form cssStyle="margin: 20px" cssClass="form-horizontal" method="POST" commandName="invoice"
+                           action="${pageContext.request.contextPath}/document/invoice">
                     <div class="form-group">
                         <form:errors path="*" cssClass="errorblock"/>
                     </div>
-
+                    <div class="form-group">
+                        <label for="title" class="col-sm-2 control-label">Title</label>
+                        <div class="col-sm-10">
+                            <form:input cssClass="form-control" id="title" path="title"/>
+                        </div>
+                    </div>
                     <div class="form-group">
                         <label for="author" class="col-sm-2 control-label">Author</label>
-
                         <div class="col-sm-10">
                             <form:input path="author" id="author" cssClass="form-control" readonly="true"/>
                         </div>
@@ -52,25 +56,18 @@
                             </form:select>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="title" class="col-sm-2 control-label">Title</label>
 
-                        <div class="col-sm-10">
-                            <form:input cssClass="form-control" id="title" path="title"/>
+                    <div class="form-group">
+                        <label for="payee" class="col-sm-2 control-label">Payee</label>
+                        <div class="col-sm-4">
+                            <form:input path="payee" id="payee" cssClass="form-control" />
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="content" class="col-sm-2 control-label">Content</label>
+                        <label for="amount" class="col-sm-2 control-label">Amount</label>
 
-                        <div class="col-sm-10">
-                            <form:textarea cssClass="form-control" id="content" path="content" rows="6"/>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="summary" class="col-sm-2 control-label">Summary</label>
-
-                        <div class="col-sm-10">
-                            <form:textarea cssClass="form-control" id="summary" path="summary" rows="3"/>
+                        <div class="col-sm-4">
+                            <form:input path="amount" id="amount" cssClass="form-control" />
                         </div>
                     </div>
                     <div class="form-group">
@@ -81,24 +78,25 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="state" class="col-sm-2 control-label">State</label>
+                        <label for="docState" class="col-sm-2 control-label">State</label>
 
                         <div class="col-sm-10">
-                            <form:input cssClass="form-control" id="state" path="state" readonly="true"/>
+                            <form:input cssClass="form-control" id="docState" path="docState" readonly="true"/>
                         </div>
                     </div>
                     <form:hidden path="id"/>
+                    <form:hidden path="docType"/>
                     <div class="form-group">
                         <div class="col-sm-offset-2 col-sm-10">
                             <div class="checkbox">
                                 <label for="isSubmit">
-                                    <input name="isSubmit" id="isSubmit" type="checkbox"> Submit for Approval?
+                                    <input name="isSubmit" id="isSubmit" type="checkbox"> Submit to Workflow?
                                 </label>
                             </div>
                         </div>
                     </div>
                     <div class="pull-right">
-                        <button type="submit" class="btn btn-primary btn-default">Save Document</button>
+                        <button type="submit" class="btn btn-primary btn-default">Save Invoice</button>
 
                     </div>
                 </form:form>
@@ -110,10 +108,12 @@
 <jsp:include page="/WEB-INF/pages/fragments/footer.jsp"/>
 <script>
     $(document).ready(function () {
-        //$("#title").attr('required', '');
-        $("#content").attr('required', '');
         $("#group").attr('required', '');
-        $("#summary").attr('required', '');
+        $("#payee").attr('required', '');
+        $("#author").attr('required', '');
+        $("#title").attr('required', '');
+        $("#group").attr('required', '');
+        $("#amount").attr('required', '');
         $('li#nav-docs').addClass('active');
     });
 

@@ -8,12 +8,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <jsp:include page="../fragments/head.jsp"/>
-    <title>Document Edit</title>
+    <jsp:include page="../../fragments/head.jsp"/>
+    <title>Document View</title>
+
 </head>
 
 <body>
-<jsp:include page="../fragments/navbar-top.jsp"/>
+<jsp:include page="../../fragments/navbar-top.jsp"/>
 
 <div class="container">
     <div class="start-template">
@@ -47,14 +48,12 @@
         </c:if>
     </div>
 
-    <div id="currentDoc" class="panel panel-default">
+    <div class="panel panel-default">
         <div class="panel-heading">
             <span class="glyphicon glyphicon-file pull-right"></span>
-
-            <h3 class="panel-title"><strong>${document.title}</strong></h3>
+            <h3 class="panel-title"><strong>Invoice ${document.title}</strong></h3>
         </div>
         <div class="panel-body">
-
             <form:form cssStyle="margin: 20px" cssClass="form-horizontal" method="POST" commandName="document">
 
                 <div class="form-group">
@@ -65,10 +64,17 @@
                     </div>
                 </div>
                 <div class="form-group">
+                    <label for="title" class="col-sm-2 control-label">Title</label>
+
+                    <div class="col-sm-10">
+                        <form:input cssClass="form-control" id="title" path="title" readonly="true"/>
+                    </div>
+                </div>
+                <div class="form-group">
                     <label for="author" class="col-sm-2 control-label">Author</label>
 
                     <div class="col-sm-10">
-                        <form:input path="author" id="author" cssClass="form-control" readonly="true"/>
+                        <p id="author" class="form-control-static">${document.author}</p>
                     </div>
                 </div>
                 <div class="form-group">
@@ -80,24 +86,17 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="title" class="col-sm-2 control-label">Title</label>
+                    <label for="payee" class="col-sm-2 control-label">Payee</label>
 
-                    <div class="col-sm-10">
-                        <form:input cssClass="form-control" id="title" path="title" readonly="false"/>
+                    <div class="col-sm-4">
+                        <form:input cssClass="form-control" id="payee" path="payee"  readonly="true"/>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="content" class="col-sm-2 control-label">Content</label>
+                    <label for="amount" class="col-sm-2 control-label">Amount</label>
 
-                    <div class="col-sm-10">
-                        <form:textarea cssClass="form-control" id="content" path="content" rows="6" readonly="false"/>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="summary" class="col-sm-2 control-label">Summary</label>
-
-                    <div class="col-sm-10">
-                        <form:textarea cssClass="form-control" id="summary" path="summary" rows="3" readonly="false"/>
+                    <div class="col-sm-4">
+                        <form:input cssClass="form-control" id="amount" path="amount" readonly="true"/>
                     </div>
                 </div>
                 <div class="form-group">
@@ -108,37 +107,32 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="state" class="col-sm-2 control-label">State</label>
+                    <label for="docState" class="col-sm-2 control-label">State</label>
 
                     <div class="col-sm-10">
-                        <form:input cssClass="form-control" id="state" path="state" readonly="true"/>
+                        <form:input cssClass="form-control" id="docState" path="docState" readonly="true"/>
                     </div>
                 </div>
                 <div class="form-group">
-                    <div class="col-sm-offset-2 col-sm-10">
-                        <div class="checkbox">
-                            <label for="isSubmit">
-                                <input name="isSubmit" id="isSubmit" type="checkbox"> Submit for Approval?
-                            </label>
-                        </div>
+                    <label for="docType" class="col-sm-2 control-label">Doc Type</label>
+
+                    <div class="col-sm-10">
+                        <form:input cssClass="form-control" id="docType" path="docType" readonly="true"/>
                     </div>
                 </div>
-                <div class="pull-right">
-                    <button type="submit" class="btn btn-primary btn-default">Save Document</button>
 
-                </div>
                 <%--<div class="pull-right">--%>
                 <%--<button type="submit" class="btn btn-primary btn-lg">Submit for Approval</button>--%>
                 <%--</div>--%>
             </form:form>
         </div>
     </div>
-
     <hr/>
     <c:if test="${not empty historicTasks}">
-        <c:if test="${document.state  ne 'DRAFT' && document.state ne 'PUBLISHED'}">
+        <c:if test="${document.docState  ne 'DRAFT' && document.docState ne 'PUBLISHED'}">
             <div id="diagram" class="center-block">
-                <h4>Default Document Approval Workflow</h4>
+                <h3>Document Approval Workflow
+                <small>${document.groupId}</small></h3>
 
                 <p>
                     <img class="img-responsive img-rounded proc-diagram"
@@ -148,7 +142,7 @@
             </div>
         </c:if>
 
-        <div id="historicTasks" class="panel panel-default">
+        <div id="historicTasks" class="panel panel-info">
             <div class="panel-heading">
                 <span class="glyphicon glyphicon-time pull-right"></span>
 
@@ -183,16 +177,10 @@
             </div>
         </div>
     </c:if>
-
 </div>
-
 <jsp:include page="/WEB-INF/pages/fragments/footer.jsp"/>
 <script>
     $(document).ready(function () {
-        $("#title").attr('required', '');
-        $("#content").attr('required', '');
-        $("#group").attr('required', '');
-        $("#summary").attr('required', '');
         $('li#nav-docs').addClass('active');
     });
 

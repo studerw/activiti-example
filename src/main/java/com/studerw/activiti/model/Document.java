@@ -1,6 +1,5 @@
 package com.studerw.activiti.model;
 
-import com.google.common.base.Objects;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -12,27 +11,20 @@ import java.util.Date;
  * User: studerw
  * Date: 5/20/14
  */
-public class Document implements Comparable<Document>, Serializable {
-
+public abstract class Document implements Serializable, Comparable<Document> {
+    protected String id;
     @NotNull
-    String id = "TEMP";
+    protected String author;
     @NotNull
-    private String author;
+    protected String title;
     @NotNull
-    private String title;
-    @NotNull
-    private String content;
-    @NotNull
-    private String summary;
-    @NotNull
-    private String groupId;
+    protected String groupId;
     @NotNull @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm Z")
-    private Date createdDate;
+    protected Date createdDate;
     @NotNull
-    private DocState state = DocState.DRAFT;
-
-    public Document() {}
-
+    protected DocState docState = DocState.DRAFT;
+    @NotNull
+    protected DocType docType;
 
     public String getId() {
         return id;
@@ -58,22 +50,6 @@ public class Document implements Comparable<Document>, Serializable {
         this.title = title;
     }
 
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public String getSummary() {
-        return summary;
-    }
-
-    public void setSummary(String summary) {
-        this.summary = summary;
-    }
-
     public String getGroupId() {
         return groupId;
     }
@@ -90,43 +66,37 @@ public class Document implements Comparable<Document>, Serializable {
         this.createdDate = createdDate;
     }
 
-    public DocState getState() {
-        return state;
+    public DocState getDocState() {
+        return docState;
     }
 
-    public void setState(DocState state) {
-        this.state = state;
+    public void setDocState(DocState docState) {
+        this.docState = docState;
     }
 
-    @Override
-    public String toString() {
-        return Objects.toStringHelper(this)
-                .add("id", id)
-                .add("author", author)
-                .add("title", title)
-                .add("content", content)
-                .add("summary", summary)
-                .add("groupId", groupId)
-                .add("createdDate", createdDate)
-                .add("state", state)
-                .toString();
+    public DocType getDocType() {
+        return docType;
+    }
+
+    public void setDocType(DocType docType) {
+        this.docType = docType;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Document)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
 
         Document document = (Document) o;
 
-        if (!id.equals(document.id)) return false;
+        if (id != null ? !id.equals(document.id) : document.id != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        return id.hashCode();
+        return id != null ? id.hashCode() : 0;
     }
 
     @Override
@@ -135,8 +105,21 @@ public class Document implements Comparable<Document>, Serializable {
     }
 
     public boolean isEditable() {
-        return DocState.DRAFT.equals(this.state) || DocState.REJECTED.equals(this.state)
-                || DocState.WAITING_FOR_COLLABORATION.equals(this.state);
+        return DocState.DRAFT.equals(this.docState) || DocState.REJECTED.equals(this.docState)
+                || DocState.WAITING_FOR_COLLABORATION.equals(this.docState);
+    }
+
+    @Override public String toString() {
+        final StringBuilder sb = new StringBuilder("Document{");
+        sb.append("id='").append(id).append('\'');
+        sb.append(", author='").append(author).append('\'');
+        sb.append(", title='").append(title).append('\'');
+        sb.append(", groupId='").append(groupId).append('\'');
+        sb.append(", createdDate=").append(createdDate);
+        sb.append(", docState=").append(docState);
+        sb.append(", docType=").append(docType);
+        sb.append('}');
+        return sb.toString();
     }
 }
 

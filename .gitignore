@@ -19,6 +19,7 @@ activiti.h2.db
 activiti.lock.db
 activiti_db.h2.db
 activiti_db.lock.
-/src/main/resources/spring/app.properties
+#/src/main/resources/spring/app.properties
 #emacs auto-save
 **/*~
+debug.log

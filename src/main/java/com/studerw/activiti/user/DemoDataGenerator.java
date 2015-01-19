@@ -116,6 +116,9 @@ public class DemoDataGenerator implements ModelDataJsonConstants {
             newGroup.setType(type);
             identityService.saveGroup(newGroup);
         }
+        else {
+            LOGGER.debug("Demo group: {} already exists - not creating", groupId);
+        }
     }
 
     protected void initDemoUsers() {
@@ -154,6 +157,9 @@ public class DemoDataGenerator implements ModelDataJsonConstants {
                     identityService.createMembership(userId, group);
                 }
             }
+        }
+        else {
+            LOGGER.debug("User {} already exists - not creating.", userId);
         }
 
         // Following data is not set by demo setup script

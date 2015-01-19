@@ -9,8 +9,6 @@
         <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
     </context:component-scan>
 
-    <context:annotation-config />
-
     <context:property-placeholder location="classpath:spring/app.properties"/>
 
     <import resource="jdbc-config.xml"/>

@@ -44,25 +44,41 @@
                         <th>Group</th>
                         <th>Created Date</th>
                         <th>State</th>
+                        <th>Type</th>
                     </tr>
 
                     <c:forEach items="${documents}" var="doc">
                         <tr>
-                            <td><a href="${pageContext.request.contextPath}/document/view.htm?id=${doc.id}">${doc.title}</a></td>
+                            <c:choose>
+                                <c:when test="${doc.docType eq 'BOOK_REPORT'}">
+                                    <td><a href="${pageContext.request.contextPath}/document/bookReport/${doc.id}">${doc.title}</a></td>
+                                </c:when>
+                                <c:when test="${doc.docType eq 'INVOICE'}">
+                                    <td><a href="${pageContext.request.contextPath}/document/invoice/${doc.id}">${doc.title}</a></td>
+                                </c:when>
+                                <c:otherwise>
+                                    <td>UNKNOWN</td>
+                                </c:otherwise>
+                            </c:choose>
                             <td>${doc.author}</td>
                             <td>${doc.groupId}</td>
                             <td><spring:eval expression="doc.createdDate"/></td>
-                            <td>${doc.state}</td>
+                            <td>${doc.docState}</td>
+                            <td>${doc.docType}</td>
                         </tr>
                     </c:forEach>
                 </table>
             </c:otherwise>
         </c:choose>
         <hr/>
-        <div class="pull-right">
-            <a href="${pageContext.request.contextPath}/document/add.htm" class="btn btn-primary" role="button">
-                Create New Document
-            </a>
+        <div class="btn-group pull-right">
+            <button type="button" class="btn btn-default dropdown-toggle btn-primary" data-toggle="dropdown" aria-expanded="false">
+                Create new Document <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+                <li><a href="${pageContext.request.contextPath}/document/bookReport/create.htm">Book Report</a></li>
+                <li><a href="${pageContext.request.contextPath}/document/invoice/create.htm">Invoice</a></li>
+            </ul>
         </div>
     </div>
 </div>

@@ -49,10 +49,10 @@ public class DocumentWorkflow {
         String docId = pi.getBusinessKey();
         Document doc = this.docSrvc.getDocument(docId);
         Map<String, Object> vars = runtimeService.getVariables(execution.getId());
-        log.debug("setting doc {} with title = {}: state set to APPROVED", doc.getId(), doc.getTitle());
-        //doc.setState(Document.STATE_APPROVED);
-        String message = String.format("Document entitled '%s'  has been approved. ", doc.getTitle());
-        this.alertService.sendAlert(doc.getAuthor(), Alert.SUCCESS, message);
+//        log.debug("setting doc {} with title = {}: state set to APPROVED", doc.getId(), doc.getTitle());
+        //doc.setDocState(Document.STATE_APPROVED);
+//        String message = String.format("Document entitled '%s'  has been approved. ", doc.getTitle());
+        this.alertService.sendAlert(doc.getAuthor(), Alert.SUCCESS, doc.getId());
         docSrvc.updateDocument(doc);
     }
 
@@ -63,9 +63,9 @@ public class DocumentWorkflow {
         String docId = pi.getBusinessKey();
         Document doc = this.docSrvc.getDocument(docId);
         Map<String, Object> vars = runtimeService.getVariables(execution.getId());
-        log.debug("setting doc {} with title = {}: state set to REJECTED", doc.getId(), doc.getTitle());
-        doc.setState(DocState.REJECTED);
-        String message = String.format("Document entitled '%s' has been rejected", doc.getTitle(), doc.getId());
+        log.debug("setting doc {} with title = {}: state set to REJECTED", doc.getId(), doc.getId());
+        doc.setDocState(DocState.REJECTED);
+        String message = String.format("Document entitled '%s' has been rejected",  doc.getId());
         this.alertService.sendAlert(doc.getAuthor(), Alert.DANGER, message);
         this.docSrvc.updateDocument(doc);
 
@@ -79,8 +79,8 @@ public class DocumentWorkflow {
                 processInstanceId(execution.getProcessInstanceId()).singleResult();
         String docId = pi.getBusinessKey();
         Document doc = this.docSrvc.getDocument(docId);
-        doc.setState(DocState.REJECTED);
-        String message = String.format("Document entitled '%s' has been successfully published ", doc.getTitle());
+        doc.setDocState(DocState.REJECTED);
+        String message = String.format("Document entitled '%s' has been successfully published ", doc.getId());
         this.alertService.sendAlert(doc.getAuthor(), Alert.SUCCESS, message);
         this.docSrvc.updateDocument(doc);
     }

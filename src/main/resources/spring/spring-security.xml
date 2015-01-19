@@ -27,7 +27,7 @@
 
         <intercept-url pattern="/**" access="hasAnyRole('user, admin')" />
 
-        <form-login login-page="/login.htm" always-use-default-target="true" default-target-url="/"
+        <form-login login-page="/login.htm" always-use-default-target="false" default-target-url="/"
                     authentication-failure-url="/loginfailed.htm" />
     </http>
 
