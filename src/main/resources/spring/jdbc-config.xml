@@ -41,5 +41,6 @@
     <jdbc:initialize-database data-source="dataSource">
         <jdbc:script location="${jdbc.initialize.location}"/>
     </jdbc:initialize-database>
+
 </beans>
 

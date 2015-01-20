@@ -4,7 +4,7 @@
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{HH:mm:ss} [%t] %-5level %logger{36} - %msg%n"/>
         </Console>
-        <File name="A1" fileName="debug.log" append="false">
+        <File name="FILE" fileName="test-debug.log" append="false">
             <PatternLayout pattern="%d{HH:mm:ss} [%t] %t %-5p %c{2} - %m%n"/>
         </File>
     </appenders>
@@ -14,17 +14,17 @@
 
         <Logger name="org.springframework" level="WARN" additivity="true"/>
 
-        <Logger name="org.springframework.security" level="WARN" additivity="true"/>
+        <Logger name="org.springframework.security" level="DEBUG" additivity="true"/>
 
-        <Logger name="org.activiti" level="INFO" additivity="true"/>
+        <Logger name="org.activiti" level="DEBUG" additivity="true"/>
 
         <!--<Logger name="yourLogger" level="debug" additivity="false">-->
         <!--<AppenderRef ref="Console" />-->
         <!--</Logger>-->
 
-        <Root level="WARN">
+        <Root level="DEBUG">
             <AppenderRef ref="Console"/>
-            <!--<AppenderRef ref="A1"/>-->
+            <AppenderRef ref="FILE"/>
         </Root>
     </Loggers>
 </configuration>

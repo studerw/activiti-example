@@ -27,8 +27,11 @@ import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.Model;
 import org.activiti.engine.runtime.Job;
 import org.activiti.engine.task.Task;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 
 import java.io.InputStream;
 import java.util.*;
@@ -45,35 +48,44 @@ public class DemoDataGenerator implements ModelDataJsonConstants {
     protected transient IdentityService identityService;
     protected transient RepositoryService repositoryService;
 
+    @Autowired
+    Environment env;
+
     protected boolean createDemoUsersAndGroups;
     protected boolean createDemoProcessDefinitions;
     protected boolean createDemoModels;
     protected boolean generateReportData;
 
     public void init() {
-        this.identityService = processEngine.getIdentityService();
-        this.repositoryService = processEngine.getRepositoryService();
+        String demo = env.getProperty("activiti.demo");
+        if (StringUtils.isNotBlank(demo) && Boolean.parseBoolean(demo) == true) {
+            this.identityService = processEngine.getIdentityService();
+            this.repositoryService = processEngine.getRepositoryService();
 
-        if (createDemoUsersAndGroups) {
-            LOGGER.info("Initializing demo groups");
-            initDemoGroups();
-            LOGGER.info("Initializing demo users");
-            initDemoUsers();
+            if (createDemoUsersAndGroups) {
+                LOGGER.info("Initializing demo groups");
+                initDemoGroups();
+                LOGGER.info("Initializing demo users");
+                initDemoUsers();
+            }
+
+            if (createDemoProcessDefinitions) {
+                LOGGER.info("Initializing demo process definitions");
+                initProcessDefinitions();
+            }
+
+            if (createDemoModels) {
+                LOGGER.info("Initializing demo models");
+                initModelData();
+            }
+
+            if (generateReportData) {
+                LOGGER.info("Initializing demo report data");
+                generateReportData();
+            }
         }
-
-        if (createDemoProcessDefinitions) {
-            LOGGER.info("Initializing demo process definitions");
-            initProcessDefinitions();
-        }
-
-        if (createDemoModels) {
-            LOGGER.info("Initializing demo models");
-            initModelData();
-        }
-
-        if (generateReportData) {
-            LOGGER.info("Initializing demo report data");
-            generateReportData();
+        else {
+            LOGGER.info("Ignoring demo creation due to activiti.demo = undefined / false");
         }
     }
 

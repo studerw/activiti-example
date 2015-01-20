@@ -22,7 +22,7 @@
     <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
 
     <jdbc:embedded-database id="dataSource" type="H2">
-        <jdbc:script location="classpath:db/h2/activiti.h2.complete.sql"/>
+        <jdbc:script location="${jdbc.initialize.location}"/>
     </jdbc:embedded-database>
 
     <tx:annotation-driven transaction-manager="transactionManager" />
@@ -30,7 +30,6 @@
     <bean id="proxiedDataSource" class="org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy" p:targetDataSource-ref="dataSource"/>
 
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager" p:dataSource-ref="dataSource"/>
-
 
     <import resource="activiti-config.xml"/>
 

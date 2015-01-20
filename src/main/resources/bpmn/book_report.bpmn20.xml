@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:activiti="http://activiti.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://activiti.org/bpmn20">
+  <process id="bookReportWorkflow" name="Book Report Workflow" isExecutable="true" >
+    <documentation>This process is initiated when a book report is created.</documentation>
+    <startEvent id="startevent1" name="Start" activiti:initiator="initiator"></startEvent>
+    <serviceTask id="publishDocServiceTask" name="Publish Book Report" activiti:expression="${documentWorkflow.publish(execution)}"></serviceTask>
+    <userTask id="submitToWorkflow" name="Submit Book Report to Workflow"></userTask>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <subProcess id="dynamic_sub_process" name="Dynamic Document Subprocess">
+      <startEvent id="dynamic_sub_process_start_event" name="Start Dynamic SubProcess"></startEvent>
+      <endEvent id="dynamic_sub_process_end_event" name="End Approval SubProcess"></endEvent>
+    </subProcess>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="submitToWorkflow"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="submitToWorkflow" targetRef="dynamic_sub_process"></sequenceFlow>
+    <sequenceFlow id="flow3" sourceRef="dynamic_sub_process" targetRef="publishDocServiceTask"></sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="publishDocServiceTask" targetRef="endevent1"></sequenceFlow>
+  </process>
+</definitions>

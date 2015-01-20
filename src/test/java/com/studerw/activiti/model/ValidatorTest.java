@@ -18,6 +18,7 @@ import static org.junit.Assert.assertNotNull;
  */
 public class ValidatorTest {
     private static final Logger log = LogManager.getLogger(ValidatorTest.class);
+
     @Test
     public void testValidateBookReport(){
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();

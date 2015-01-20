@@ -40,7 +40,7 @@ public class BookReportController extends DocumentController {
     }
 
     @RequestMapping(value = "/create.htm", method = RequestMethod.GET)
-    public String addDocument(ModelMap model) {
+    public String createForm(ModelMap model) {
         model.addAttribute("bookReport", newBookReport());
         return "document/bookReport/create";
     }
@@ -53,7 +53,6 @@ public class BookReportController extends DocumentController {
                                    HttpServletRequest request) {
         log.debug("submitting bookReport: {}", bookReport);
 
-//        new BookReportValidator().validate(bookReport, result);
         if (result.hasErrors()) {
             return "document/bookReport/create";
         }

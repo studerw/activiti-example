@@ -29,16 +29,11 @@ import java.util.Map;
 public class DocumentWorkflow {
     private static final Logger log = LoggerFactory.getLogger(DocumentWorkflow.class);
 
-    @Autowired
-    protected IdentityService identityService;
-    @Autowired
-    protected RuntimeService runtimeService;
-    @Autowired
-    protected DocumentService docSrvc;
-    @Autowired
-    protected AlertService alertService;
-    @Autowired
-    protected TaskService taskService;
+    @Autowired protected IdentityService identityService;
+    @Autowired protected RuntimeService runtimeService;
+    @Autowired protected DocumentService docSrvc;
+    @Autowired protected AlertService alertService;
+    @Autowired protected TaskService taskService;
 
 
     public void approved(DelegateExecution execution) {
@@ -79,7 +74,7 @@ public class DocumentWorkflow {
                 processInstanceId(execution.getProcessInstanceId()).singleResult();
         String docId = pi.getBusinessKey();
         Document doc = this.docSrvc.getDocument(docId);
-        doc.setDocState(DocState.REJECTED);
+        doc.setDocState(DocState.PUBLISHED);
         String message = String.format("Document entitled '%s' has been successfully published ", doc.getId());
         this.alertService.sendAlert(doc.getAuthor(), Alert.SUCCESS, message);
         this.docSrvc.updateDocument(doc);

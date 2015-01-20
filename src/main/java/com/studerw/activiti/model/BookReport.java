@@ -7,6 +7,8 @@ import org.hibernate.validator.constraints.NotEmpty;
  */
 public class BookReport extends Document {
 
+    public final static String WORKFLOW_ID = "bookReportWorkflow";
+
     @NotEmpty
     private String bookAuthor;
     @NotEmpty
@@ -16,9 +18,10 @@ public class BookReport extends Document {
     @NotEmpty
     private String summary;
 
-    public BookReport() {};
-//        this.docType = DocType.BOOK_REPORT;
-//    }
+    public BookReport() {
+        super();
+        this.docType = DocType.BOOK_REPORT;
+    }
 
     public String getBookAuthor() {
         return bookAuthor;
@@ -50,5 +53,16 @@ public class BookReport extends Document {
 
     public void setSummary(String summary) {
         this.summary = summary;
+    }
+
+    @Override public String toString() {
+        final StringBuilder sb = new StringBuilder("BookReport{");
+        sb.append(super.toString());
+        sb.append("bookAuthor='").append(bookAuthor).append('\'');
+        sb.append(", bookTitle='").append(bookTitle).append('\'');
+        sb.append(", content='").append(content).append('\'');
+        sb.append(", summary='").append(summary).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

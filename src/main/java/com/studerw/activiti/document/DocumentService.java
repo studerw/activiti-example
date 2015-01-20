@@ -100,13 +100,11 @@ public class DocumentService {
         }
         document.setId(null);
         String newId = null;
-        if (DocType.BOOK_REPORT.equals(document.getDocType())){
-            newId = this.bookReportDao.create((BookReport)document);
-        }
-        else if  (DocType.INVOICE.equals(document.getDocType())){
-            newId = this.invoiceDao.create((Invoice)document);
-        }
-        else {
+        if (DocType.BOOK_REPORT.equals(document.getDocType())) {
+            newId = this.bookReportDao.create((BookReport) document);
+        } else if (DocType.INVOICE.equals(document.getDocType())) {
+            newId = this.invoiceDao.create((Invoice) document);
+        } else {
             throw new IllegalArgumentException("Unknown doc type: " + document.getDocType());
         }
         return newId;
@@ -137,13 +135,11 @@ public class DocumentService {
             Task task = taskService.createTaskQuery().processInstanceId(current.getProcessInstanceId()).singleResult();
             taskService.setAssignee(task.getId(), userDetails.getUsername());
 
-            if (DocType.BOOK_REPORT.equals(doc.getDocType())){
+            if (DocType.BOOK_REPORT.equals(doc.getDocType())) {
                 this.bookReportDao.update((BookReport) doc);
-            }
-            else if  (DocType.INVOICE.equals(doc.getDocType())){
+            } else if (DocType.INVOICE.equals(doc.getDocType())) {
                 this.invoiceDao.update((Invoice) doc);
-            }
-            else {
+            } else {
                 throw new IllegalArgumentException("Unknown doc type: " + doc.getDocType());
             }
             taskService.setVariableLocal(task.getId(), "taskOutcome", "Submitted for Approval");
@@ -176,13 +172,11 @@ public class DocumentService {
     @Transactional
     public void updateDocument(Document document) {
         String id = document.getId();
-        if (DocType.BOOK_REPORT.equals(document.getDocType())){
-            this.bookReportDao.update((BookReport)document);
-        }
-        else if  (DocType.INVOICE.equals(document.getDocType())){
-            this.invoiceDao.update((Invoice)document);
-        }
-        else {
+        if (DocType.BOOK_REPORT.equals(document.getDocType())) {
+            this.bookReportDao.update((BookReport) document);
+        } else if (DocType.INVOICE.equals(document.getDocType())) {
+            this.invoiceDao.update((Invoice) document);
+        } else {
             throw new IllegalArgumentException("Unknown doc type: " + document.getDocType());
         }
     }
@@ -192,7 +186,8 @@ public class DocumentService {
         try {
             return this.bookReportDao.read(id);
         }
-        catch(Throwable t){}
+        catch (Throwable t) {
+        }
 
         return this.invoiceDao.read(id);
     }
