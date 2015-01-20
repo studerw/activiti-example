@@ -1,4 +1,4 @@
-package com.studerw.design;
+package com.studerw.activiti.design;
 
 import com.google.common.collect.Lists;
 import com.studerw.activiti.util.Workflow;

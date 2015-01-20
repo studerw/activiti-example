@@ -48,44 +48,43 @@ public class DemoDataGenerator implements ModelDataJsonConstants {
     protected transient IdentityService identityService;
     protected transient RepositoryService repositoryService;
 
-    @Autowired
-    Environment env;
-
+    //if this is false, none of the other properties will be evaluated
+    protected boolean addDemoData;
     protected boolean createDemoUsersAndGroups;
     protected boolean createDemoProcessDefinitions;
     protected boolean createDemoModels;
     protected boolean generateReportData;
 
     public void init() {
-        String demo = env.getProperty("activiti.demo");
-        if (StringUtils.isNotBlank(demo) && Boolean.parseBoolean(demo) == true) {
-            this.identityService = processEngine.getIdentityService();
-            this.repositoryService = processEngine.getRepositoryService();
-
-            if (createDemoUsersAndGroups) {
-                LOGGER.info("Initializing demo groups");
-                initDemoGroups();
-                LOGGER.info("Initializing demo users");
-                initDemoUsers();
-            }
-
-            if (createDemoProcessDefinitions) {
-                LOGGER.info("Initializing demo process definitions");
-                initProcessDefinitions();
-            }
-
-            if (createDemoModels) {
-                LOGGER.info("Initializing demo models");
-                initModelData();
-            }
-
-            if (generateReportData) {
-                LOGGER.info("Initializing demo report data");
-                generateReportData();
-            }
-        }
-        else {
+        if (!addDemoData) {
             LOGGER.info("Ignoring demo creation due to activiti.demo = undefined / false");
+            return;
+        }
+
+
+        this.identityService = processEngine.getIdentityService();
+        this.repositoryService = processEngine.getRepositoryService();
+
+        if (createDemoUsersAndGroups) {
+            LOGGER.info("Initializing demo groups");
+            initDemoGroups();
+            LOGGER.info("Initializing demo users");
+            initDemoUsers();
+        }
+
+        if (createDemoProcessDefinitions) {
+            LOGGER.info("Initializing demo process definitions");
+            initProcessDefinitions();
+        }
+
+        if (createDemoModels) {
+            LOGGER.info("Initializing demo models");
+            initModelData();
+        }
+
+        if (generateReportData) {
+            LOGGER.info("Initializing demo report data");
+            generateReportData();
         }
     }
 
@@ -99,6 +98,10 @@ public class DemoDataGenerator implements ModelDataJsonConstants {
 
     public void setCreateDemoProcessDefinitions(boolean createDemoProcessDefinitions) {
         this.createDemoProcessDefinitions = createDemoProcessDefinitions;
+    }
+
+    public void setAddDemoData(boolean addDemoData) {
+        this.addDemoData = addDemoData;
     }
 
     public void setCreateDemoModels(boolean createDemoModels) {
@@ -127,8 +130,7 @@ public class DemoDataGenerator implements ModelDataJsonConstants {
             newGroup.setName(groupId.substring(0, 1).toUpperCase() + groupId.substring(1));
             newGroup.setType(type);
             identityService.saveGroup(newGroup);
-        }
-        else {
+        } else {
             LOGGER.debug("Demo group: {} already exists - not creating", groupId);
         }
     }
@@ -169,8 +171,7 @@ public class DemoDataGenerator implements ModelDataJsonConstants {
                     identityService.createMembership(userId, group);
                 }
             }
-        }
-        else {
+        } else {
             LOGGER.debug("User {} already exists - not creating.", userId);
         }
 
@@ -325,14 +326,16 @@ public class DemoDataGenerator implements ModelDataJsonConstants {
             try {
                 InputStream svgStream = this.getClass().getClassLoader().getResourceAsStream("org/activiti/explorer/demo/model/test.svg");
                 repositoryService.addModelEditorSourceExtra(model.getId(), org.apache.commons.io.IOUtils.toByteArray(svgStream));
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 LOGGER.warn("Failed to read SVG", e);
             }
 
             try {
                 InputStream editorJsonStream = this.getClass().getClassLoader().getResourceAsStream(jsonFile);
                 repositoryService.addModelEditorSource(model.getId(), org.apache.commons.io.IOUtils.toByteArray(editorJsonStream));
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 LOGGER.warn("Failed to read editor JSON", e);
             }
         }

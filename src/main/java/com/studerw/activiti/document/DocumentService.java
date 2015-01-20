@@ -8,6 +8,7 @@ import com.studerw.activiti.model.*;
 import com.studerw.activiti.user.InvalidAccessException;
 import com.studerw.activiti.user.UserService;
 import com.studerw.activiti.util.Workflow;
+import com.studerw.activiti.workflow.WorkflowService;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
@@ -33,42 +34,13 @@ import java.util.Map;
 @Service("documentService")
 public class DocumentService {
     private static final Logger log = LoggerFactory.getLogger(DocumentService.class);
-    protected IdentityService identityService;
-    protected RuntimeService runtimeService;
-    protected TaskService taskService;
-    protected UserService userService;
-    protected InvoiceDao invoiceDao;
-    protected BookReportDao bookReportDao;
-
-    @Autowired
-    public void setInvoiceDao(InvoiceDao invoiceDao) {
-        this.invoiceDao = invoiceDao;
-    }
-
-    @Autowired
-    public void setBookReportDao(BookReportDao bookReportDao) {
-        this.bookReportDao = bookReportDao;
-    }
-
-    @Autowired
-    public void setUserService(UserService userService) {
-        this.userService = userService;
-    }
-
-    @Autowired
-    public void setTaskService(TaskService taskService) {
-        this.taskService = taskService;
-    }
-
-    @Autowired
-    public void setRuntimeService(RuntimeService runtimeService) {
-        this.runtimeService = runtimeService;
-    }
-
-    @Autowired
-    public void setIdentityService(IdentityService identityService) {
-        this.identityService = identityService;
-    }
+    @Autowired protected IdentityService identityService;
+    @Autowired protected RuntimeService runtimeService;
+    @Autowired protected TaskService taskService;
+    @Autowired protected UserService userService;
+    @Autowired protected InvoiceDao invoiceDao;
+    @Autowired protected BookReportDao bookReportDao;
+    @Autowired protected WorkflowService workflowService;
 
     @Transactional(readOnly = true)
     public List<Document> getGroupDocumentsByUser(String userId) {
@@ -110,8 +82,8 @@ public class DocumentService {
         return newId;
     }
 
-    public void submitForApproval(String docId) {
-        Document doc = this.invoiceDao.read(docId);
+    public void submitToWorkflow(String docId) {
+        Document doc = this._getDocument(docId);
         log.debug("beginning (or continuing) doc approval workflow for doc {}. ", doc.getId());
         UserDetails userDetails = this.userService.currentUser();
         if (!StringUtils.equals(userDetails.getUsername(), doc.getAuthor())) {
@@ -123,15 +95,15 @@ public class DocumentService {
         //TODO check author and currentUser
         Map<String, Object> processVariables = Maps.newHashMap();
         processVariables.put("initiator", doc.getAuthor());
-        processVariables.put("docId", doc.getId());
+        processVariables.put("businessKey", doc.getId());
         processVariables.put("docAuthor", doc.getAuthor());
         try {
             identityService.setAuthenticatedUserId(userDetails.getUsername());
-            ProcessInstance current = this.getCurrentProcess(docId);
-            if (current == null) {
-                String key = String.format("%s-%s", Workflow.PROCESS_ID_DOC_APPROVAL, doc.getGroupId());
-                current = runtimeService.startProcessInstanceByKey(key, doc.getId());
+            ProcessInstance current = workflowService.getProcessByBusinessKey(docId);
+            if (current != null) {
+                throw new IllegalStateException("Running WF Process with key: " + docId + " already exists.");
             }
+//            current = runtimeService.startProcessInstanceByKey(key, doc.getId());
             Task task = taskService.createTaskQuery().processInstanceId(current.getProcessInstanceId()).singleResult();
             taskService.setAssignee(task.getId(), userDetails.getUsername());
 
@@ -151,23 +123,7 @@ public class DocumentService {
         }
     }
 
-    /**
-     * It's possible this document is being resubmitted after reject - no need to create a new process.
-     *
-     * @param docId
-     * @return the associated ProcessInstance or null if one does not exist
-     */
-    private ProcessInstance getCurrentProcess(String docId) {
-        List<ProcessInstance> instances =
-                runtimeService.createProcessInstanceQuery().processInstanceBusinessKey(docId).list();
-        if (instances.size() == 0) {
-            return null;
-        } else if (instances.size() > 1) {
-            throw new IllegalStateException("More than one process found for document: " + docId + " - zero or one should have been found.");
-        } else {
-            return instances.get(0);
-        }
-    }
+
 
     @Transactional
     public void updateDocument(Document document) {
@@ -183,6 +139,16 @@ public class DocumentService {
 
     @Transactional(readOnly = true)
     public Document getDocument(String id) {
+        return null;
+    }
+
+
+    /**
+     * We use a private method here to enable internal calls without messing with spring proxies.
+     * @param id
+     * @return null
+     */
+    private Document _getDocument(String id){
         try {
             return this.bookReportDao.read(id);
         }

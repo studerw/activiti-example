@@ -88,7 +88,7 @@
 //        String docId;
 //        docId = documentService.createDocument(doc);
 //        log.debug("new doc id: " + docId);
-//        this.documentService.submitForApproval(docId);
+//        this.documentService.submitToWorkflow(docId);
 //
 //
 //        setSpringSecurity("fozzie");

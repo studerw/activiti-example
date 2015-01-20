@@ -40,6 +40,7 @@
         <property name="createDemoUsersAndGroups" value="true" />
         <property name="createDemoProcessDefinitions" value="false" />
         <property name="createDemoModels" value="false" />
+        <property name="addDemoData" value="${activiti.demo}" />
     </bean>
 
 </beans>

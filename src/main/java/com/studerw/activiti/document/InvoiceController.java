@@ -62,8 +62,8 @@ public class InvoiceController extends DocumentController {
         String docId = this.docService.createDocument(invoice);
 
         if (isSubmit) {
-            log.debug("Submitting for approval docId {}", docId);
-            this.docService.submitForApproval(docId);
+            log.debug("Submitting to dynamic workflow docId {}", docId);
+            this.docService.submitToWorkflow(docId);
         }
         if (isSubmit) {
             redirectAttributes.addFlashAttribute("msg", "<p>Your Document has been submitted for approval.<p/>" +
@@ -115,8 +115,8 @@ public class InvoiceController extends DocumentController {
         String docId = invoice.getId();
 
         if (isSubmit) {
-            log.debug("Submitting for approval docId {}", docId);
-            this.docService.submitForApproval(docId);
+            log.debug("Submitting to dynamic workflow docId {}", docId);
+            this.docService.submitToWorkflow(docId);
         }
         if (isSubmit) {
             redirectAttributes.addFlashAttribute("msg", "<p>Your Document has been submitted for approval.<p/>" +

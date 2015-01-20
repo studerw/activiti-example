@@ -5,6 +5,9 @@ package com.studerw.activiti.util;
  * Date: 5/24/14
  */
 public class Workflow {
+    public final static String CATEGORY_GROUP = "ACT_GROUP";
+    public final static String CATEGORY_DOC_TYPE = "ACT_DOC_TYPE";
+
     public static final String PROCESS_ID_DOC_APPROVAL = "docApprovalWithSubProcess";
     public static final String PROCESS_NAME_DOC_APPROVAL = "Approve Document Workflow";
     public static final String TASK_ID_DOC_APPROVAL = "approveDocUserTask";

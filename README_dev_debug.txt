@@ -29,5 +29,9 @@ Then in Eclipse:
 **** If you get a error trying to connect to socket when running mvn jetty:run or mvn tomcat7:run from command line above, you probably have an old Java Process bound to the port 4000. Kill it with process manager.
 
 Memory Errors in Tomcat7:
-Windows: set MAVEN_OPTS=-XX:MaxPermSize=1024m
-Linux / Cygwin: export MAVEN_OPTS="-XX:MaxPermSize=1024m"
+    Windows: set MAVEN_OPTS=-XX:MaxPermSize=1024m
+    Linux / Cygwin: export MAVEN_OPTS="-XX:MaxPermSize=1024m"
+
+
+Starting a H2 DB at breakpoint:
+    org.h2.tools.Server.startWebServer(conn);

@@ -1,4 +1,4 @@
-package com.studerw.design;
+package com.studerw.activiti.design;
 
 import org.activiti.bpmn.BpmnAutoLayout;
 import org.activiti.bpmn.model.*;

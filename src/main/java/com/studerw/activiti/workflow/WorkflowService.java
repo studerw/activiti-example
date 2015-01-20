@@ -1,5 +1,6 @@
 package com.studerw.activiti.workflow;
 
+import com.studerw.activiti.model.Document;
 import com.studerw.activiti.util.Workflow;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.engine.RepositoryService;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * User: studerw
@@ -26,10 +28,8 @@ import java.io.InputStream;
 @Service("workflowService")
 public class WorkflowService {
     private static final Logger log = LoggerFactory.getLogger(WorkflowService.class);
-    @Autowired
-    RuntimeService runtimeService;
-    @Autowired
-    RepositoryService repoSrvc;
+    @Autowired RuntimeService runtimeService;
+    @Autowired RepositoryService repoSrvc;
 
     /**
      * @param processId the process <strong>Definition</strong> Id - NOT the process Instance Id.
@@ -81,5 +81,26 @@ public class WorkflowService {
 
     public static String getApprovalKeyByGroup(String group){
         return String.format("%s-%s",Workflow.PROCESS_ID_DOC_APPROVAL, group);
+    }
+
+    /**
+     *
+     * @param businessKey
+     * @return the associated ProcessInstance or null if one does not exist
+     */
+    public ProcessInstance getProcessByBusinessKey(String businessKey) {
+        List<ProcessInstance> instances =
+                runtimeService.createProcessInstanceQuery().processInstanceBusinessKey(businessKey).list();
+        if (instances.size() == 0) {
+            return null;
+        } else if (instances.size() > 1) {
+            throw new IllegalStateException("More than one process found for document: " + businessKey + " - zero or one should have been found.");
+        } else {
+            return instances.get(0);
+        }
+    }
+
+    public ProcessDefinition findDefinitionByDocType(Document doc){
+        return null;
     }
 }

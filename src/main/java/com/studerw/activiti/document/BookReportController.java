@@ -59,8 +59,8 @@ public class BookReportController extends DocumentController {
         String docId = this.docService.createDocument(bookReport);
 
         if (isSubmit) {
-            log.debug("Submitting for approval docId {}", docId);
-            this.docService.submitForApproval(docId);
+            log.debug("Submitting to dynamic workflow docId {}", docId);
+            this.docService.submitToWorkflow(docId);
         }
         if (isSubmit) {
             redirectAttributes.addFlashAttribute("msg", "<p>Your Document has been submitted for approval.<p/>" +
@@ -85,8 +85,8 @@ public class BookReportController extends DocumentController {
 //        }
 //        this.docService.updateDocument(bookReport);
 //        if (isSubmit) {
-//            log.debug("Submitting for approval docId {}", bookReport.getId());
-//            this.docService.submitForApproval(bookReport.getId());
+//            log.debug("Submitting to dynamic workflow docId {}", bookReport.getId());
+//            this.docService.submitToWorkflow(bookReport.getId());
 //        }
 //        if (isSubmit) {
 //            redirectAttributes.addFlashAttribute("msg", "<p>Your Document has been submitted for approval.<p/>" +
@@ -138,8 +138,8 @@ public class BookReportController extends DocumentController {
         String docId = bookReport.getId();
 
         if (isSubmit) {
-            log.debug("Submitting for approval docId {}", docId);
-            this.docService.submitForApproval(docId);
+            log.debug("Submitting to dynamic workflow docId {}", docId);
+            this.docService.submitToWorkflow(docId);
         }
         if (isSubmit) {
             redirectAttributes.addFlashAttribute("msg", "<p>Your Document has been submitted for approval.<p/>" +

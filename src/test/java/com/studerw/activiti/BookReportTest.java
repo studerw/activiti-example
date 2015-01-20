@@ -1,10 +1,13 @@
 package com.studerw.activiti;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.studerw.activiti.document.DocumentService;
 import com.studerw.activiti.model.BookReport;
 import com.studerw.activiti.model.DocState;
+import com.studerw.activiti.model.DocType;
+import com.studerw.activiti.util.Workflow;
 import org.activiti.engine.*;
 import org.activiti.engine.identity.Group;
 import org.activiti.engine.repository.ProcessDefinition;
@@ -16,6 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -25,9 +29,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.net.URI;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -47,10 +50,27 @@ public class BookReportTest {
     @Autowired IdentityService identityService;
     @Autowired RepositoryService repositoryService;
     @Autowired DocumentService documentService;
+    @Autowired @Qualifier("dataSource") javax.sql.DataSource datasource;
 
     @Before
     public void before(){
         setSpringSecurity("fozzie");
+    }
+
+    @Test
+    public void testParseCategory(){
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey(BookReport.WORKFLOW_ID).singleResult();
+        assertNotNull("Book Report Process Definition is not null", processDefinition);
+
+        String category = processDefinition.getCategory();
+        log.debug("Category: {}", category);
+        final Map<String, String> map = Splitter.on('&').trimResults().withKeyValueSeparator("=").split(category);
+        log.debug(map);
+        assertTrue(map.keySet().containsAll(Arrays.asList(Workflow.CATEGORY_DOC_TYPE, Workflow.CATEGORY_GROUP)));
+        String docType = map.get(Workflow.CATEGORY_DOC_TYPE);
+        String group = map.get(Workflow.CATEGORY_GROUP);
+        assertEquals(DocType.valueOf(docType), DocType.BOOK_REPORT);
+        assertEquals(group, "engineering");
     }
 
     @Test
@@ -62,6 +82,9 @@ public class BookReportTest {
 
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey(BookReport.WORKFLOW_ID).singleResult();
         assertNotNull("Book Report Process Definition is not null", processDefinition);
+
+        String category = processDefinition.getCategory();
+        log.debug("Category: {}", category);
     }
 
     @Test
