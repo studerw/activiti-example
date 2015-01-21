@@ -139,7 +139,7 @@ public class DocumentService {
 
     @Transactional(readOnly = true)
     public Document getDocument(String id) {
-        return null;
+        return this._getDocument(id);
     }
 
 
