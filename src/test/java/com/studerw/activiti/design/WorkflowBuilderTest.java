@@ -57,7 +57,7 @@ public class WorkflowBuilderTest {
     public void testBuildDefault() {
         BpmnModel model = workflowBldr.defaultDocumentApprove();
         Process process = model.getProcesses().get(0);
-        SubProcess sub = (SubProcess) process.getFlowElement(Workflow.SUB_PROC_ID_DOC_APPROVAL);
+        SubProcess sub = (SubProcess) process.getFlowElement(Workflow.SUBPROCESS_ID_DYNAMIC);
         log.debug(sub.getName());
         Collection<FlowElement> flowElements = sub.getFlowElements();
         List<UserTask> userTasks = Lists.newArrayList();

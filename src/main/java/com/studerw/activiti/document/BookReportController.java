@@ -23,10 +23,8 @@ import java.util.List;
 public class BookReportController extends DocumentController {
     private static final Logger log = LoggerFactory.getLogger(BookReportController.class);
 
-    @Autowired
-    DocumentService docService;
-    @Autowired
-    LocalTaskService localTaskSrvc;
+    @Autowired DocumentService docService;
+    @Autowired LocalTaskService localTaskSrvc;
 
     @Override
     @ModelAttribute

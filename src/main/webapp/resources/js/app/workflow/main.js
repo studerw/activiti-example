@@ -243,10 +243,21 @@ $(function () {
     $('#update-button').on('click', function () {
         submitApprovals();
     });
+    $('#docTypeSel').change(function(){
+       if (_.isEmpty($(this.val()))){
+           $('#groupSel').hide().find('option').remove().end();//.append('<option value="whatever">text</option>').val('whatever');
+       }
+       //else {
+       //
+       //}
+
+
+
+    });
     $('#groupSel').change(function () {
         APP.currentGroup = $(this).val();
         console.log(APP.currentGroup);
-        if (APP.currentGroup !== '' && APP.currentGroup !== null) {
+        if (!_.isEmpty(APP.currentGroup)){
             $('#approvals').removeClass('hidden');
             var newSrc = SERVLET_CONTEXT + '/workflow/diagrams/' + DOC_APPROVAL_ROOT_ID + '-' + APP.currentGroup;
             //need to add random param to avoid caching of the image

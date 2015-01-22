@@ -2,6 +2,7 @@ package com.studerw.activiti.workflow;
 
 import com.google.common.collect.Lists;
 import com.studerw.activiti.model.Approval;
+import com.studerw.activiti.model.DocType;
 import com.studerw.activiti.model.Response;
 import com.studerw.activiti.util.Workflow;
 import com.studerw.activiti.web.BaseController;
@@ -43,7 +44,8 @@ public class WorkflowController extends BaseController {
         super.addModelInfo(model, request);
         List<Group> groups = userService.getAllAssignmentGroups();
         model.addAttribute("groups", groups);
-        model.addAttribute("defaultDocProcId", Workflow.PROCESS_ID_DOC_APPROVAL);
+        model.addAttribute("defaultDocProcId", "FOO");//TODOWorkflow.PROCESS_ID_DOC_APPROVAL);
+        model.addAttribute("docTypes", DocType.asList());
     }
 
 

@@ -43,7 +43,7 @@ public class DocApproveTest {
     @Test
     public void testDynamicDeploy() throws Exception {
         String fakeGroup = "fakeGroup";
-        String procId = Workflow.PROCESS_ID_DOC_APPROVAL + "-" + fakeGroup;
+        String procId = Workflow.PROCESS_ID_USER_APPROVAL + "-" + fakeGroup;
         // 1. Build up the model from scratch
         BpmnModel model = new BpmnModel();
         Process process = new Process();
@@ -202,7 +202,7 @@ public class DocApproveTest {
         rejectedFlow.setTargetRef(errorEnd.getId());
         ActivitiListener rejectedListener = new ActivitiListener();
         rejectedListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
-        rejectedListener.setImplementation("${documentWorkflow.rejected(execution)}");
+        rejectedListener.setImplementation("${documentWorkflow.onRejected(execution)}");
         rejectedListener.setEvent("take");
         rejectedFlow.setExecutionListeners(Lists.newArrayList(rejectedListener));
         rejectedFlow.setConditionExpression("${approved == false}");
@@ -215,7 +215,7 @@ public class DocApproveTest {
         approvedFlow.setTargetRef(end.getId());
         ActivitiListener approvedListener = new ActivitiListener();
         approvedListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
-        approvedListener.setImplementation("${documentWorkflow.approved(execution)}");
+        approvedListener.setImplementation("${documentWorkflow.onApproved(execution)}");
         approvedListener.setEvent("take");
         approvedFlow.setExecutionListeners(Lists.newArrayList(approvedListener));
         approvedFlow.setConditionExpression("${approved == true}");

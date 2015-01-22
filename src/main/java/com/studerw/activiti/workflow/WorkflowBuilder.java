@@ -2,6 +2,7 @@ package com.studerw.activiti.workflow;
 
 import com.google.common.collect.Lists;
 import com.studerw.activiti.model.Approval;
+import com.studerw.activiti.model.DocType;
 import com.studerw.activiti.util.Workflow;
 import org.activiti.bpmn.BpmnAutoLayout;
 import org.activiti.bpmn.model.*;
@@ -33,7 +34,7 @@ public class WorkflowBuilder {
         BpmnModel model = new BpmnModel();
         Process process = new Process();
         process.setId(WorkflowService.getApprovalKeyByGroup(group));
-        process.setName(Workflow.PROCESS_NAME_DOC_APPROVAL);
+        process.setName("FOO");//TODOWorkflow.PROCESS_NAME_DOC_APPROVAL);
         model.addProcess(process);
 
 
@@ -47,7 +48,7 @@ public class WorkflowBuilder {
         submitTask.setName("Submit Document for Approval");
         process.addFlowElement(submitTask);
         process.addFlowElement(createSequenceFlow(startEvent.getId(), submitTask.getId()));
-        SubProcess sub = createApprovalSub(approvals);
+        SubProcess sub = createDynamicSubProcess(approvals);
         process.addFlowElement(sub);
 
         process.addFlowElement(createSequenceFlow(submitTask.getId(), sub.getId()));
@@ -85,9 +86,10 @@ public class WorkflowBuilder {
 
     public BpmnModel defaultDocumentApprove() {
         BpmnModel model = new BpmnModel();
+        model.setTargetNamespace(DocType.GENERAL.name());
         org.activiti.bpmn.model.Process process = new Process();
-        process.setId(Workflow.PROCESS_ID_DOC_APPROVAL);
-        process.setName(Workflow.PROCESS_NAME_DOC_APPROVAL);
+        process.setId("FOO");//TODOWorkflow.PROCESS_ID_DOC_APPROVAL);
+        process.setName("FOO NAME");//Workflow.PROCESS_NAME_DOC_APPROVAL);
         model.addProcess(process);
 
         StartEvent startEvent = new StartEvent();
@@ -141,7 +143,7 @@ public class WorkflowBuilder {
      * @return a sorted list of approvals contained in the workflow associated with the given group
      */
     public List<Approval> getDocApprovalsByGroup(String group) {
-        String base = Workflow.PROCESS_ID_DOC_APPROVAL;
+        String base = "FOO";//TODOWorkflow.PROCESS_ID_DOC_APPROVAL;
         String procId = StringUtils.isBlank(group) ? base : base + "-" + group;
         log.debug("building approval list for procDef: " + procId);
         ProcessDefinition pd =
@@ -149,7 +151,7 @@ public class WorkflowBuilder {
         BpmnModel model = this.repositoryService.getBpmnModel(pd.getId());
         Process process = model.getProcesses().get(0);
 
-        SubProcess sub = (SubProcess) process.getFlowElement(Workflow.SUB_PROC_ID_DOC_APPROVAL);
+        SubProcess sub = (SubProcess) process.getFlowElement(Workflow.SUBPROCESS_ID_DYNAMIC);
         log.debug(sub.getName());
         Collection<FlowElement> flowElements = sub.getFlowElements();
         List<UserTask> userTasks = Lists.newArrayList();
@@ -185,8 +187,8 @@ public class WorkflowBuilder {
 
     protected SubProcess createDefaultSubProcess() {
         SubProcess sub = new SubProcess();
-        sub.setId("approvalSubProcess");
-        sub.setName("Document Approval Subprocess");
+        sub.setId(Workflow.SUBPROCESS_ID_DYNAMIC);
+        sub.setName(Workflow.SUBPROCESS_NAME_DYNAMIC);
 
         StartEvent start = new StartEvent();
         start.setId("approvalSubProcessStartEvent");
@@ -228,7 +230,7 @@ public class WorkflowBuilder {
         rejectedFlow.setTargetRef(errorEnd.getId());
         ActivitiListener rejectedListener = new ActivitiListener();
         rejectedListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
-        rejectedListener.setImplementation("${documentWorkflow.rejected(execution)}");
+        rejectedListener.setImplementation("${documentWorkflow.onRejected(execution)}");
         rejectedListener.setEvent("take");
         rejectedFlow.setExecutionListeners(Lists.newArrayList(rejectedListener));
         rejectedFlow.setConditionExpression("${approved == false}");
@@ -241,7 +243,7 @@ public class WorkflowBuilder {
         approvedFlow.setTargetRef(end.getId());
         ActivitiListener approvedListener = new ActivitiListener();
         approvedListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
-        approvedListener.setImplementation("${documentWorkflow.approved(execution)}");
+        approvedListener.setImplementation("${documentWorkflow.onApproved(execution)}");
         approvedListener.setEvent("take");
         approvedFlow.setExecutionListeners(Lists.newArrayList(approvedListener));
         approvedFlow.setConditionExpression("${approved == true}");
@@ -254,10 +256,10 @@ public class WorkflowBuilder {
 
     }
 
-    protected SubProcess createApprovalSub(List<Approval> approvals) {
+    protected SubProcess createDynamicSubProcess(List<Approval> approvals) {
         SubProcess sub = new SubProcess();
-        sub.setId(Workflow.SUB_PROC_ID_DOC_APPROVAL);
-        sub.setName("Document Approval Subprocess");
+        sub.setId(Workflow.SUBPROCESS_ID_DYNAMIC);
+        sub.setName(Workflow.SUBPROCESS_NAME_DYNAMIC);
 
         StartEvent start = new StartEvent();
         start.setId("approvalSubProcessStartEvent");
@@ -320,7 +322,7 @@ public class WorkflowBuilder {
             rejectedFlow.setTargetRef(errorEnd.getId());
             ActivitiListener rejectedListener = new ActivitiListener();
             rejectedListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
-            rejectedListener.setImplementation("${documentWorkflow.rejected(execution)}");
+            rejectedListener.setImplementation("${documentWorkflow.onRejected(execution)}");
             rejectedListener.setEvent("take");
             rejectedFlow.setExecutionListeners(Lists.newArrayList(rejectedListener));
             rejectedFlow.setConditionExpression("${approved == false}");
@@ -340,7 +342,7 @@ public class WorkflowBuilder {
 
             ActivitiListener approvedListener = new ActivitiListener();
             approvedListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
-            approvedListener.setImplementation("${documentWorkflow.approved(execution)}");
+            approvedListener.setImplementation("${documentWorkflow.onApproved(execution)}");
             approvedListener.setEvent("take");
             approvedFlow.setExecutionListeners(Lists.newArrayList(approvedListener));
             approvedFlow.setConditionExpression("${approved == true}");

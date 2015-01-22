@@ -4,6 +4,7 @@ import com.studerw.activiti.alert.AlertService;
 import com.studerw.activiti.model.Alert;
 import com.studerw.activiti.model.DocState;
 import com.studerw.activiti.model.Document;
+import com.studerw.activiti.util.Workflow;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
@@ -11,19 +12,20 @@ import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.DelegateTask;
 import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.runtime.ProcessInstance;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
-
 /**
  * User: studerw
  * Date: 5/18/14
- *
- * Workflow methods for Document Approval, Reject, etc. Most likely embedded as bean services
+ * <p>
+ * Workflow execution listeners for Document tasks - approve/reject, collaborate, etc
+ * Most likely embedded as bean service refs within the BPMN definition.
  * within the BPMN workflow definitions.
+ * </p>
  */
 @Service("documentWorkflow")
 public class DocumentWorkflow {
@@ -36,37 +38,46 @@ public class DocumentWorkflow {
     @Autowired protected TaskService taskService;
 
 
-    public void approved(DelegateExecution execution) {
+    /**
+     * Called when the process enters a approve/reject transition
+     *
+     * @param execution
+     */
+    public void onApproved(DelegateExecution execution) {
         log.debug("doc approved - process id: " + execution.getProcessInstanceId());
-
         ProcessInstance pi = runtimeService.createProcessInstanceQuery().
                 processInstanceId(execution.getProcessInstanceId()).singleResult();
         String docId = pi.getBusinessKey();
         Document doc = this.docSrvc.getDocument(docId);
-        Map<String, Object> vars = runtimeService.getVariables(execution.getId());
-//        log.debug("setting doc {} with title = {}: state set to APPROVED", doc.getId(), doc.getTitle());
-        //doc.setDocState(Document.STATE_APPROVED);
-//        String message = String.format("Document entitled '%s'  has been approved. ", doc.getTitle());
-        this.alertService.sendAlert(doc.getAuthor(), Alert.SUCCESS, doc.getId());
-        docSrvc.updateDocument(doc);
+        String message = String.format("%s entitled '%s'  has been approved. ", doc.getDocType().name(), doc.getTitle());
+        this.alertService.sendAlert(doc.getAuthor(), Alert.SUCCESS, message);
+
+        doc.setDocState(DocState.APPROVED);
+        this.docSrvc.updateDocument(doc);
+        log.info("{} approved: {}", doc.getDocType().name(), doc.getTitle());
+
     }
 
-    public void rejected(DelegateExecution execution) {
+    public void onRejected(DelegateExecution execution) {
         log.debug("doc rejected - process id: " + execution.getProcessInstanceId());
         ProcessInstance pi = runtimeService.createProcessInstanceQuery().
                 processInstanceId(execution.getProcessInstanceId()).singleResult();
         String docId = pi.getBusinessKey();
         Document doc = this.docSrvc.getDocument(docId);
-        Map<String, Object> vars = runtimeService.getVariables(execution.getId());
         log.debug("setting doc {} with title = {}: state set to REJECTED", doc.getId(), doc.getId());
-        doc.setDocState(DocState.REJECTED);
-        String message = String.format("Document entitled '%s' has been rejected",  doc.getId());
+        String message = String.format("Document entitled '%s' has been rejected", doc.getId());
         this.alertService.sendAlert(doc.getAuthor(), Alert.DANGER, message);
-        this.docSrvc.updateDocument(doc);
 
-        log.info("document rejected: " + docId);
+        doc.setDocState(DocState.REJECTED);
+        this.docSrvc.updateDocument(doc);
+        log.info("{} rejected: {}", doc.getDocType().name(), doc.getTitle());
     }
 
+    /**
+     * Pseudo publish task (doesn't actually do anything except change the docState = PUBLISHED.
+     *
+     * @param execution
+     */
     public void publish(Execution execution) {
         String pId = execution.getProcessInstanceId();
         log.debug("doc being published - procId={}", pId);
@@ -80,15 +91,95 @@ public class DocumentWorkflow {
         this.docSrvc.updateDocument(doc);
     }
 
+
     /**
-     * Task listener that runs when an approveDoc task is created. Sets the candidate group to the document's group.
+     * Called when a collaboration task is created
      *
      * @param execution
      * @param task
      */
+    public void onCreateCollaborate(Execution execution, DelegateTask task) {
+        ProcessInstance pi = runtimeService.createProcessInstanceQuery().
+                processInstanceId(execution.getProcessInstanceId()).singleResult();
+
+        String docId = pi.getBusinessKey();
+        if (StringUtils.isBlank(docId)) {
+            return;
+        }
+        Document doc = this.docSrvc.getDocument(docId);
+        if (doc == null) {
+            return;
+        }
+        log.debug("Setting doc: {} to state = {}", doc.getTitle(), DocState.WAITING_FOR_COLLABORATION.name());
+        doc.setDocState(DocState.WAITING_FOR_COLLABORATION);
+        this.docSrvc.updateDocument(doc);
+    }
+
+    /**
+     * Called when a collaboration task is completed
+     *
+     * @param execution
+     * @param task
+     */
+    public void onCompleteCollaborate(Execution execution, DelegateTask task) {
+        ProcessInstance pi = runtimeService.createProcessInstanceQuery().
+                processInstanceId(execution.getProcessInstanceId()).singleResult();
+
+        String docId = pi.getBusinessKey();
+        if (StringUtils.isBlank(docId)) {
+            return;
+        }
+        Document doc = this.docSrvc.getDocument(docId);
+        if (doc == null) {
+            return;
+        }
+        log.debug("Setting doc: {} to state = {}", doc.getTitle(), DocState.COLLABORATED.name());
+        doc.setDocState(DocState.COLLABORATED);
+        this.docSrvc.updateDocument(doc);
+
+        String message = String.format("%s entitled '%s' has been collaborated on. ", doc.getDocType().name(), doc.getTitle());
+        this.alertService.sendAlert(doc.getAuthor(), Alert.SUCCESS, message);
+
+    }
+
+
+    /**
+     * Called when a approve/reject user task is created.
+     *
+     * @param execution
+     * @param task
+     */
+    public void onCreateApproval(Execution execution, DelegateTask task) {
+        ProcessInstance pi = runtimeService.createProcessInstanceQuery().
+                processInstanceId(execution.getProcessInstanceId()).singleResult();
+
+        String docId = pi.getBusinessKey();
+        if (StringUtils.isBlank(docId)) {
+            return;
+        }
+
+        Document doc = this.docSrvc.getDocument(docId);
+        if (doc == null) {
+            return;
+        }
+
+        log.debug("Setting doc: {} to state = {}", doc.getTitle(), DocState.WAITING_FOR_APPROVAL.name());
+        doc.setDocState(DocState.WAITING_FOR_APPROVAL);
+        this.docSrvc.updateDocument(doc);
+    }
+
+
+
+    /**
+     * Task listener that runs when an {@link com.studerw.activiti.model.TaskCollaboration} or
+     * {@link com.studerw.activiti.model.TaskApproval} is created. Sets the candidate group to the document's group.
+     *
+     * @param execution
+     * @param task
+     */
+    @Deprecated
     public void setAssignee(Execution execution, DelegateTask task) {
         String pId = execution.getProcessInstanceId();
-        log.debug("doc being published - procId={}", pId);
         ProcessInstance pi = runtimeService.createProcessInstanceQuery().
                 processInstanceId(execution.getProcessInstanceId()).singleResult();
         String docId = pi.getBusinessKey();

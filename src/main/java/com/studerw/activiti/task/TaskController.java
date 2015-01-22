@@ -33,8 +33,7 @@ import java.util.List;
 public class TaskController extends BaseController {
     private static final Logger log = LoggerFactory.getLogger(TaskController.class);
 
-    @Autowired
-    protected LocalTaskService taskService;
+    @Autowired protected LocalTaskService taskService;
 
     @InitBinder
     protected void initBinder(WebDataBinder binder) {
@@ -63,8 +62,7 @@ public class TaskController extends BaseController {
     @RequestMapping(value = "/tasks/approve.htm", method = RequestMethod.POST)
     public String approve(@Valid @ModelAttribute TaskApproval taskApproval,
                           BindingResult result,
-                          final RedirectAttributes redirectAttributes,
-                          HttpServletRequest request) {
+                          final RedirectAttributes redirectAttributes){
         log.debug("task approval: {}", taskApproval.toString());
 
         if (result.hasFieldErrors()) {
@@ -73,7 +71,7 @@ public class TaskController extends BaseController {
             return "redirect:/tasks.htm";
         }
 
-        this.taskService.approveTask(taskApproval);
+        this.taskService.approveOrRejectDoc(taskApproval);
 
         redirectAttributes.addFlashAttribute("msg", "The task has been completed.");
         return "redirect:/tasks.htm";

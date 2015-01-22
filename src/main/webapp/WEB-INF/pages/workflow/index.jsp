@@ -57,7 +57,19 @@
             </div>
         </c:if>
         <h4>${param.group}</h4>
-        <div id="groupSelForm">
+        <div id="docTypeSelForm">
+            <div class="form-group">
+                <label for="docTypeSel" class="">Document Type</label>
+                <select class="form-control" id="docTypeSel">
+                    <option value="">Choose a Document Type</option>
+                    <c:forEach var="docType" items="${docTypes}">
+                        <option value="${docType}">${docType}</option>
+                    </c:forEach>
+                </select>
+            </div>
+        </div>
+
+        <div id="groupSelForm" style="display:none;">
             <div class="form-group">
                 <label for="groupSel" class="">Group</label>
                 <select class="form-control" id="groupSel">

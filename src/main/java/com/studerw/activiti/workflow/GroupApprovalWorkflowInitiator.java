@@ -19,8 +19,9 @@ import java.util.List;
  * User: studerw
  * Date: 5/30/14
  */
-@Component
+//@Component
 @Lazy(value = false)
+@Deprecated
 public class GroupApprovalWorkflowInitiator {
     private static final Logger log = LoggerFactory.getLogger(GroupApprovalWorkflowInitiator.class);
     @Autowired com.studerw.activiti.user.UserService userSrvc;

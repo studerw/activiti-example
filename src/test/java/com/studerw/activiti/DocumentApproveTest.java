@@ -79,7 +79,7 @@
 //        List<TaskForm> tasks = this.localTaskService.getTasks("fozzie");
 //        assertTrue(tasks.size() == 1);
 //        log.debug("got task: " + tasks.get(0).getName());
-//        localTaskService.approveTask(true, "task approved blah blah blah", tasks.get(0).getId());
+//        localTaskService.approveOrRejectDoc(true, "task approved blah blah blah", tasks.get(0).getId());
 //        HistoricProcessInstance pi = historyService.createHistoricProcessInstanceQuery().
 //                includeProcessVariables().processInstanceBusinessKey(docId).singleResult();
 //

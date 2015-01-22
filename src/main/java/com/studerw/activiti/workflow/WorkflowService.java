@@ -1,7 +1,6 @@
 package com.studerw.activiti.workflow;
 
-import com.studerw.activiti.model.Document;
-import com.studerw.activiti.util.Workflow;
+import com.studerw.activiti.model.DocType;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
 /**
  * User: studerw
@@ -31,11 +29,15 @@ public class WorkflowService {
     @Autowired RuntimeService runtimeService;
     @Autowired RepositoryService repoSrvc;
 
+    public static String getApprovalKeyByGroup(String group) {
+        return null;//TODOString.format("%s-%s",Workflow.PROCESS_ID_DOC_APPROVAL, group);
+    }
+
     /**
      * @param processId the process <strong>Definition</strong> Id - NOT the process Instance Id.
      * @return png image of diagram - nothing highlighted since this is the process definition - not a specific instance.
      */
-    byte[] getProcessDefinitionDiagram(String processId) throws IOException {
+    public byte[] getProcessDefinitionDiagram(String processId) throws IOException {
         ProcessDefinition pd =
                 this.repoSrvc.createProcessDefinitionQuery().processDefinitionKey(processId).latestVersion().singleResult();
         log.debug("Getting process diagram for processId: " + pd.getId());
@@ -47,7 +49,11 @@ public class WorkflowService {
         return bytes;
     }
 
-    byte[] getActiveDocumentDiagram(String docId) throws IOException {
+    /**
+     * @param docId The document id.
+     * @return png image of diagram with current activity highlighted.
+     */
+    public byte[] getActiveDocumentDiagram(String docId) throws IOException {
         log.debug("getting active diagram for doc: " + docId);
         //http://forums.activiti.org/content/process-diagram-highlighting-current-process
         ProcessInstance pi =
@@ -79,28 +85,23 @@ public class WorkflowService {
                 .deploy();
     }
 
-    public static String getApprovalKeyByGroup(String group){
-        return String.format("%s-%s",Workflow.PROCESS_ID_DOC_APPROVAL, group);
+    /**
+     * @param businessKey the document Id as returned from DAO classes
+     * @return the associated ProcessInstance or null if one does not exist
+     */
+    public ProcessInstance findProcessByBusinessKey(String businessKey) {
+        return runtimeService.createProcessInstanceQuery().processInstanceBusinessKey(businessKey).singleResult();
     }
 
     /**
-     *
-     * @param businessKey
-     * @return the associated ProcessInstance or null if one does not exist
+     * @param docType
+     * @return returns the matching {@code ProcessDefinition} based on the namespace (i.e. category) which must
+     * be a valid {@link com.studerw.activiti.model.DocType} or null if no definition exists.
      */
-    public ProcessInstance getProcessByBusinessKey(String businessKey) {
-        List<ProcessInstance> instances =
-                runtimeService.createProcessInstanceQuery().processInstanceBusinessKey(businessKey).list();
-        if (instances.size() == 0) {
-            return null;
-        } else if (instances.size() > 1) {
-            throw new IllegalStateException("More than one process found for document: " + businessKey + " - zero or one should have been found.");
-        } else {
-            return instances.get(0);
-        }
-    }
+    public ProcessDefinition findDefinitionByDocType(DocType docType) {
+        log.debug("searching for process definition for docType={}", docType);
+        ProcessDefinition pd = repoSrvc.createProcessDefinitionQuery().processDefinitionCategory(docType.name()).singleResult();
+        return pd;
 
-    public ProcessDefinition findDefinitionByDocType(Document doc){
-        return null;
     }
 }

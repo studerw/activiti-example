@@ -5,13 +5,13 @@ package com.studerw.activiti.util;
  * Date: 5/24/14
  */
 public class Workflow {
-    public final static String CATEGORY_GROUP = "ACT_GROUP";
-    public final static String CATEGORY_DOC_TYPE = "ACT_DOC_TYPE";
+    public static final String SUBPROCESS_ID_DYNAMIC = "DYNAMIC_SUB_PROCESS";
+    public static final String SUBPROCESS_NAME_DYNAMIC = "Dynamic Document Subprocess";
+    public static final String TASK_ID_DOC_APPROVAL = "APPROVE_REJECT_DOC_USER_TASK_";
+    public static final String TASK_ID_DOC_COLLABORATE = "COLLABORATE_DOC_USER_TASK_";
 
-    public static final String PROCESS_ID_DOC_APPROVAL = "docApprovalWithSubProcess";
-    public static final String PROCESS_NAME_DOC_APPROVAL = "Approve Document Workflow";
-    public static final String TASK_ID_DOC_APPROVAL = "approveDocUserTask";
-    public static final String SUB_PROC_ID_DOC_APPROVAL = "approvalSubProcess";
+    public static final String TASK_VAR_APPROVED_OR_REJECTED = "taskOutcome";
+    public static final String PROCESS_VAR_APPROVED_OR_REJECTED = "approved";
 
     public static final String PROCESS_ID_USER_APPROVAL = "NEW_USER";
     public static final String PROCESS_NAME_USER_APPROVAL = "Approve New User";

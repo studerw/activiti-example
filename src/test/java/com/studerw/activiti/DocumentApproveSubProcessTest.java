@@ -104,7 +104,7 @@
 //        InputStream in = new DefaultProcessDiagramGenerator().generateDiagram(bpmnModel, "png", runtimeService.getActiveActivityIds(currentTask.getProcessInstanceId()));
 //        FileUtils.copyInputStreamToFile(in, new File("target/current-diagram.png"));
 //
-//        localTaskService.approveTask(true, "task approved blah blah blah", tasks.get(0).getId());
+//        localTaskService.approveOrRejectDoc(true, "task approved blah blah blah", tasks.get(0).getId());
 //        HistoricProcessInstance pi = historyService.createHistoricProcessInstanceQuery().
 //                includeProcessVariables().processInstanceBusinessKey(docId).singleResult();
 //

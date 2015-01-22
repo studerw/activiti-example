@@ -4,10 +4,12 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.studerw.activiti.document.dao.BookReportDao;
 import com.studerw.activiti.document.dao.InvoiceDao;
-import com.studerw.activiti.model.*;
+import com.studerw.activiti.model.BookReport;
+import com.studerw.activiti.model.DocType;
+import com.studerw.activiti.model.Document;
+import com.studerw.activiti.model.Invoice;
 import com.studerw.activiti.user.InvalidAccessException;
 import com.studerw.activiti.user.UserService;
-import com.studerw.activiti.util.Workflow;
 import com.studerw.activiti.workflow.WorkflowService;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.RuntimeService;
@@ -84,13 +86,11 @@ public class DocumentService {
 
     public void submitToWorkflow(String docId) {
         Document doc = this._getDocument(docId);
-        log.debug("beginning (or continuing) doc approval workflow for doc {}. ", doc.getId());
+        log.debug("beginning (or continuing) doc workflow for doc {}. ", doc.getId());
         UserDetails userDetails = this.userService.currentUser();
         if (!StringUtils.equals(userDetails.getUsername(), doc.getAuthor())) {
             throw new InvalidAccessException("Only the author of a doc can submit for approval");
         }
-        doc.setDocState(DocState.WAITING_FOR_APPROVAL);
-
         //Workflow
         //TODO check author and currentUser
         Map<String, Object> processVariables = Maps.newHashMap();
@@ -99,11 +99,11 @@ public class DocumentService {
         processVariables.put("docAuthor", doc.getAuthor());
         try {
             identityService.setAuthenticatedUserId(userDetails.getUsername());
-            ProcessInstance current = workflowService.getProcessByBusinessKey(docId);
+            ProcessInstance current = workflowService.findProcessByBusinessKey(docId);
             if (current != null) {
                 throw new IllegalStateException("Running WF Process with key: " + docId + " already exists.");
             }
-//            current = runtimeService.startProcessInstanceByKey(key, doc.getId());
+            //TODOcurrent = runtimeService.startProcessInstanceByKey(key, doc.getId());
             Task task = taskService.createTaskQuery().processInstanceId(current.getProcessInstanceId()).singleResult();
             taskService.setAssignee(task.getId(), userDetails.getUsername());
 
@@ -122,7 +122,6 @@ public class DocumentService {
             identityService.setAuthenticatedUserId(null);
         }
     }
-
 
 
     @Transactional
@@ -145,10 +144,11 @@ public class DocumentService {
 
     /**
      * We use a private method here to enable internal calls without messing with spring proxies.
+     *
      * @param id
      * @return null
      */
-    private Document _getDocument(String id){
+    private Document _getDocument(String id) {
         try {
             return this.bookReportDao.read(id);
         }

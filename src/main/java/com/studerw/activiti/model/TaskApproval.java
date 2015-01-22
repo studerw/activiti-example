@@ -9,47 +9,22 @@ import javax.validation.constraints.Size;
  * User: studerw
  * Date: 5/19/14
  */
-public class TaskApproval {
-    @Size(max = 4000)
-    private String comment;
+public class TaskApproval extends AbstractTask{
     @NotNull
     private Boolean approved;
-    @NotNull
-    private String taskId;
-
-    public TaskApproval() {
-    }
-
-    public String getTaskId() {
-        return taskId;
-    }
-
-    public void setTaskId(String taskId) {
-        this.taskId = taskId;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
 
     public Boolean getApproved() {
         return approved;
     }
-
     public void setApproved(Boolean approved) {
         this.approved = approved;
     }
 
-    @Override
-    public String toString() {
-        return Objects.toStringHelper(this)
-                .add("taskId", taskId)
-                .add("comment", comment)
-                .add("approved", approved)
-                .toString();
+    @Override public String toString() {
+        final StringBuilder sb = new StringBuilder("TaskApproval{");
+        sb.append(super.toString());
+        sb.append("approved=").append(approved);
+        sb.append('}');
+        return sb.toString();
     }
 }

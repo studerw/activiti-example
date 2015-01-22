@@ -33,5 +33,9 @@
 
     <import resource="activiti-config.xml"/>
 
+    <bean id="activitiRule" class="org.activiti.engine.test.ActivitiRule">
+        <property name="processEngine" ref="processEngine" />
+    </bean>
+
 
 </beans>

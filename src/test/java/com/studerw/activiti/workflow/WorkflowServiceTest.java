@@ -1,7 +1,9 @@
 package com.studerw.activiti.workflow;
 
 import com.studerw.activiti.document.DocumentService;
+import com.studerw.activiti.model.DocType;
 import org.activiti.engine.*;
+import org.activiti.engine.repository.ProcessDefinition;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,6 +40,11 @@ public class WorkflowServiceTest {
 
     @Test
     public void testFindDefinitionByDocType() throws Exception {
+        ProcessDefinition pd = this.workflowService.findDefinitionByDocType(DocType.BOOK_REPORT);
+        assertNotNull(pd);
+
+        ProcessDefinition pd1 = this.workflowService.findDefinitionByDocType(DocType.RECEIPT);
+        assertNull(pd1);
 
     }
 }

@@ -34,16 +34,11 @@ import java.util.Map;
 public class LocalTaskService {
     private static final Logger log = LoggerFactory.getLogger(LocalTaskService.class);
 
-    @Autowired
-    TaskService taskService;
-    @Autowired
-    IdentityService identityService;
-    @Autowired
-    RuntimeService runtimeService;
-    @Autowired
-    UserService userService;
-    @Autowired
-    HistoryService historyService;
+    @Autowired TaskService taskService;
+    @Autowired IdentityService identityService;
+    @Autowired RuntimeService runtimeService;
+    @Autowired UserService userService;
+    @Autowired HistoryService historyService;
 
     /**
      * @param userId
@@ -71,12 +66,22 @@ public class LocalTaskService {
         return taskForms;
     }
 
-    public void approveTask(TaskApproval taskApproval) {
-        this.approveTask(taskApproval.getApproved(), taskApproval.getComment(), taskApproval.getTaskId());
+    /**
+     * Complete an approval task
+     * @param taskApproval
+     */
+    public void approveOrRejectDoc(TaskApproval taskApproval) {
+        this.approveOrRejectDoc(taskApproval.getApproved(), taskApproval.getComment(), taskApproval.getTaskId());
     }
 
-    public void approveTask(boolean approved, String comment, String taskId) {
-        log.debug("New User task completion: " + approved);
+    /**
+     * Complete an approval task
+     * @param approved
+     * @param comment
+     * @param taskId
+     */
+    public void approveOrRejectDoc(boolean approved, String comment, String taskId) {
+        log.debug("Approve Task completion?: " + approved);
         UserDetails userDetails = userService.currentUser();
         try {
             identityService.setAuthenticatedUserId(userDetails.getUsername());
@@ -85,16 +90,36 @@ public class LocalTaskService {
                 throw new RuntimeException("Unable to find task - it's possible another user has already completed it");
             }
             Map<String, Object> vars = task.getProcessVariables();
-            runtimeService.setVariable(task.getExecutionId(), "approved", approved);
-            vars.put("approved", approved);
+            runtimeService.setVariable(task.getExecutionId(), Workflow.PROCESS_VAR_APPROVED_OR_REJECTED, approved);
             if (StringUtils.equalsIgnoreCase((String) vars.get("initiator"), userDetails.getUsername())) {
                 throw new RuntimeException("The author of a document cannot perform approvals of the same document");
             }
             taskService.setAssignee(task.getId(), userDetails.getUsername());
             taskService.addComment(task.getId(), task.getProcessInstanceId(), comment);
-            Map<String, Object> taskVariables = new HashMap<String, Object>();
-            taskService.setVariableLocal(task.getId(), "taskOutcome", approved ? "Approved" : "Rejected");
-            taskService.complete(task.getId(), taskVariables);
+            taskService.setVariableLocal(task.getId(), Workflow.TASK_VAR_APPROVED_OR_REJECTED, Boolean.valueOf(approved));
+            taskService.complete(task.getId());
+        } finally {
+            identityService.setAuthenticatedUserId(null);
+        }
+    }
+
+    /**
+     * Complete a collaboration task
+     * @param comment
+     * @param taskId
+     */
+    public void collaborateTask(String comment, String taskId){
+        log.debug("Collaboration Task completion");
+        UserDetails userDetails = userService.currentUser();
+        try {
+            identityService.setAuthenticatedUserId(userDetails.getUsername());
+            Task task = taskService.createTaskQuery().taskId(taskId).includeProcessVariables().singleResult();
+            if (task == null) {
+                throw new RuntimeException("Unable to find task - it's possible another user has already completed it");
+            }
+            taskService.setAssignee(task.getId(), userDetails.getUsername());
+            taskService.addComment(task.getId(), task.getProcessInstanceId(), comment);
+            taskService.complete(task.getId());
         } finally {
             identityService.setAuthenticatedUserId(null);
         }
@@ -119,9 +144,13 @@ public class LocalTaskService {
         hTasks = historyService.createHistoricTaskInstanceQuery().includeTaskLocalVariables().processInstanceBusinessKey(businessKey).list();
         List<HistoricTask> historicTasks = Lists.newArrayList();
         for (HistoricTaskInstance hti : hTasks) {
-            if (StringUtils.startsWith(hti.getProcessDefinitionId(), Workflow.PROCESS_ID_DOC_APPROVAL)
-                    && hti.getEndTime() != null) {
+//            if (StringUtils.startsWith(hti.getProcessDefinitionId(), "FOO")//TODOWorkflow.PROCESS_ID_DOC_APPROVAL)
+//                    && hti.getEndTime() != null) {
+//                historicTasks.add(fromActiviti(hti));
+//            }
+            if (hti.getEndTime() != null){
                 historicTasks.add(fromActiviti(hti));
+
             }
         }
         Collections.sort(historicTasks);

@@ -1,13 +1,11 @@
 package com.studerw.activiti;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.studerw.activiti.document.DocumentService;
 import com.studerw.activiti.model.BookReport;
 import com.studerw.activiti.model.DocState;
-import com.studerw.activiti.model.DocType;
-import com.studerw.activiti.util.Workflow;
+import com.studerw.activiti.task.LocalTaskService;
 import org.activiti.engine.*;
 import org.activiti.engine.identity.Group;
 import org.activiti.engine.repository.ProcessDefinition;
@@ -29,12 +27,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.net.URI;
 import java.util.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * User: studerw
@@ -46,6 +41,7 @@ public class BookReportTest {
     private static final Logger log = LogManager.getLogger(BookReportTest.class);
     @Autowired RuntimeService runtimeService;
     @Autowired TaskService taskService;
+    @Autowired LocalTaskService localTaskService;
     @Autowired HistoryService historyService;
     @Autowired IdentityService identityService;
     @Autowired RepositoryService repositoryService;
@@ -53,34 +49,36 @@ public class BookReportTest {
     @Autowired @Qualifier("dataSource") javax.sql.DataSource datasource;
 
     @Before
-    public void before(){
+    public void before() {
         setSpringSecurity("fozzie");
     }
 
-    @Test
-    public void testParseCategory(){
-        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey(BookReport.WORKFLOW_ID).singleResult();
-        assertNotNull("Book Report Process Definition is not null", processDefinition);
-
-        String category = processDefinition.getCategory();
-        log.debug("Category: {}", category);
-        final Map<String, String> map = Splitter.on('&').trimResults().withKeyValueSeparator("=").split(category);
-        log.debug(map);
-        assertTrue(map.keySet().containsAll(Arrays.asList(Workflow.CATEGORY_DOC_TYPE, Workflow.CATEGORY_GROUP)));
-        String docType = map.get(Workflow.CATEGORY_DOC_TYPE);
-        String group = map.get(Workflow.CATEGORY_GROUP);
-        assertEquals(DocType.valueOf(docType), DocType.BOOK_REPORT);
-        assertEquals(group, "engineering");
-    }
+//    @Test
+//    public void testParseCategory() {
+//        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().
+//                processDefinitionKey(BookReport.WORKFLOW_ID).singleResult();
+//        assertNotNull("Book Report Process Definition is not null", processDefinition);
+//
+//        String category = processDefinition.getCategory();
+//        log.debug("Category: {}", category);
+//        final Map<String, String> map = Splitter.on('&').trimResults().withKeyValueSeparator("=").split(category);
+//        log.debug(map);
+//        assertTrue(map.keySet().containsAll(Arrays.asList(Workflow.CATEGORY_DOC_TYPE, Workflow.CATEGORY_GROUP)));
+//        String docType = map.get(Workflow.CATEGORY_DOC_TYPE);
+//        String group = map.get(Workflow.CATEGORY_GROUP);
+//        assertEquals(DocType.valueOf(docType), DocType.BOOK_REPORT);
+//        assertEquals(group, "engineering");
+//    }
 
     @Test
     public void testDeployed() throws Exception {
         List<ProcessDefinition> definitions = repositoryService.createProcessDefinitionQuery().list();
-        for(ProcessDefinition definition: definitions){
+        for (ProcessDefinition definition : definitions) {
             System.err.println(definition.getId());
         }
 
-        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey(BookReport.WORKFLOW_ID).singleResult();
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().
+                processDefinitionKey(BookReport.WORKFLOW_ID).singleResult();
         assertNotNull("Book Report Process Definition is not null", processDefinition);
 
         String category = processDefinition.getCategory();
@@ -88,7 +86,7 @@ public class BookReportTest {
     }
 
     @Test
-    public void testProcess() throws Exception {
+    public void testEmptyBookReportProcess() throws Exception {
         BookReport bookReport = new BookReport();
         bookReport.setCreatedDate(new Date());
         bookReport.setAuthor("fozzie");
@@ -110,6 +108,67 @@ public class BookReportTest {
         log.debug(updated);
 
         assertNotNull("should have returned valid doc", updated);
+        assertTrue("Should have state=Published", updated.getDocState() == DocState.PUBLISHED);
+    }
+
+    @Test
+    public void testBookReportWithTasks() throws Exception {
+        final String defKey = "bookReportWithTasksWorkflow";
+        BookReport updated = null;
+
+        BookReport bookReport = new BookReport();
+        bookReport.setCreatedDate(new Date());
+        bookReport.setAuthor("fozzie");
+        bookReport.setTitle("test book report");
+        bookReport.setContent("some content");
+        bookReport.setSummary("summary");
+        bookReport.setBookTitle("Some title");
+        bookReport.setBookAuthor("John Smith");
+        bookReport.setGroupId("engineering");
+        log.debug(bookReport.toString());
+
+        String id = this.documentService.createDocument(bookReport);
+
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey(defKey, id);
+
+        Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+        taskService.complete(task.getId());
+
+        updated = (BookReport) this.documentService.getDocument(id);
+        log.debug(updated);
+        assertTrue("Should have state=WAITING_FOR_COLLABORATION", updated.getDocState() == DocState.WAITING_FOR_COLLABORATION);
+
+        task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+        assertEquals(task.getTaskDefinitionKey(), "COLLABORATE_DOC_USER_TASK_1");
+        localTaskService.collaborateTask("some colloboration comment 1", task.getId());
+        updated = (BookReport) this.documentService.getDocument(id);
+        log.debug(updated);
+        assertTrue("Should have state=WAITING_FOR_COLLABORATION", updated.getDocState() == DocState.WAITING_FOR_COLLABORATION);
+
+
+        task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+        assertEquals(task.getTaskDefinitionKey(), "COLLABORATE_DOC_USER_TASK_2");
+        localTaskService.collaborateTask("some colloboration comment 2", task.getId());
+        updated = (BookReport) this.documentService.getDocument(id);
+        log.debug(updated);
+        assertTrue("Should have state=WAITING_FOR_APPROVAL", updated.getDocState() == DocState.WAITING_FOR_APPROVAL);
+
+
+        task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+        assertEquals(task.getTaskDefinitionKey(), "APPROVE_REJECT_DOC_USER_TASK_1");
+        localTaskService.approveOrRejectDoc(true, "some comment 1", task.getId());
+        updated = (BookReport) this.documentService.getDocument(id);
+        log.debug(updated);
+        assertTrue("Should have state=WAITING_FOR_APPROVAL", updated.getDocState() == DocState.WAITING_FOR_APPROVAL);
+
+        task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+        assertEquals(task.getTaskDefinitionKey(), "APPROVE_REJECT_DOC_USER_TASK_2");
+        localTaskService.approveOrRejectDoc(true, "some comment 2", task.getId());
+        updated = (BookReport) this.documentService.getDocument(id);
+        log.debug(updated);
+
+        updated = (BookReport) this.documentService.getDocument(id);
+        log.debug(updated);
         assertTrue("Should have state=Published", updated.getDocState() == DocState.PUBLISHED);
     }
 
