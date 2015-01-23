@@ -1,11 +1,12 @@
 package com.studerw.activiti.model;
 
+import com.studerw.activiti.model.document.DocType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 
 /**
- * @author studerw
+ * @author William Studer
  */
 public class DocTypeTest {
     private static final Logger log = LogManager.getLogger(DocTypeTest.class);

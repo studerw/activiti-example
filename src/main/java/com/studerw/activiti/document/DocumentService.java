@@ -4,17 +4,19 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.studerw.activiti.document.dao.BookReportDao;
 import com.studerw.activiti.document.dao.InvoiceDao;
-import com.studerw.activiti.model.BookReport;
-import com.studerw.activiti.model.DocType;
-import com.studerw.activiti.model.Document;
-import com.studerw.activiti.model.Invoice;
+import com.studerw.activiti.model.document.BookReport;
+import com.studerw.activiti.model.document.DocType;
+import com.studerw.activiti.model.document.Document;
+import com.studerw.activiti.model.document.Invoice;
 import com.studerw.activiti.user.InvalidAccessException;
 import com.studerw.activiti.user.UserService;
 import com.studerw.activiti.workflow.WorkflowService;
 import org.activiti.engine.IdentityService;
+import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.identity.Group;
+import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.apache.commons.lang3.StringUtils;
@@ -30,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * User: studerw
+ * @author William Studer
  * Date: 5/18/14
  */
 @Service("documentService")
@@ -38,6 +40,7 @@ public class DocumentService {
     private static final Logger log = LoggerFactory.getLogger(DocumentService.class);
     @Autowired protected IdentityService identityService;
     @Autowired protected RuntimeService runtimeService;
+    @Autowired protected RepositoryService repositoryService;
     @Autowired protected TaskService taskService;
     @Autowired protected UserService userService;
     @Autowired protected InvoiceDao invoiceDao;
@@ -103,7 +106,8 @@ public class DocumentService {
             if (current != null) {
                 throw new IllegalStateException("Running WF Process with key: " + docId + " already exists.");
             }
-            //TODOcurrent = runtimeService.startProcessInstanceByKey(key, doc.getId());
+            ProcessDefinition procDef = this.findProcDefByTypeAndGroup(doc.getDocType(), doc.getGroupId());
+            current = runtimeService.startProcessInstanceByKey(procDef.getKey());
             Task task = taskService.createTaskQuery().processInstanceId(current.getProcessInstanceId()).singleResult();
             taskService.setAssignee(task.getId(), userDetails.getUsername());
 
@@ -126,7 +130,6 @@ public class DocumentService {
 
     @Transactional
     public void updateDocument(Document document) {
-        String id = document.getId();
         if (DocType.BOOK_REPORT.equals(document.getDocType())) {
             this.bookReportDao.update((BookReport) document);
         } else if (DocType.INVOICE.equals(document.getDocType())) {
@@ -154,7 +157,17 @@ public class DocumentService {
         }
         catch (Throwable t) {
         }
-
         return this.invoiceDao.read(id);
+    }
+
+    /**
+     * @param docType
+     * @param group
+     * @return a valid process definition by DocType and Group or null if none exits
+     */
+    public ProcessDefinition findProcDefByTypeAndGroup(DocType docType, String group) {
+        log.debug("Finding process definition by docType={} and group={}", docType.name(), group);
+        return repositoryService.createProcessDefinitionQuery().processDefinitionCategory(docType.name()).
+                processDefinitionKey(group).singleResult();
     }
 }

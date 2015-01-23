@@ -23,7 +23,7 @@ import java.util.UUID;
 import static com.google.common.base.Preconditions.checkArgument;
 
 /**
- * User: studerw
+ * @author William Studer
  * Date: 5/21/14
  */
 @Repository

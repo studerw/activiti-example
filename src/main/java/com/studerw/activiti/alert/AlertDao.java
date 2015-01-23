@@ -6,7 +6,7 @@ import com.studerw.activiti.model.Alert;
 import java.util.List;
 
 /**
- * User: studerw
+ * @author William Studer
  * Date: 5/21/14
  */
 public interface AlertDao extends IBaseDao<Alert> {

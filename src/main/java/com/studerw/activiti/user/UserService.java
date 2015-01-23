@@ -3,7 +3,7 @@ package com.studerw.activiti.user;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.studerw.activiti.model.UserForm;
-import com.studerw.activiti.util.Workflow;
+import com.studerw.activiti.workflow.Workflow;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * User: studerw
+ * @author William Studer
  * Date: 5/18/14
  */
 @Service("userService")

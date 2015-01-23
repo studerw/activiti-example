@@ -1,7 +1,7 @@
 package com.studerw.activiti.workflow;
 
 import com.studerw.activiti.document.DocumentService;
-import com.studerw.activiti.model.DocType;
+import com.studerw.activiti.model.document.DocType;
 import org.activiti.engine.*;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.junit.After;

@@ -16,7 +16,7 @@ import java.util.Map;
 import static org.junit.Assert.assertTrue;
 
 /**
- * @author studerw
+ * @author William Studer
  */
 public class JsonTest {
     private static final Logger log = LogManager.getLogger(JsonTest.class);

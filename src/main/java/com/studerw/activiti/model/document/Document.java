@@ -1,4 +1,4 @@
-package com.studerw.activiti.model;
+package com.studerw.activiti.model.document;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * User: studerw
+ * @author William Studer
  * Date: 5/20/14
  */
 public abstract class Document implements Serializable, Comparable<Document> {

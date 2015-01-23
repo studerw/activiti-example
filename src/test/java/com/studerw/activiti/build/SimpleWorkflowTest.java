@@ -1,4 +1,4 @@
-package com.studerw.activiti.design;
+package com.studerw.activiti.build;
 
 import org.activiti.bpmn.BpmnAutoLayout;
 import org.activiti.bpmn.model.*;
@@ -23,7 +23,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 /**
- * User: studerw
+ * @author William Studer
  * Date: 5/25/14
  */
 @RunWith(SpringJUnit4ClassRunner.class)

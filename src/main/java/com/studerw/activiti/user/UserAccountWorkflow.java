@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 
 /**
- * User: studerw
+ * @author William Studer
  * Date: 5/18/14
  */
 @Service("userAccountWorkflow")

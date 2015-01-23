@@ -1,11 +1,11 @@
 package com.studerw.activiti.task;
 
 import com.google.common.collect.Lists;
-import com.studerw.activiti.model.HistoricTask;
-import com.studerw.activiti.model.TaskApproval;
-import com.studerw.activiti.model.TaskForm;
+import com.studerw.activiti.model.task.AssignedTask;
+import com.studerw.activiti.model.task.HistoricTask;
+import com.studerw.activiti.model.task.TaskApprovalForm;
 import com.studerw.activiti.user.UserService;
-import com.studerw.activiti.util.Workflow;
+import com.studerw.activiti.workflow.Workflow;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.RuntimeService;
@@ -13,7 +13,6 @@ import org.activiti.engine.TaskService;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.task.Task;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,12 +21,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
- * User: studerw
+ * @author William Studer
  * Date: 5/18/14
  */
 @Service("localTaskService")
@@ -43,39 +42,42 @@ public class LocalTaskService {
     /**
      * @param userId
      * @return a list of all tasks either assigned or as possible candidate based on user groups.
-     *         Removes all cases of 'ApproveDoc' tasks where the user is the author of the document, as we
-     *         assume the document author cannot also be an approver. This may change in the future.
+     * Removes all cases of 'ApproveDoc' tasks where the user is the author of the document, as we
+     * assume the document author cannot also be an approver. This may change in the future.
      */
-    public List<TaskForm> getTasks(String userId) {
+    public List<AssignedTask> getTasks(String userId) {
         log.debug("Getting tasks for user: {}", userId);
         List<Task> tasks = taskService.createTaskQuery().
                 includeProcessVariables().
                 taskCandidateOrAssigned(userId).
                 orderByTaskCreateTime().asc().list();
-        List<TaskForm> taskForms = Lists.newArrayList();
+        List<AssignedTask> assignedTasks = Lists.newArrayList();
         try {
             for (Task task : tasks) {
                 if (!isDocAuthor(task, userId)) {
-                    taskForms.add(TaskForm.fromTask(task));
+                    assignedTasks.add(AssignedTask.fromTask(task));
                 }
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new RuntimeException("Error converting task to Task Form", e);
         }
-        log.debug("got {} tasks for user {}", taskForms.size(), userId);
-        return taskForms;
+        log.debug("got {} tasks for user {}", assignedTasks.size(), userId);
+        return assignedTasks;
     }
 
     /**
      * Complete an approval task
-     * @param taskApproval
+     *
+     * @param taskApprovalForm
      */
-    public void approveOrRejectDoc(TaskApproval taskApproval) {
-        this.approveOrRejectDoc(taskApproval.getApproved(), taskApproval.getComment(), taskApproval.getTaskId());
+    public void approveOrRejectDoc(TaskApprovalForm taskApprovalForm) {
+        this.approveOrRejectDoc(taskApprovalForm.getApproved(), taskApprovalForm.getComment(), taskApprovalForm.getTaskId());
     }
 
     /**
      * Complete an approval task
+     *
      * @param approved
      * @param comment
      * @param taskId
@@ -98,17 +100,19 @@ public class LocalTaskService {
             taskService.addComment(task.getId(), task.getProcessInstanceId(), comment);
             taskService.setVariableLocal(task.getId(), Workflow.TASK_VAR_APPROVED_OR_REJECTED, Boolean.valueOf(approved));
             taskService.complete(task.getId());
-        } finally {
+        }
+        finally {
             identityService.setAuthenticatedUserId(null);
         }
     }
 
     /**
      * Complete a collaboration task
+     *
      * @param comment
      * @param taskId
      */
-    public void collaborateTask(String comment, String taskId){
+    public void collaborateTask(String comment, String taskId) {
         log.debug("Collaboration Task completion");
         UserDetails userDetails = userService.currentUser();
         try {
@@ -120,7 +124,8 @@ public class LocalTaskService {
             taskService.setAssignee(task.getId(), userDetails.getUsername());
             taskService.addComment(task.getId(), task.getProcessInstanceId(), comment);
             taskService.complete(task.getId());
-        } finally {
+        }
+        finally {
             identityService.setAuthenticatedUserId(null);
         }
     }
@@ -148,7 +153,7 @@ public class LocalTaskService {
 //                    && hti.getEndTime() != null) {
 //                historicTasks.add(fromActiviti(hti));
 //            }
-            if (hti.getEndTime() != null){
+            if (hti.getEndTime() != null) {
                 historicTasks.add(fromActiviti(hti));
 
             }
@@ -177,6 +182,6 @@ public class LocalTaskService {
             return false;
         }
         String author = (String) task.getProcessVariables().get("initiator");
-        return ObjectUtils.equals(author, userId);
+        return Objects.equals(author, userId);
     }
 }

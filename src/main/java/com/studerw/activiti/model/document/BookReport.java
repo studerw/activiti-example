@@ -1,9 +1,9 @@
-package com.studerw.activiti.model;
+package com.studerw.activiti.model.document;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
 /**
- * @author studerw
+ * @author William Studer
  */
 public class BookReport extends Document {
 

@@ -1,5 +1,6 @@
 package com.studerw.activiti.model;
 
+import com.studerw.activiti.model.document.BookReport;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;
@@ -14,7 +15,7 @@ import java.util.Set;
 import static org.junit.Assert.assertNotNull;
 
 /**
- * @author studerw
+ * @author William Studer
  */
 public class ValidatorTest {
     private static final Logger log = LogManager.getLogger(ValidatorTest.class);

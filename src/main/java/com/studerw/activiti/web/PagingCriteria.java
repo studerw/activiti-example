@@ -3,7 +3,7 @@ package com.studerw.activiti.web;
 /**
  * Simple pojo used for paging result sets.
  *
- * @author studerw
+ * @author William Studer
  */
 public class PagingCriteria {
 

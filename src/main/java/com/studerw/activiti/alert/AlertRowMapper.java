@@ -9,7 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * @author studerw
+ * @author William Studer
  */
 public class AlertRowMapper implements RowMapper<Alert> {
 

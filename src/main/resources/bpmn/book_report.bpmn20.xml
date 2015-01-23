@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-             xmlns:activiti="http://activiti.org/bpmn"
-             typeLanguage="http://www.w3.org/2001/XMLSchema"
-             expressionLanguage="http://www.w3.org/1999/XPath"
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+             xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath"
              targetNamespace="BOOK_REPORT">
-    <process id="bookReportWorkflow" name="Book Report Workflow" isExecutable="true">
+    <process id="NONE" name="Book Report Workflow" isExecutable="true">
         <documentation>This process is initiated when a book report is created.</documentation>
-        <startEvent id="startevent1" name="Start" activiti:initiator="initiator"></startEvent>
+        <startEvent id="startevent" name="Start" activiti:initiator="initiator"></startEvent>
         <serviceTask id="publishBookReport" name="Publish Book Report"
-                     activiti:expression="${documentWorkflow.publish(execution)}"></serviceTask>
+                     activiti:expression="${docWorkflowListener.publish(execution)}"></serviceTask>
         <userTask id="submitToWorkflow" name="Submit Book Report to Workflow"></userTask>
-        <endEvent id="endevent1" name="End"></endEvent>
+        <endEvent id="endevent" name="End"></endEvent>
         <subProcess id="DYNAMIC_SUB_PROCESS" name="Dynamic Document Subprocess">
             <startEvent id="dynamic_sub_process_start_event" name="Start Dynamic SubProcess"></startEvent>
-            <endEvent id="dynamic_sub_process_end_event" name="End Approval SubProcess"></endEvent>
+            <endEvent id="dynamic_sub_process_end_event" name="End Dynamic SubProcess"></endEvent>
             <endEvent id="rejectedErrorEndEvent" name="ErrorEnd">
                 <errorEventDefinition errorRef="errorDocRejected"></errorEventDefinition>
             </endEvent>
@@ -21,9 +22,57 @@
         <boundaryEvent id="rejectedErrorBoundaryEvent" name="Rejected Error Event" attachedToRef="DYNAMIC_SUB_PROCESS">
             <errorEventDefinition errorRef="errorDocRejected"></errorEventDefinition>
         </boundaryEvent>
-        <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="submitToWorkflow"></sequenceFlow>
+        <sequenceFlow id="flow1" sourceRef="startevent" targetRef="submitToWorkflow"></sequenceFlow>
         <sequenceFlow id="flow2" sourceRef="submitToWorkflow" targetRef="DYNAMIC_SUB_PROCESS"></sequenceFlow>
         <sequenceFlow id="flow3" sourceRef="DYNAMIC_SUB_PROCESS" targetRef="publishBookReport"></sequenceFlow>
-        <sequenceFlow id="flow4" sourceRef="publishBookReport" targetRef="endevent1"></sequenceFlow>
+        <sequenceFlow id="flow4" sourceRef="publishBookReport" targetRef="endevent"></sequenceFlow>
     </process>
+    <bpmndi:BPMNDiagram id="BPMNDiagram_bookReportWorkflow">
+        <bpmndi:BPMNPlane bpmnElement="bookReportWorkflow" id="BPMNPlane_bookReportWorkflow">
+            <bpmndi:BPMNShape bpmnElement="startevent" id="BPMNShape_startevent">
+                <omgdc:Bounds height="35.0" width="35.0" x="0.0" y="110.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="publishBookReport" id="BPMNShape_publishBookReport">
+                <omgdc:Bounds height="126.0" width="105.0" x="350.0" y="62.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="submitToWorkflow" id="BPMNShape_submitToWorkflow">
+                <omgdc:Bounds height="141.0" width="105.0" x="80.0" y="57.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="endevent" id="BPMNShape_endevent">
+                <omgdc:Bounds height="35.0" width="35.0" x="500.0" y="110.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="DYNAMIC_SUB_PROCESS" id="BPMNShape_DYNAMIC_SUB_PROCESS">
+                <omgdc:Bounds height="250.0" width="70.0" x="230.0" y="0.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="dynamic_sub_process_start_event"
+                              id="BPMNShape_dynamic_sub_process_start_event">
+                <omgdc:Bounds height="35.0" width="35.0" x="250.0" y="20.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="dynamic_sub_process_end_event" id="BPMNShape_dynamic_sub_process_end_event">
+                <omgdc:Bounds height="35.0" width="35.0" x="250.0" y="110.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="rejectedErrorEndEvent" id="BPMNShape_rejectedErrorEndEvent">
+                <omgdc:Bounds height="35.0" width="35.0" x="250.0" y="200.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="rejectedErrorBoundaryEvent" id="BPMNShape_rejectedErrorBoundaryEvent">
+                <omgdc:Bounds height="30.0" width="30.0" x="271.0" y="235.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+                <omgdi:waypoint x="35.0" y="127.0"></omgdi:waypoint>
+                <omgdi:waypoint x="80.0" y="127.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+                <omgdi:waypoint x="185.0" y="127.0"></omgdi:waypoint>
+                <omgdi:waypoint x="230.0" y="125.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+                <omgdi:waypoint x="300.0" y="125.0"></omgdi:waypoint>
+                <omgdi:waypoint x="350.0" y="125.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+                <omgdi:waypoint x="455.0" y="125.0"></omgdi:waypoint>
+                <omgdi:waypoint x="500.0" y="127.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+        </bpmndi:BPMNPlane>
+    </bpmndi:BPMNDiagram>
 </definitions>

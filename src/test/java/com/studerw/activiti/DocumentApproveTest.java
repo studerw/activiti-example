@@ -38,7 +38,7 @@
 //import static org.junit.Assert.assertTrue;
 //
 ///**
-// * User: studerw
+// * @author William Studer
 // * Date: 5/21/14
 // */
 //@RunWith(SpringJUnit4ClassRunner.class)

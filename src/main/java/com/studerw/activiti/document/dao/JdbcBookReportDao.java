@@ -2,7 +2,7 @@ package com.studerw.activiti.document.dao;
 
 import com.google.common.collect.ImmutableMap;
 import com.studerw.activiti.document.BookReportRowMapper;
-import com.studerw.activiti.model.BookReport;
+import com.studerw.activiti.model.document.BookReport;
 import com.studerw.activiti.web.PagingCriteria;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +27,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 /**
  * Implementation of {@link BookReportDao} using Spring / JDBC
  *
- * @author studerw
+ * @author William Studer
  */
 @Repository
 @Component("bookReportDao")

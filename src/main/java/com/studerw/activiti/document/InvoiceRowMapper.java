@@ -1,8 +1,8 @@
 package com.studerw.activiti.document;
 
-import com.studerw.activiti.model.DocState;
-import com.studerw.activiti.model.DocType;
-import com.studerw.activiti.model.Invoice;
+import com.studerw.activiti.model.document.DocState;
+import com.studerw.activiti.model.document.DocType;
+import com.studerw.activiti.model.document.Invoice;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -12,7 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * @author studerw
+ * @author William Studer
  */
 public class InvoiceRowMapper implements RowMapper<Invoice> {
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd">
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
 
     <bean id="processEngineConfiguration" class="org.activiti.spring.SpringProcessEngineConfiguration">
         <property name="databaseType" value="${jdbc.type}"/>
@@ -37,10 +37,9 @@
 
     <bean id="demoDataGenerator" class="com.studerw.activiti.user.DemoDataGenerator" init-method="init" depends-on="processEngine">
         <property name="processEngine" ref="processEngine" />
-        <property name="createDemoUsersAndGroups" value="true" />
+        <property name="createDemoUsersAndGroups" value="${activiti.demo.createUsers}" />
         <property name="createDemoProcessDefinitions" value="false" />
         <property name="createDemoModels" value="false" />
-        <property name="addDemoData" value="${activiti.demo}" />
     </bean>
 
 </beans>

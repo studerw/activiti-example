@@ -2,9 +2,8 @@ package com.studerw.activiti.document;
 
 import com.studerw.activiti.alert.AlertService;
 import com.studerw.activiti.model.Alert;
-import com.studerw.activiti.model.DocState;
-import com.studerw.activiti.model.Document;
-import com.studerw.activiti.util.Workflow;
+import com.studerw.activiti.model.document.DocState;
+import com.studerw.activiti.model.document.Document;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
@@ -19,7 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * User: studerw
+ * @author William Studer
  * Date: 5/18/14
  * <p>
  * Workflow execution listeners for Document tasks - approve/reject, collaborate, etc
@@ -28,8 +27,8 @@ import org.springframework.stereotype.Service;
  * </p>
  */
 @Service("documentWorkflow")
-public class DocumentWorkflow {
-    private static final Logger log = LoggerFactory.getLogger(DocumentWorkflow.class);
+public class DocWorkflowListener {
+    private static final Logger log = LoggerFactory.getLogger(DocWorkflowListener.class);
 
     @Autowired protected IdentityService identityService;
     @Autowired protected RuntimeService runtimeService;
@@ -86,7 +85,25 @@ public class DocumentWorkflow {
         String docId = pi.getBusinessKey();
         Document doc = this.docSrvc.getDocument(docId);
         doc.setDocState(DocState.PUBLISHED);
-        String message = String.format("Document entitled '%s' has been successfully published ", doc.getId());
+        String message = String.format("%s entitled '%s' has been successfully published ", doc.getDocType().name(), doc.getId());
+        this.alertService.sendAlert(doc.getAuthor(), Alert.SUCCESS, message);
+        this.docSrvc.updateDocument(doc);
+    }
+
+    /**
+     * Pseudo email task (doesn't actually do anything except change the docState = EMAILED.
+     *
+     * @param execution
+     */
+    public void email(Execution execution) {
+        String pId = execution.getProcessInstanceId();
+        log.debug("doc being emailed - procId={}", pId);
+        ProcessInstance pi = runtimeService.createProcessInstanceQuery().
+                processInstanceId(execution.getProcessInstanceId()).singleResult();
+        String docId = pi.getBusinessKey();
+        Document doc = this.docSrvc.getDocument(docId);
+        doc.setDocState(DocState.EMAILED);
+        String message = String.format("%s entitled '%s' has been successfully emailed ", doc.getDocType().name(), doc.getId());
         this.alertService.sendAlert(doc.getAuthor(), Alert.SUCCESS, message);
         this.docSrvc.updateDocument(doc);
     }
@@ -169,10 +186,9 @@ public class DocumentWorkflow {
     }
 
 
-
     /**
-     * Task listener that runs when an {@link com.studerw.activiti.model.TaskCollaboration} or
-     * {@link com.studerw.activiti.model.TaskApproval} is created. Sets the candidate group to the document's group.
+     * Task listener that runs when an {@link com.studerw.activiti.model.task.TaskCollaborationForm} or
+     * {@link com.studerw.activiti.model.task.TaskApprovalForm} is created. Sets the candidate group to the document's group.
      *
      * @param execution
      * @param task

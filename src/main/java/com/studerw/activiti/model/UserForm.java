@@ -10,7 +10,7 @@ import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 /**
- * User: studerw
+ * @author William Studer
  * Date: 5/18/14
  */
 public class UserForm implements Serializable {

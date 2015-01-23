@@ -3,8 +3,8 @@ package com.studerw.activiti;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.studerw.activiti.document.DocumentService;
-import com.studerw.activiti.model.BookReport;
-import com.studerw.activiti.model.DocState;
+import com.studerw.activiti.model.document.BookReport;
+import com.studerw.activiti.model.document.DocState;
 import com.studerw.activiti.task.LocalTaskService;
 import org.activiti.engine.*;
 import org.activiti.engine.identity.Group;
@@ -32,7 +32,7 @@ import java.util.*;
 import static org.junit.Assert.*;
 
 /**
- * User: studerw
+ * @author William Studer
  * Date: 5/25/14
  */
 @RunWith(SpringJUnit4ClassRunner.class)

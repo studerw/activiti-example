@@ -1,8 +1,10 @@
-package com.studerw.activiti.design;
+package com.studerw.activiti.build;
 
 import com.google.common.collect.Lists;
-import com.studerw.activiti.model.Approval;
-import com.studerw.activiti.util.Workflow;
+import com.studerw.activiti.model.document.DocType;
+import com.studerw.activiti.model.workflow.UserTask;
+import com.studerw.activiti.model.workflow.UserTaskType;
+import com.studerw.activiti.workflow.Workflow;
 import com.studerw.activiti.workflow.WorkflowBuilder;
 import org.activiti.bpmn.converter.BpmnXMLConverter;
 import org.activiti.bpmn.model.*;
@@ -14,6 +16,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +30,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * User: studerw
+ * @author William Studer
  * Date: 5/25/14
  */
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -42,6 +45,7 @@ public class WorkflowBuilderTest {
     @Autowired RepositoryService repositoryService;
 
     @Test
+    @Ignore
     public void testRepoService() throws IOException {
         List<ProcessDefinition> pds = this.repositoryService.createProcessDefinitionQuery().list();
         log.debug("Number of pds: " + pds.size());
@@ -55,44 +59,46 @@ public class WorkflowBuilderTest {
 
     @Test
     public void testBuildDefault() {
-        BpmnModel model = workflowBldr.defaultDocumentApprove();
+        BpmnModel model = workflowBldr.defaultDocument("foo");
         Process process = model.getProcesses().get(0);
         SubProcess sub = (SubProcess) process.getFlowElement(Workflow.SUBPROCESS_ID_DYNAMIC);
         log.debug(sub.getName());
         Collection<FlowElement> flowElements = sub.getFlowElements();
-        List<UserTask> userTasks = Lists.newArrayList();
+        List<org.activiti.bpmn.model.UserTask> userTasks = Lists.newArrayList();
         for (FlowElement el : flowElements) {
             log.debug(el.getClass().getName() + " -- " + el.getId());
             if (el.getClass().equals(org.activiti.bpmn.model.UserTask.class)) {
-                userTasks.add((UserTask) (el));
+                userTasks.add((org.activiti.bpmn.model.UserTask) (el));
             }
         }
 
-        int i = 1;
-        for (UserTask uTask : userTasks) {
-            Approval approval = new Approval();
-            approval.setPosition(i);
-            i++;
-
-            approval.setCandidateGroups(Lists.newArrayList(uTask.getCandidateGroups()));
-            approval.setCandidateUsers(Lists.newArrayList(uTask.getCandidateUsers()));
-        }
+//        int i = 1;
+//        for (UserTask uTask : userTasks) {
+//            Approval approval = new Approval();
+//            approval.setPosition(i);
+//            i++;
+//            approval.setCandidateGroups(Lists.newArrayList(uTask.getCandidateGroups()));
+//            approval.setCandidateUsers(Lists.newArrayList(uTask.getCandidateUsers()));
+//        }
     }
 
 
     @Test
-    public void testBuildWF() throws IOException {
-        List<Approval> approvals = Lists.newArrayList();
+    public void testBuildWFWithUserTasks() throws IOException {
+        List<UserTask> userTasks = Lists.newArrayList();
+        UserTask userTask = new UserTask();
+        userTask.getCandidateGroups().add("engineering");
+        userTask.setPosition(1);
+        userTask.setUserTaskType(UserTaskType.APPROVE_REJECT);
+        userTasks.add(userTask);
 
-        Approval approval = new Approval();
-        approval.getCandidateGroups().add("engineering");
-        approvals.add(approval);
+        UserTask userTask2 = new UserTask();
+        userTask2.getCandidateUsers().add("kermit");
+        userTask2.setUserTaskType(UserTaskType.COLLABORATION);
+        userTask.setPosition(2);
+        userTasks.add(userTask2);
 
-        Approval approval2 = new Approval();
-        approval2.getCandidateUsers().add("kermit");
-        approvals.add(approval2);
-
-        BpmnModel model = workflowBldr.documentApprove(approvals, "engineering");
+        BpmnModel model = workflowBldr.documentWithTasks(userTasks, DocType.BOOK_REPORT, "engineering");
 
         InputStream in = new DefaultProcessDiagramGenerator().generatePngDiagram(model);
         FileUtils.copyInputStreamToFile(in, new File("target/some_group_diagram.png"));
@@ -101,7 +107,7 @@ public class WorkflowBuilderTest {
 
     @Test
     public void testBuildDefaultWF() throws IOException {
-        BpmnModel model = workflowBldr.defaultDocumentApprove();
+        BpmnModel model = workflowBldr.defaultDocument("foo");
         BpmnXMLConverter converter = new BpmnXMLConverter();
         byte[] bytes = converter.convertToXML(model);
         System.out.println(new String(bytes, "UTF-8"));

@@ -1,15 +1,14 @@
-package com.studerw.activiti.model;
+package com.studerw.activiti.model.task;
 
-import com.google.common.base.Objects;
+import com.studerw.activiti.model.task.AbstractTaskForm;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 /**
- * User: studerw
+ * @author William Studer
  * Date: 5/19/14
  */
-public class TaskApproval extends AbstractTask{
+public class TaskApprovalForm extends AbstractTaskForm {
     @NotNull
     private Boolean approved;
 

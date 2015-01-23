@@ -16,7 +16,7 @@ import java.util.Date;
  * 3 = info
  * 4 = warning
  * 5 = danger
- * User: studerw
+ * @author William Studer
  * Date: 5/20/14
  */
 public class Alert implements Comparable<Alert>, Serializable {

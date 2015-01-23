@@ -1,7 +1,7 @@
 package com.studerw.activiti;
 
 import com.google.common.collect.Maps;
-import com.studerw.activiti.model.TaskForm;
+import com.studerw.activiti.model.task.AssignedTask;
 import com.studerw.activiti.model.UserForm;
 import com.studerw.activiti.task.LocalTaskService;
 import org.activiti.engine.HistoryService;
@@ -73,8 +73,8 @@ public class NewUserProcessTest {
                 //includeProcessVariables().
                         singleResult();
         assertNotNull(task);
-        TaskForm taskForm = TaskForm.fromTask(task);
-        log.debug(taskForm);
+        AssignedTask assignedTask = AssignedTask.fromTask(task);
+        log.debug(assignedTask);
         List<Task> tasks = taskService.createTaskQuery().
                 taskCandidateOrAssigned("kermit").
                 orderByTaskCreateTime().asc().list();

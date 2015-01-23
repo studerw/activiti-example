@@ -1,4 +1,4 @@
-package com.studerw.activiti.model;
+package com.studerw.activiti.model.task;
 
 import com.google.common.base.Objects;
 
@@ -6,10 +6,11 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
- * User: studerw
+ * Abstract base type of web forms used for completing user tasks
+ * @author William Studer
  * Date: 5/19/14
  */
-public abstract class AbstractTask {
+public abstract class AbstractTaskForm {
     @Size(max = 4000)
     private String comment;
     @NotNull

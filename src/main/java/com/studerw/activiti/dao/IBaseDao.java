@@ -8,7 +8,7 @@ import java.util.List;
  * BaseDao interface which all other interfaces should implement
  *
  * @param <T>
- * @author studerw
+ * @author William Studer
  */
 public interface IBaseDao<T> {
 

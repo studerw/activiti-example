@@ -1,4 +1,4 @@
-package com.studerw.activiti.model;
+package com.studerw.activiti.model.document;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -6,7 +6,7 @@ import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 /**
- * @author studerw
+ * @author William Studer
  */
 public class Invoice extends Document {
 

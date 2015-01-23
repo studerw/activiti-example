@@ -1,7 +1,7 @@
-package com.studerw.activiti.design;
+package com.studerw.activiti.build;
 
 import com.google.common.collect.Lists;
-import com.studerw.activiti.util.Workflow;
+import com.studerw.activiti.workflow.Workflow;
 import org.activiti.bpmn.BpmnAutoLayout;
 import org.activiti.bpmn.constants.BpmnXMLConstants;
 import org.activiti.bpmn.model.*;
@@ -22,7 +22,7 @@ import java.io.File;
 import java.io.InputStream;
 
 /**
- * User: studerw
+ * @author William Studer
  * Date: 5/25/14
  */
 @RunWith(SpringJUnit4ClassRunner.class)

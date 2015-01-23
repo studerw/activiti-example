@@ -3,7 +3,7 @@
   <process id="docApprovalWithSubProcess" name="Approve Document Workflow" isExecutable="true">
     <documentation>This process is initiated when a document is created.</documentation>
     <startEvent id="startevent1" name="Start" activiti:initiator="initiator"></startEvent>
-    <serviceTask id="publishDocServiceTask" name="Publish Approved Document" activiti:expression="${documentWorkflow.publish(execution)}"></serviceTask>
+    <serviceTask id="publishDocServiceTask" name="Publish Approved Document" activiti:expression="${docWorkflowListener.publish(execution)}"></serviceTask>
     <endEvent id="endevent1" name="End"></endEvent>
     <sequenceFlow id="flow6" sourceRef="publishDocServiceTask" targetRef="endevent1"></sequenceFlow>
     <userTask id="submitDocUserTask" name="Submit Document for Approval"></userTask>
@@ -13,7 +13,7 @@
       <endEvent id="approvalSubProcessEndEvent" name="End Approval SubProcess"></endEvent>
       <userTask id="approveDocUserTask1" name="Approve Document">
           <extensionElements>
-              <activiti:taskListener event="create" expression="${documentWorkflow.setAssignee(execution, task)}"/>
+              <activiti:taskListener event="create" expression="${docWorkflowListener.setAssignee(execution, task)}"/>
           </extensionElements>
       </userTask>
       <endEvent id="rejectedErrorEndEvent" name="ErrorEnd">
@@ -24,13 +24,13 @@
       <sequenceFlow id="flow31" sourceRef="approveDocUserTask1" targetRef="exclusivegateway1"></sequenceFlow>
       <sequenceFlow id="docRejectedSubFlow" name="Doc Rejected" sourceRef="exclusivegateway1" targetRef="rejectedErrorEndEvent">
           <extensionElements>
-              <activiti:executionListener event="take" expression="${documentWorkflow.rejected(execution)}"></activiti:executionListener>
+              <activiti:executionListener event="take" expression="${docWorkflowListener.rejected(execution)}"></activiti:executionListener>
           </extensionElements>
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${approved == false}]]></conditionExpression>
       </sequenceFlow>
       <sequenceFlow id="docApprovedSubFlow" name="Doc Approved" sourceRef="exclusivegateway1" targetRef="approvalSubProcessEndEvent">
           <extensionElements>
-              <activiti:executionListener event="take" expression="${documentWorkflow.approved(execution)}"></activiti:executionListener>
+              <activiti:executionListener event="take" expression="${docWorkflowListener.approved(execution)}"></activiti:executionListener>
           </extensionElements>
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${approved == true}]]></conditionExpression>
       </sequenceFlow>

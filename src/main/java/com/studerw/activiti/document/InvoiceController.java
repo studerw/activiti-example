@@ -1,9 +1,9 @@
 package com.studerw.activiti.document;
 
-import com.studerw.activiti.model.DocType;
-import com.studerw.activiti.model.Document;
-import com.studerw.activiti.model.HistoricTask;
-import com.studerw.activiti.model.Invoice;
+import com.studerw.activiti.model.document.DocType;
+import com.studerw.activiti.model.document.Document;
+import com.studerw.activiti.model.document.Invoice;
+import com.studerw.activiti.model.task.HistoricTask;
 import com.studerw.activiti.task.LocalTaskService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

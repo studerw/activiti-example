@@ -1,40 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xmlns:activiti="http://activiti.org/bpmn"
-             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
-             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
              typeLanguage="http://www.w3.org/2001/XMLSchema"
              expressionLanguage="http://www.w3.org/1999/XPath"
              targetNamespace="BOOK_REPORT">
-    <process id="bookReportWithTasksWorkflow" name="Book Report Workflow" isExecutable="true">
+    <process id="engineering" name="Book Report for Engineering Group Workflow" isExecutable="true">
         <documentation>This process is initiated when a book report is created.</documentation>
         <startEvent id="startevent1" name="Start" activiti:initiator="initiator"/>
         <userTask id="submitToWorkflow" name="Submit Book Report to Workflow"/>
-        <serviceTask id="publishBookReport" name="Publish Book Report" activiti:expression="${documentWorkflow.publish(execution)}"/>
+        <serviceTask id="publishBookReport" name="Publish Book Report" activiti:expression="${docWorkflowListener.publish(execution)}"/>
         <endEvent id="endevent1" name="End"/>
         <subProcess id="DYNAMIC_SUB_PROCESS" name="Dynamic Document Subprocess">
             <startEvent id="dynamic_sub_process_start_event" name="Start Dynamic SubProcess"/>
             <userTask id="COLLABORATE_DOC_USER_TASK_1" name="Collaborate Document (1 of 2)">
                 <extensionElements>
-                    <activiti:taskListener event="create" expression="${documentWorkflow.onCreateCollaborate(execution, task)}"/>
-                    <activiti:taskListener event="complete" expression="${documentWorkflow.onCompleteCollaborate(execution, task)}"/>
+                    <activiti:taskListener event="create" expression="${docWorkflowListener.onCreateCollaborate(execution, task)}"/>
+                    <activiti:taskListener event="complete" expression="${docWorkflowListener.onCompleteCollaborate(execution, task)}"/>
                 </extensionElements>
             </userTask>
             <userTask id="COLLABORATE_DOC_USER_TASK_2" name="Collaborate Document (2 of 2)">
                 <extensionElements>
-                    <activiti:taskListener event="create" expression="${documentWorkflow.onCreateCollaborate(execution, task)}"/>
-                    <activiti:taskListener event="complete" expression="${documentWorkflow.onCompleteCollaborate(execution, task)}"/>
+                    <activiti:taskListener event="create" expression="${docWorkflowListener.onCreateCollaborate(execution, task)}"/>
+                    <activiti:taskListener event="complete" expression="${docWorkflowListener.onCompleteCollaborate(execution, task)}"/>
                 </extensionElements>
             </userTask>
             <userTask id="APPROVE_REJECT_DOC_USER_TASK_1" name="Approve Document (1 of 2)">
                 <extensionElements>
-                    <activiti:taskListener event="create" expression="${documentWorkflow.onCreateApproval(execution, task)}"/>
+                    <activiti:taskListener event="create" expression="${docWorkflowListener.onCreateApproval(execution, task)}"/>
                 </extensionElements>
             </userTask>
             <userTask id="APPROVE_REJECT_DOC_USER_TASK_2" name="Approve Document (2 of 2)">
                 <extensionElements>
-                    <activiti:taskListener event="create" expression="${documentWorkflow.onCreateApproval(execution, task)}"/>
+                    <activiti:taskListener event="create" expression="${docWorkflowListener.onCreateApproval(execution, task)}"/>
                 </extensionElements>
             </userTask>
             <endEvent id="rejectedErrorEndEvent" name="ErrorEnd">
@@ -43,30 +40,32 @@
             <sequenceFlow id="dynamic_subflow_1" sourceRef="dynamic_sub_process_start_event" targetRef="COLLABORATE_DOC_USER_TASK_1"/>
             <sequenceFlow id="dynamic_subflow_2" sourceRef="COLLABORATE_DOC_USER_TASK_1" targetRef="COLLABORATE_DOC_USER_TASK_2"/>
             <sequenceFlow id="dynamic_subflow_3" sourceRef="COLLABORATE_DOC_USER_TASK_2" targetRef="APPROVE_REJECT_DOC_USER_TASK_1"/>
+
             <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway 1"/>
             <sequenceFlow id="dynamic_subflow_4" sourceRef="APPROVE_REJECT_DOC_USER_TASK_1" targetRef="exclusivegateway1"/>
             <sequenceFlow id="docRejectedSubFlow1" name="Doc Rejected" sourceRef="exclusivegateway1" targetRef="rejectedErrorEndEvent">
                 <extensionElements>
-                    <activiti:executionListener event="take" expression="${documentWorkflow.onRejected(execution)}"/>
+                    <activiti:executionListener event="take" expression="${docWorkflowListener.onRejected(execution)}"/>
                 </extensionElements>
                 <conditionExpression xsi:type="tFormalExpression"><![CDATA[${approved == false}]]></conditionExpression>
             </sequenceFlow>
             <sequenceFlow id="docApprovedSubFlow1" name="Doc Approved" sourceRef="exclusivegateway1" targetRef="APPROVE_REJECT_DOC_USER_TASK_2">
                 <extensionElements>
-                    <activiti:executionListener event="take" expression="${documentWorkflow.onApproved(execution)}"/>
+                    <activiti:executionListener event="take" expression="${docWorkflowListener.onApproved(execution)}"/>
                 </extensionElements>
                 <conditionExpression xsi:type="tFormalExpression"><![CDATA[${approved == true}]]></conditionExpression>
             </sequenceFlow>
+
             <exclusiveGateway id="exclusivegateway2" name="Exclusive Gateway 2"/>
             <sequenceFlow id="docRejectedSubFlow2" name="Doc Rejected" sourceRef="exclusivegateway2" targetRef="rejectedErrorEndEvent">
                 <extensionElements>
-                    <activiti:executionListener event="take" expression="${documentWorkflow.onRejected(execution)}"/>
+                    <activiti:executionListener event="take" expression="${docWorkflowListener.onRejected(execution)}"/>
                 </extensionElements>
                 <conditionExpression xsi:type="tFormalExpression"><![CDATA[${approved == false}]]></conditionExpression>
             </sequenceFlow>
             <sequenceFlow id="docApprovedSubFlow2" name="Doc Approved" sourceRef="exclusivegateway2" targetRef="dynamic_sub_process_end_event">
                 <extensionElements>
-                    <activiti:executionListener event="take" expression="${documentWorkflow.onApproved(execution)}"/>
+                    <activiti:executionListener event="take" expression="${docWorkflowListener.onApproved(execution)}"/>
                 </extensionElements>
                 <conditionExpression xsi:type="tFormalExpression"><![CDATA[${approved == true}]]></conditionExpression>
             </sequenceFlow>

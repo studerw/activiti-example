@@ -17,7 +17,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * User: studerw
+ * @author William Studer
  * Date: 5/21/14
  */
 @Service("alertService")
@@ -57,12 +57,13 @@ public class AlertService {
 
     /**
      * Send an alert using the general <em>System User</em> as the sender
+     *
      * @param to
      * @param priority
      * @param message
      * @return
      */
-    public String sendSystemAlert(String to, int priority, String message){
+    public String sendSystemAlert(String to, int priority, String message) {
         log.debug("sending system alert to: {} at priority {}", to, priority);
         Alert alert = new Alert();
         alert.setCreatedBy(UserService.SYSTEM_USER);
@@ -78,6 +79,7 @@ public class AlertService {
 
     /**
      * Send an alert using the current logged in user as the sender
+     *
      * @param to
      * @param priority
      * @param message
@@ -108,7 +110,6 @@ public class AlertService {
     }
 
     /**
-     *
      * @param userId
      * @return a list of alerts, sorted ascending by creation date, for a given user.
      * Only the actual user him/herself can obtain his/her own alerts

@@ -16,8 +16,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import javax.servlet.http.HttpServletRequest;
-
 @Controller
 public class AlertController extends BaseController {
     private static final Logger log = LoggerFactory.getLogger(AlertController.class);
@@ -28,17 +26,16 @@ public class AlertController extends BaseController {
     }
 
     @RequestMapping(value = "/alerts.htm", method = RequestMethod.GET)
-    public String getAlerts(ModelMap model, HttpServletRequest request) {
+    public String getAlerts(ModelMap model) {
         return "alerts";
     }
 
     @RequestMapping(value = "/alerts/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-        public ResponseEntity<Response> acknowledgeAlert(
-                        @PathVariable("id") String alertId,
-                        HttpServletRequest request) {
-            log.debug("acknowledging alert {}", alertId);
-            this.alertService.acknowledgeAlert(alertId, this.currentUserName());
-            Response res = new Response(true, "Alert acknowledged");
-            return new ResponseEntity<Response>(res, HttpStatus.OK);
-        }
+    public ResponseEntity<Response> acknowledgeAlert(
+            @PathVariable("id") String alertId) {
+        log.debug("acknowledging alert {}", alertId);
+        this.alertService.acknowledgeAlert(alertId, this.currentUserName());
+        Response res = new Response(true, "Alert acknowledged");
+        return new ResponseEntity<Response>(res, HttpStatus.OK);
+    }
 }

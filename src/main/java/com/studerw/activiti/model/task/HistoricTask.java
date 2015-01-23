@@ -1,4 +1,4 @@
-package com.studerw.activiti.model;
+package com.studerw.activiti.model.task;
 
 import com.google.common.base.Objects;
 import org.activiti.engine.task.Comment;
@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * User: studerw
+ * @author William Studer
  * Date: 5/22/14
  */
 public class HistoricTask implements Comparable<HistoricTask> {

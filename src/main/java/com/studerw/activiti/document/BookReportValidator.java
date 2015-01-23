@@ -1,7 +1,6 @@
 package com.studerw.activiti.document;
 
-import com.studerw.activiti.model.BookReport;
-import org.apache.commons.lang3.StringUtils;
+import com.studerw.activiti.model.document.BookReport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.Errors;
@@ -9,7 +8,7 @@ import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
 /**
- * @author studerw
+ * @author William Studer
  */
 public class BookReportValidator implements Validator {
     private static final Logger log = LoggerFactory.getLogger(BookReportValidator.class);

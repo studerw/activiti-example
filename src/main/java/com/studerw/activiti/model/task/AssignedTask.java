@@ -1,4 +1,4 @@
-package com.studerw.activiti.model;
+package com.studerw.activiti.model.task;
 
 import com.google.common.base.Objects;
 import org.activiti.engine.task.Task;
@@ -10,10 +10,10 @@ import java.util.Date;
 import java.util.Map;
 
 /**
- * User: studerw
+ * @author William Studer
  * Date: 5/18/14
  */
-public class TaskForm {
+public class AssignedTask {
     private String id;
     private String owner;
     private String delegate;
@@ -31,13 +31,13 @@ public class TaskForm {
     private boolean suspended;
     private String taskDefinitionKey;
 
-    public TaskForm() {
+    public AssignedTask() {
     }
 
-    public static TaskForm fromTask(Task task) throws InvocationTargetException, IllegalAccessException {
-        TaskForm taskForm = new TaskForm();
-        BeanUtils.copyProperties(taskForm, task);
-        return taskForm;
+    public static AssignedTask fromTask(Task task) throws InvocationTargetException, IllegalAccessException {
+        AssignedTask assignedTask = new AssignedTask();
+        BeanUtils.copyProperties(assignedTask, task);
+        return assignedTask;
     }
 
     public String getTaskDefinitionKey() {

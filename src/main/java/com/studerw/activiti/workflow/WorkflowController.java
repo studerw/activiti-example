@@ -1,10 +1,10 @@
 package com.studerw.activiti.workflow;
 
 import com.google.common.collect.Lists;
-import com.studerw.activiti.model.Approval;
-import com.studerw.activiti.model.DocType;
 import com.studerw.activiti.model.Response;
-import com.studerw.activiti.util.Workflow;
+import com.studerw.activiti.model.document.DocType;
+import com.studerw.activiti.model.workflow.UserTask;
+import com.studerw.activiti.model.workflow.UserTaskType;
 import com.studerw.activiti.web.BaseController;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.engine.identity.Group;
@@ -44,24 +44,24 @@ public class WorkflowController extends BaseController {
         super.addModelInfo(model, request);
         List<Group> groups = userService.getAllAssignmentGroups();
         model.addAttribute("groups", groups);
-        model.addAttribute("defaultDocProcId", "FOO");//TODOWorkflow.PROCESS_ID_DOC_APPROVAL);
+        //model.addAttribute("defaultDocProcId", "FOO");//TODOWorkflow.PROCESS_ID_DOC_APPROVAL);
         model.addAttribute("docTypes", DocType.asList());
+        model.addAttribute("userTaskTypes", UserTaskType.asList());
     }
 
 
     @RequestMapping(value = "/index.htm", method = RequestMethod.GET)
-    public String index(ModelMap model,
-                        HttpServletRequest request) {
+    public String index(ModelMap model) {
         return "workflow/index";
     }
 
-    @RequestMapping(value = "/approvals/{group}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Response<String>>approvalsByGroupPost(@RequestBody List<Approval> approvals,
-                        @PathVariable(value="group") String group,
-                        HttpServletRequest request) throws InterruptedException {
-
-        log.debug(approvals.toString());
-        BpmnModel model = this.workflowBldr.documentApprove(approvals, group);
+    @RequestMapping(value = "/tasks/{docType}/{group}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Response<String>> userTasksByGroup(
+            @RequestBody List<UserTask> userTasks,
+            @PathVariable(value = "group") String group,
+            @PathVariable(value = "docType") DocType docType) throws InterruptedException {
+        log.debug(userTasks.toString());
+        BpmnModel model = this.workflowBldr.documentWithTasks(userTasks, docType, group);
         this.workflowSrvc.updateGroupDocApproveWorkflow(model, group);
 
         //wait for the model diagram to catch up (maybe)
@@ -69,25 +69,25 @@ public class WorkflowController extends BaseController {
         return new ResponseEntity<Response<String>>(res, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/approvals/{group}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Response<List<Approval>>> approvalsByGroup(@PathVariable(value="group") String group,
-                                                                     HttpServletRequest request) {
-        String groupId = group;
-        if(!workflowSrvc.groupDocApproveWorkflowExists(group)){
+    @RequestMapping(value = "/tasks/{docType}/{group}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Response<List<UserTask>>> tasksByDocAndGroup
+            (@PathVariable(value = "group") String group,
+             @PathVariable(value = "docType") DocType docType){
+        String groupId = null;
+        if (!workflowSrvc.groupWorkflowExists(docType, group)) {
             groupId = null;
         }
 
-        List<Approval> approvals = workflowBldr.getDocApprovalsByGroup(groupId);
-        log.debug("returning json response of {} approvals",  approvals.size());
-        Response res = new Response(true, groupId,  approvals);
-        return new ResponseEntity<Response<List<Approval>>>(res, HttpStatus.OK);
+        List<UserTask> userTasks = Lists.newArrayList();//TODO workflowBldr.getDocApprovalsByGroup(groupId);
+        log.debug("returning json response of {} approvals", userTasks.size());
+        Response res = new Response(true, groupId, userTasks);
+        return new ResponseEntity<Response<List<UserTask>>>(res, HttpStatus.OK);
     }
 
 
     @RequestMapping(value = "/diagrams/{id}", method = RequestMethod.GET)
     public ResponseEntity<byte[]> getDiagram(
-            @PathVariable("id") String id,
-            HttpServletRequest request)  throws IOException {
+            @PathVariable("id") String id) throws IOException {
 
         log.debug("fetching diagram for process {}", id);
 
@@ -100,16 +100,13 @@ public class WorkflowController extends BaseController {
 
     @RequestMapping(value = "/document/{docId}/diagram", method = RequestMethod.GET)
     public ResponseEntity<byte[]> getActiveDocDiagram(
-            @PathVariable("docId") String docId,
-            HttpServletRequest request)  throws IOException {
-
+            @PathVariable("docId") String docId) throws IOException {
         log.debug("fetching diagram for docId{}", docId);
 
         byte[] bytes = workflowSrvc.getActiveDocumentDiagram(docId);
 
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("Content-Type", "image/png");
-        List<Integer> integers = Lists.newArrayList();
         return new ResponseEntity<byte[]>(bytes, responseHeaders, HttpStatus.OK);
 
     }

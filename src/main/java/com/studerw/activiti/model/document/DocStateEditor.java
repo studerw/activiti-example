@@ -1,4 +1,4 @@
-package com.studerw.activiti.model;
+package com.studerw.activiti.model.document;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import java.beans.PropertyEditorSupport;
 
 /**
-* @author studerw
+* @author William Studer
 */
 public class DocStateEditor extends PropertyEditorSupport {
 

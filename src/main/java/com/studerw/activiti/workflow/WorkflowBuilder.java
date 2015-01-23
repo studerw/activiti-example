@@ -1,95 +1,41 @@
 package com.studerw.activiti.workflow;
 
 import com.google.common.collect.Lists;
-import com.studerw.activiti.model.Approval;
-import com.studerw.activiti.model.DocType;
-import com.studerw.activiti.util.Workflow;
+import com.studerw.activiti.model.document.DocType;
+import com.studerw.activiti.model.workflow.UserTask;
+import com.studerw.activiti.model.workflow.UserTaskType;
 import org.activiti.bpmn.BpmnAutoLayout;
 import org.activiti.bpmn.model.*;
 import org.activiti.bpmn.model.Process;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.repository.ProcessDefinition;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
- * User: studerw
- * Date: 5/29/14
+ * Used to build and modify workflows for addition of dynamic tasks
+ *
+ * @author William Studer
+ *         Date: 5/29/14
  */
 @Service("workflowBuilder")
 public class WorkflowBuilder {
     private static final Logger log = LoggerFactory.getLogger(WorkflowBuilder.class);
-    @Autowired RuntimeService runtimeService;
-    @Autowired RepositoryService repositoryService;
-    @Autowired WorkflowService workflowService;
 
-    public BpmnModel documentApprove(List<Approval> approvals, String group) {
-        BpmnModel model = new BpmnModel();
-        Process process = new Process();
-        process.setId(WorkflowService.getApprovalKeyByGroup(group));
-        process.setName("FOO");//TODOWorkflow.PROCESS_NAME_DOC_APPROVAL);
-        model.addProcess(process);
-
-
-        StartEvent startEvent = new StartEvent();
-        startEvent.setId("start");
-
-        process.addFlowElement(startEvent);
-
-        UserTask submitTask = new UserTask();
-        submitTask.setId("submitDocUserTask");
-        submitTask.setName("Submit Document for Approval");
-        process.addFlowElement(submitTask);
-        process.addFlowElement(createSequenceFlow(startEvent.getId(), submitTask.getId()));
-        SubProcess sub = createDynamicSubProcess(approvals);
-        process.addFlowElement(sub);
-
-        process.addFlowElement(createSequenceFlow(submitTask.getId(), sub.getId()));
-
-        BoundaryEvent boundaryEvent = new BoundaryEvent();
-        boundaryEvent.setId("rejectedErrorBoundaryEvent");
-        boundaryEvent.setName("Rejected Error Event");
-        boundaryEvent.setAttachedToRef(sub);
-        ErrorEventDefinition errorDef = new ErrorEventDefinition();
-        errorDef.setErrorCode("errorDocRejected");
-        boundaryEvent.addEventDefinition(errorDef);
-        process.addFlowElement(boundaryEvent);
-
-        process.addFlowElement(createSequenceFlow(boundaryEvent.getId(), submitTask.getId(), "Rejected"));
-        ServiceTask pub = new ServiceTask();
-        pub.setId("publishDocServiceTask");
-        pub.setName("Publish Approved Document");
-        pub.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
-        pub.setImplementation("${documentWorkflow.publish(execution)}");
-
-        process.addFlowElement(pub);
-        process.addFlowElement(createSequenceFlow(sub.getId(), pub.getId()));
-
-        EndEvent endEvent = new EndEvent();
-        endEvent.setId("end");
-
-        process.addFlowElement(endEvent);
-        process.addFlowElement(createSequenceFlow(pub.getId(), endEvent.getId()));
-
-        //Generate graphical information
-        new BpmnAutoLayout(model).execute();
-
-        return model;
-    }
-
-    public BpmnModel defaultDocumentApprove() {
+    /**
+     * Build the minimal base document definition needed for dynamic tasks ({@code NONE} group is used).
+     *
+     * @param name
+     * @return BpmnModel
+     */
+    public BpmnModel defaultDocument(String name) {
         BpmnModel model = new BpmnModel();
         model.setTargetNamespace(DocType.GENERAL.name());
         org.activiti.bpmn.model.Process process = new Process();
-        process.setId("FOO");//TODOWorkflow.PROCESS_ID_DOC_APPROVAL);
-        process.setName("FOO NAME");//Workflow.PROCESS_NAME_DOC_APPROVAL);
+        process.setId(Workflow.WORKFLOW_GROUP_NONE);
+        process.setName(name);
         model.addProcess(process);
 
         StartEvent startEvent = new StartEvent();
@@ -97,12 +43,16 @@ public class WorkflowBuilder {
 
         process.addFlowElement(startEvent);
 
-        UserTask submitTask = new UserTask();
+        org.activiti.bpmn.model.UserTask submitTask = new org.activiti.bpmn.model.UserTask();
         submitTask.setId("submitDocUserTask");
-        submitTask.setName("Submit Document for Approval");
+        submitTask.setName("Submit Document to Workflow");
         process.addFlowElement(submitTask);
         process.addFlowElement(createSequenceFlow(startEvent.getId(), submitTask.getId()));
-        SubProcess sub = createDefaultSubProcess();
+
+        ErrorEventDefinition errorDef = new ErrorEventDefinition();
+        errorDef.setErrorCode("errorDocRejected");
+
+        SubProcess sub = createEmptyDynamicSubProcess(errorDef);
         process.addFlowElement(sub);
 
         process.addFlowElement(createSequenceFlow(submitTask.getId(), sub.getId()));
@@ -111,12 +61,11 @@ public class WorkflowBuilder {
         boundaryEvent.setId("rejectedErrorBoundaryEvent");
         boundaryEvent.setName("Rejected Error Event");
         boundaryEvent.setAttachedToRef(sub);
-        ErrorEventDefinition errorDef = new ErrorEventDefinition();
-        errorDef.setErrorCode("errorDocRejected");
         boundaryEvent.addEventDefinition(errorDef);
         process.addFlowElement(boundaryEvent);
 
         process.addFlowElement(createSequenceFlow(boundaryEvent.getId(), submitTask.getId(), "Rejected"));
+/*
         ServiceTask pub = new ServiceTask();
         pub.setId("publishDocServiceTask");
         pub.setName("Publish Approved Document");
@@ -124,50 +73,264 @@ public class WorkflowBuilder {
         pub.setImplementation("${documentWorkflow.publish(execution)}");
 
         process.addFlowElement(pub);
-        process.addFlowElement(createSequenceFlow(sub.getId(), pub.getId()));
+*/
 
         EndEvent endEvent = new EndEvent();
         endEvent.setId("end");
-
         process.addFlowElement(endEvent);
-        process.addFlowElement(createSequenceFlow(pub.getId(), endEvent.getId()));
+        process.addFlowElement(createSequenceFlow(sub.getId(), endEvent.getId()));
+
+//        process.addFlowElement(createSequenceFlow(pub.getId(), endEvent.getId()));
 
         //Generate graphical information
         new BpmnAutoLayout(model).execute();
-
         return model;
     }
 
     /**
-     * @param group - If no {@code Group} is passed, the default document approval workflow will be used.
-     * @return a sorted list of approvals contained in the workflow associated with the given group
+     * @param userTasks
+     * @param docType
+     * @param group
+     * @return fully populated BpmnModel with appropriate ids, namespace, sub process tasks, etc.
      */
-    public List<Approval> getDocApprovalsByGroup(String group) {
-        String base = "FOO";//TODOWorkflow.PROCESS_ID_DOC_APPROVAL;
-        String procId = StringUtils.isBlank(group) ? base : base + "-" + group;
-        log.debug("building approval list for procDef: " + procId);
-        ProcessDefinition pd =
-                this.repositoryService.createProcessDefinitionQuery().processDefinitionKey(procId).latestVersion().singleResult();
-        BpmnModel model = this.repositoryService.getBpmnModel(pd.getId());
-        Process process = model.getProcesses().get(0);
+    public BpmnModel documentWithTasks(List<UserTask> userTasks, DocType docType, String group) {
+        BpmnModel model = new BpmnModel();
+        model.setTargetNamespace(docType.name());
+        Process process = new Process();
+        process.setId(group);
+        String name = String.format("Dynamic Workflow for DocType: %s and Group: %s", docType.name(), group);
+        process.setName(name);
+        model.addProcess(process);
 
-        SubProcess sub = (SubProcess) process.getFlowElement(Workflow.SUBPROCESS_ID_DYNAMIC);
-        log.debug(sub.getName());
-        Collection<FlowElement> flowElements = sub.getFlowElements();
-        List<UserTask> userTasks = Lists.newArrayList();
-        for (FlowElement el : flowElements) {
-            if (el.getClass().equals(org.activiti.bpmn.model.UserTask.class)) {
-                userTasks.add((UserTask) (el));
+        StartEvent startEvent = new StartEvent();
+        startEvent.setId("start");
+        process.addFlowElement(startEvent);
+
+        org.activiti.bpmn.model.UserTask submitTask = new org.activiti.bpmn.model.UserTask();
+        submitTask.setId("submitDocUserTask");
+        submitTask.setName("Submit doc to Workflow");
+        process.addFlowElement(submitTask);
+        process.addFlowElement(createSequenceFlow(startEvent.getId(), submitTask.getId()));
+
+        ErrorEventDefinition errorDef = new ErrorEventDefinition();
+        errorDef.setErrorCode("errorDocRejected");
+
+        SubProcess sub = createDynamicSubProcess(userTasks, errorDef);
+        process.addFlowElement(sub);
+
+        process.addFlowElement(createSequenceFlow(submitTask.getId(), sub.getId()));
+
+        BoundaryEvent boundaryEvent = new BoundaryEvent();
+        boundaryEvent.setId("rejectedErrorBoundaryEvent");
+        boundaryEvent.setName("Rejected Error Event");
+        boundaryEvent.setAttachedToRef(sub);
+        boundaryEvent.addEventDefinition(errorDef);
+        process.addFlowElement(boundaryEvent);
+
+        process.addFlowElement(createSequenceFlow(boundaryEvent.getId(), submitTask.getId(), "Rejected"));
+/*
+        ServiceTask pub = new ServiceTask();
+        pub.setId("publishDocServiceTask");
+        pub.setName("Publish Approved Document");
+        pub.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
+        pub.setImplementation("${documentWorkflow.publish(execution)}");
+
+        process.addFlowElement(pub);
+        process.addFlowElement(createSequenceFlow(sub.getId(), pub.getId()));
+*/
+
+        EndEvent endEvent = new EndEvent();
+        endEvent.setId("end");
+
+        process.addFlowElement(endEvent);
+        process.addFlowElement(createSequenceFlow(sub.getId(), endEvent.getId()));
+
+        //Generate graphical information
+        new BpmnAutoLayout(model).execute();
+        return model;
+    }
+
+
+    protected SubProcess createEmptyDynamicSubProcess(ErrorEventDefinition errorDef) {
+        SubProcess sub = new SubProcess();
+        sub.setId(Workflow.SUBPROCESS_ID_DYNAMIC);
+        sub.setName(Workflow.SUBPROCESS_NAME_DYNAMIC);
+
+        StartEvent start = new StartEvent();
+        start.setId("dynamic_sub_process_start_event");
+        start.setName("Start Dynamic SubProcess");
+        sub.addFlowElement(start);
+
+        EndEvent end = new EndEvent();
+        end.setId("dynamic_sub_process_end_event");
+        end.setName("End Dynamic SubProcess");
+        sub.addFlowElement(end);
+
+        EndEvent errorEnd = new EndEvent();
+        errorEnd.setId("rejectedErrorEndEvent");
+        errorEnd.setName("ErrorEnd");
+        errorEnd.addEventDefinition(errorDef);
+        sub.addFlowElement(errorEnd);
+
+        sub.addFlowElement(createSequenceFlow(start.getId(), end.getId()));
+
+        return sub;
+
+    }
+
+    protected SubProcess createDynamicSubProcess(List<UserTask> userTasks, ErrorEventDefinition errorDef) {
+        SubProcess sub = new SubProcess();
+        sub.setId(Workflow.SUBPROCESS_ID_DYNAMIC);
+        sub.setName(Workflow.SUBPROCESS_NAME_DYNAMIC);
+
+        StartEvent start = new StartEvent();
+        start.setId("dynamic_sub_process_start_event");
+        start.setName("Start Dynamic SubProcess");
+        sub.addFlowElement(start);
+
+        EndEvent end = new EndEvent();
+        end.setId("dynamic_sub_process_end_event");
+        end.setName("End Dynamic SubProcess");
+        sub.addFlowElement(end);
+
+        EndEvent errorEnd = new EndEvent();
+        errorEnd.setId("rejectedErrorEndEvent");
+        errorEnd.setName("ErrorEnd");
+        errorEnd.addEventDefinition(errorDef);
+        sub.addFlowElement(errorEnd);
+
+        if (userTasks.isEmpty()) {
+            sub.addFlowElement(createSequenceFlow(start.getId(), end.getId()));
+            return sub;
+        }
+
+        List<UserTask> collaborations = Lists.newArrayList();
+        List<UserTask> approvals = Lists.newArrayList();
+        for (UserTask ut : userTasks) {
+            if (UserTaskType.APPROVE_REJECT.equals(ut.getUserTaskType())) {
+                approvals.add(ut);
+            } else if (UserTaskType.COLLABORATION.equals(ut.getUserTaskType())) {
+                collaborations.add(ut);
+            } else {
+                throw new IllegalArgumentException("Invalid user task type: " + ut.getUserTaskType());
             }
         }
 
-        List<Approval> approvals = Lists.newArrayList();
-        int i = 1;
-        for (UserTask userTask : userTasks) {
-            approvals.add(fromUserTask(userTask, i));
-            i++;
+        List<org.activiti.bpmn.model.UserTask> created = Lists.newArrayList();
+        int approvalCount = 1;
+        int collabCount = 1;
+        boolean first = true;
+        for (UserTask from : userTasks) {
+            if (UserTaskType.APPROVE_REJECT.equals(from.getUserTaskType())) {
+                org.activiti.bpmn.model.UserTask approvalTask = approvalTask(sub, errorEnd, from, approvalCount, approvals.size());
+                created.add(approvalTask);
+                approvalCount++;
+            } else if (UserTaskType.COLLABORATION.equals(from.getUserTaskType())) {
+                org.activiti.bpmn.model.UserTask collabTask = collaborationTask(sub, from, collabCount, collaborations.size());
+                created.add(collabTask);
+                collabCount++;
+            } else {
+                throw new IllegalArgumentException("Invalid user task type: " + from.getUserTaskType());
+            }
+
         }
-        return approvals;
+
+        sub.addFlowElement(createSequenceFlow(start.getId(), created.get(0).getId()));
+        sub.addFlowElement(createSequenceFlow(created.get(created.size()).getId(), end.getId()));
+        return sub;
+    }
+
+
+    protected org.activiti.bpmn.model.UserTask approvalTask(SubProcess sub, EndEvent errorEnd, UserTask from, int current, int total) {
+        org.activiti.bpmn.model.UserTask to = new org.activiti.bpmn.model.UserTask();
+        to.setId(String.format("%s_%d", Workflow.TASK_ID_DOC_APPROVAL, current));
+        if (StringUtils.isBlank(from.getName())) {
+            to.setName(String.format("Approve Document (%d / %d)", current, total));
+        } else {
+            to.setName(from.getName());
+        }
+
+        ActivitiListener onCreateApproval = new ActivitiListener();
+        onCreateApproval.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
+        onCreateApproval.setImplementation("${docWorkflowListener.onCreateApproval(execution, task)}");
+        onCreateApproval.setEvent("create");
+        to.setTaskListeners(Lists.newArrayList(onCreateApproval));
+
+
+        if (from.getCandidateGroups().isEmpty() && from.getCandidateUsers().isEmpty()) {
+            throw new IllegalArgumentException("user task does not have any candidate users / groups assigned");
+/*
+                ActivitiListener taskListener = new ActivitiListener();
+                taskListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
+                taskListener.setImplementation("${documentWorkflow.setAssignee(execution, task)}");
+                taskListener.setEvent("create");
+                userTask.setTaskListeners(Lists.newArrayList(taskListener));
+*/
+        }
+        to.setCandidateGroups(from.getCandidateGroups());
+        to.setCandidateUsers(from.getCandidateUsers());
+
+        sub.addFlowElement(to);
+
+        ExclusiveGateway gw = new ExclusiveGateway();
+        gw.setId(String.format("exclusivegateway_approval_%d_of_%d", current, total));
+        gw.setName(String.format("Exclusive Approval Gateway %d of %d", current, total));
+        sub.addFlowElement(gw);
+        sub.addFlowElement(createSequenceFlow(to.getId(), gw.getId()));
+
+        //-------------------------------------------------------------
+        SequenceFlow rejectedFlow = new SequenceFlow();
+        rejectedFlow.setId(String.format("docRejectedSubFlow_%d_of_%d", current, total));
+        rejectedFlow.setName(String.format("Doc Rejected %d of %d", current, total));
+        rejectedFlow.setSourceRef(gw.getId());
+        rejectedFlow.setTargetRef(errorEnd.getId());
+
+        ActivitiListener rejectedListener = new ActivitiListener();
+        rejectedListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
+        rejectedListener.setImplementation("${documentWorkflow.onRejected(execution)}");
+        rejectedListener.setEvent("take");
+        rejectedFlow.setExecutionListeners(Lists.newArrayList(rejectedListener));
+        rejectedFlow.setConditionExpression("${approved == false}");
+        sub.addFlowElement(rejectedFlow);
+
+        //-----------------------------------------------
+        SequenceFlow approvedFlow = new SequenceFlow();
+        approvedFlow.setId(String.format("docApprovedSubFlow_%d_of_%d", current, total));
+        approvedFlow.setName(String.format("Doc Approved %d of %d", current, total));
+        approvedFlow.setSourceRef(gw.getId());
+
+        ActivitiListener approvedListener = new ActivitiListener();
+        approvedListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
+        approvedListener.setImplementation("${documentWorkflow.onApproved(execution)}");
+        approvedListener.setEvent("take");
+        approvedFlow.setExecutionListeners(Lists.newArrayList(approvedListener));
+        approvedFlow.setConditionExpression("${approved == true}");
+        sub.addFlowElement(approvedFlow);
+
+        return to;
+    }
+
+    protected org.activiti.bpmn.model.UserTask collaborationTask(SubProcess sub, UserTask from, int current, int total) {
+        org.activiti.bpmn.model.UserTask to = new org.activiti.bpmn.model.UserTask();
+        to.setId(String.format("%s_%d", Workflow.TASK_ID_DOC_COLLABORATE, current));
+        if (StringUtils.isBlank(from.getName())) {
+            to.setName(String.format("Document Collaboration (%d / %d)", current, total));
+        } else {
+            to.setName(from.getName());
+        }
+
+        ActivitiListener onCreate = new ActivitiListener();
+        onCreate.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
+        onCreate.setImplementation("${docWorkflowListener.onCreateCollaborate(execution, task)}");
+        onCreate.setEvent("create");
+
+        ActivitiListener onComplete = new ActivitiListener();
+        onComplete.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
+        onComplete.setImplementation("${docWorkflowListener.onCompleteCollaborate(execution, task)}");
+        onComplete.setEvent("complete");
+
+        to.setTaskListeners(Lists.newArrayList(onCreate, onComplete));
+        return to;
     }
 
     protected SequenceFlow createSequenceFlow(String from, String to) {
@@ -185,182 +348,13 @@ public class WorkflowBuilder {
         return flow;
     }
 
-    protected SubProcess createDefaultSubProcess() {
-        SubProcess sub = new SubProcess();
-        sub.setId(Workflow.SUBPROCESS_ID_DYNAMIC);
-        sub.setName(Workflow.SUBPROCESS_NAME_DYNAMIC);
-
-        StartEvent start = new StartEvent();
-        start.setId("approvalSubProcessStartEvent");
-        start.setName("Start Approval SubProcess");
-        sub.addFlowElement(start);
-
-        EndEvent end = new EndEvent();
-        end.setId("approvalSubProcessEndEvent");
-        end.setName("End Approval SubProcess");
-        sub.addFlowElement(end);
-
-        EndEvent errorEnd = new EndEvent();
-        errorEnd.setId("rejectedErrorEndEvent");
-        errorEnd.setName("ErrorEnd");
-        ErrorEventDefinition errorDef = new ErrorEventDefinition();
-        errorDef.setErrorCode("errorDocRejected");
-        errorEnd.addEventDefinition(errorDef);
-        sub.addFlowElement(errorEnd);
-
-        UserTask userTask = new UserTask();
-        userTask.setId(Workflow.TASK_ID_DOC_APPROVAL);
-        userTask.setName("Approve Document (1 / 1)");
-        ActivitiListener taskListener = new ActivitiListener();
-        taskListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
-        taskListener.setImplementation("${documentWorkflow.setAssignee(execution, task)}");
-        taskListener.setEvent("create");
-        userTask.setTaskListeners(Lists.newArrayList(taskListener));
-        sub.addFlowElement(userTask);
-
-        ExclusiveGateway gw = new ExclusiveGateway();
-        gw.setId("exclusivegateway1");
-        gw.setName("Exclusive Gateway");
-        sub.addFlowElement(gw);
-
-        SequenceFlow rejectedFlow = new SequenceFlow();
-        rejectedFlow.setId("docRejectedSubFlow");
-        rejectedFlow.setName("Doc Rejected");
-        rejectedFlow.setSourceRef(gw.getId());
-        rejectedFlow.setTargetRef(errorEnd.getId());
-        ActivitiListener rejectedListener = new ActivitiListener();
-        rejectedListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
-        rejectedListener.setImplementation("${documentWorkflow.onRejected(execution)}");
-        rejectedListener.setEvent("take");
-        rejectedFlow.setExecutionListeners(Lists.newArrayList(rejectedListener));
-        rejectedFlow.setConditionExpression("${approved == false}");
-        sub.addFlowElement(rejectedFlow);
-
-        SequenceFlow approvedFlow = new SequenceFlow();
-        approvedFlow.setId("docApprovedSubFlow");
-        approvedFlow.setName("Doc Approved");
-        approvedFlow.setSourceRef(gw.getId());
-        approvedFlow.setTargetRef(end.getId());
-        ActivitiListener approvedListener = new ActivitiListener();
-        approvedListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
-        approvedListener.setImplementation("${documentWorkflow.onApproved(execution)}");
-        approvedListener.setEvent("take");
-        approvedFlow.setExecutionListeners(Lists.newArrayList(approvedListener));
-        approvedFlow.setConditionExpression("${approved == true}");
-        sub.addFlowElement(approvedFlow);
-
-        sub.addFlowElement(createSequenceFlow(start.getId(), userTask.getId()));
-        sub.addFlowElement(createSequenceFlow(userTask.getId(), gw.getId()));
-
-        return sub;
-
-    }
-
-    protected SubProcess createDynamicSubProcess(List<Approval> approvals) {
-        SubProcess sub = new SubProcess();
-        sub.setId(Workflow.SUBPROCESS_ID_DYNAMIC);
-        sub.setName(Workflow.SUBPROCESS_NAME_DYNAMIC);
-
-        StartEvent start = new StartEvent();
-        start.setId("approvalSubProcessStartEvent");
-        start.setName("Start Approval SubProcess");
-        sub.addFlowElement(start);
-
-        EndEvent end = new EndEvent();
-        end.setId("approvalSubProcessEndEvent");
-        end.setName("End Approval SubProcess");
-        sub.addFlowElement(end);
-
-        EndEvent errorEnd = new EndEvent();
-        errorEnd.setId("rejectedErrorEndEvent");
-        errorEnd.setName("ErrorEnd");
-        ErrorEventDefinition errorDef = new ErrorEventDefinition();
-        errorDef.setErrorCode("errorDocRejected");
-        errorEnd.addEventDefinition(errorDef);
-        sub.addFlowElement(errorEnd);
-
-        if (approvals.isEmpty()) {
-            sub.addFlowElement(createSequenceFlow(start.getId(), end.getId()));
-            return sub;
-        } else {
-            sub.addFlowElement(createSequenceFlow(start.getId(), "approveDocUserTask_1"));
-        }
-        int i = 1;
-        for (Approval approval : approvals) {
-            UserTask userTask = new UserTask();
-            if (StringUtils.isBlank(approval.getName())) {
-                approval.setName(String.format("Approve Document (%d / %d)", i, approvals.size()));
-            }
-            userTask.setId(String.format("approveDocUserTask_%d", i));
-            userTask.setName(approval.getName());
-            if (!approval.getCandidateGroups().isEmpty()) {
-                userTask.setCandidateGroups(approval.getCandidateGroups());
-            }
-            if (!approval.getCandidateUsers().isEmpty()) {
-                userTask.setCandidateUsers(approval.getCandidateUsers());
-            }
-            if (approval.getCandidateGroups().isEmpty() && approval.getCandidateUsers().isEmpty()) {
-                ActivitiListener taskListener = new ActivitiListener();
-                taskListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
-                taskListener.setImplementation("${documentWorkflow.setAssignee(execution, task)}");
-                taskListener.setEvent("create");
-                userTask.setTaskListeners(Lists.newArrayList(taskListener));
-            }
-
-            sub.addFlowElement(userTask);
-
-            ExclusiveGateway gw = new ExclusiveGateway();
-            gw.setId(String.format("exclusivegateway_%d", i));
-            gw.setName(String.format("Exclusive Gateway %d", i));
-            sub.addFlowElement(gw);
-            sub.addFlowElement(createSequenceFlow(userTask.getId(), gw.getId()));
-
-            SequenceFlow rejectedFlow = new SequenceFlow();
-            rejectedFlow.setId(String.format("docRejectedSubFlow_%d", i));
-            rejectedFlow.setName(String.format("Doc Rejected %d", i));
-            rejectedFlow.setSourceRef(gw.getId());
-            rejectedFlow.setTargetRef(errorEnd.getId());
-            ActivitiListener rejectedListener = new ActivitiListener();
-            rejectedListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
-            rejectedListener.setImplementation("${documentWorkflow.onRejected(execution)}");
-            rejectedListener.setEvent("take");
-            rejectedFlow.setExecutionListeners(Lists.newArrayList(rejectedListener));
-            rejectedFlow.setConditionExpression("${approved == false}");
-            sub.addFlowElement(rejectedFlow);
-
-            SequenceFlow approvedFlow = new SequenceFlow();
-            approvedFlow.setId(String.format("docApprovedSubFlow_%d", i));
-            approvedFlow.setName(String.format("Doc Approved %d", i));
-            approvedFlow.setSourceRef(gw.getId());
-            //We're on the last one
-            if (i == approvals.size()) {
-                approvedFlow.setTargetRef(end.getId());
-            } else {
-                approvedFlow.setTargetRef(String.format("approveDocUserTask_%d", i + 1));
-            }
-
-
-            ActivitiListener approvedListener = new ActivitiListener();
-            approvedListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
-            approvedListener.setImplementation("${documentWorkflow.onApproved(execution)}");
-            approvedListener.setEvent("take");
-            approvedFlow.setExecutionListeners(Lists.newArrayList(approvedListener));
-            approvedFlow.setConditionExpression("${approved == true}");
-            sub.addFlowElement(approvedFlow);
-            i++;
-        }
-        return sub;
-
-    }
-
-    protected Approval fromUserTask(UserTask userTask, int position) {
-        Approval approval = new Approval();
-        approval.setPosition(position);
-        approval.setCandidateGroups(Lists.newArrayList(userTask.getCandidateGroups()));
-        approval.setCandidateUsers(Lists.newArrayList(userTask.getCandidateUsers()));
-        approval.setName(userTask.getName());
-        approval.setId(userTask.getId());
-
-        return approval;
-    }
+    /*protected UserTask fromUserTask(org.activiti.bpmn.model.UserTask userTask, int position) {
+        UserTask uTask = new UserTask();
+        uTask.setPosition(position);
+        uTask.setCandidateGroups(Lists.newArrayList(userTask.getCandidateGroups()));
+        uTask.setCandidateUsers(Lists.newArrayList(userTask.getCandidateUsers()));
+        uTask.setName(userTask.getName());
+        uTask.setId(userTask.getId());
+        return uTask;
+    }*/
 }
