@@ -104,6 +104,17 @@
             </div>
         </div>
 
+        <div class="alert alert-info">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            <h3>Workflow Process Definitions (all versions): ${fn:length(procDefs)}</h3>
+            <ul>
+                <c:forEach var="procDef" items="${procDefs}">
+                    <li>${procDef.id} - ${procDef.key}</li>
+                </c:forEach>
+            </ul>
+            <hr/>
+        </div>
+
     </div>
 </div>
 

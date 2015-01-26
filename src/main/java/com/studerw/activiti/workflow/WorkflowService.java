@@ -8,6 +8,7 @@ import org.activiti.engine.impl.RepositoryServiceImpl;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
+import org.activiti.engine.repository.ProcessDefinitionQuery;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.image.impl.DefaultProcessDiagramGenerator;
 import org.apache.commons.io.IOUtils;
@@ -21,6 +22,10 @@ import java.io.InputStream;
 import java.util.List;
 
 /**
+ * Various methods to find process definitions by group and {@link com.studerw.activiti.model.document.DocType}.
+ * Be aware that all BPMN docs must have a namepsace equal to {@code studerw.com} or whatever is set in the
+ * {@code WFConstants} class.
+ *
  * @author William Studer
  *         Date: 5/29/14
  */
@@ -68,7 +73,6 @@ public class WorkflowService {
     }
 
     /**
-     *
      * @param docType
      * @param group
      * @return true if the specific {@code DocType} and Group workflow exists, false if not
@@ -82,12 +86,11 @@ public class WorkflowService {
     }
 
     /**
-     *
      * @param docType
      * @return true if one or more workflows of the specific {@code DocType} exists, false if not.
      * e.g. process Id of deployed definition(s) would be like {@code BOOK_REPORT_engineering} or just {@code BOOK_REPORT}
      */
-    public boolean docTypeWorkflowsExist(DocType docType){
+    public boolean docTypeWorkflowsExist(DocType docType) {
         log.debug("Checking for workflow exists of doctype={}.", docType.name());
         String processIdStr = String.format("%s_%s", docType.name(), "%");
         log.info("using key LIKE={}", processIdStr);
@@ -96,7 +99,6 @@ public class WorkflowService {
     }
 
     /**
-     *
      * @param docType
      * @return List (may be empty) of process definitions for the given doc type.
      */
@@ -112,13 +114,12 @@ public class WorkflowService {
     }
 
     /**
-     *
      * @param docType
      * @return true if the base workflow for the {@code DocType} exists. Essentially, this is a process definition
      * with the {@code processId=DOC_TYPE_NONE} and the namespace set to default namespace
      * @see {@link com.studerw.activiti.workflow.WFConstants#NAMESPACE_CATEGORY}
      */
-    public boolean baseDocTypeWorkflowExists(DocType docType){
+    public boolean baseDocTypeWorkflowExists(DocType docType) {
         log.debug("Checking for base workflow exists of doctype={}.", docType.name());
         String processIdStr = String.format("%s_%s", docType.name(), WFConstants.WORKFLOW_GROUP_NONE);
         log.info("search for base doc workflow using processId={}", processIdStr);
@@ -138,6 +139,12 @@ public class WorkflowService {
         return pd;
     }
 
+    /**
+     *
+     * @param docType
+     * @return the base workflow for a given document type (i.e. the process id of the process is {@code DocType_NONE})
+     * or null if no base document exists.
+     */
     public ProcessDefinition findBaseProcDef(DocType docType) {
         log.debug("Checking for base workflow exists of doctype={}", docType.name());
         String processIdStr = String.format("%s_%s", docType.name(), WFConstants.WORKFLOW_GROUP_NONE);
@@ -147,14 +154,14 @@ public class WorkflowService {
     }
 
     /**
-     * <p>
+     * <p/>
      * This is a convenience method that will try for the most specific workflow (group and docType),
      * but will fall back to just general docType if no group workflow exists.
+     *
      * @param docType
      * @return latest process definition for the given group and/or docType or null if neither (i.e. no group and also no docType) exits.
      */
     public ProcessDefinition findProcDef(DocType docType, String group) {
-        log.debug("Checking for workflow exists of doctype={} and group={}", docType.name(), group);
         ProcessDefinition pd = this.findProcDefByDocTypeAndGroup(docType, group);
         if (pd == null) {
             log.debug("no group workflow exists of doctype={} and group={} -> checking for base wf.", docType.name(), group);
@@ -163,6 +170,22 @@ public class WorkflowService {
         return pd;
     }
 
+    /**
+     *
+     * @param onlyLatestVersion retrieve only the latest version of each Process Definition
+     * @return all process definitions in the Activiti workflow
+     */
+    //TODO this should be protected by admin only
+    public List<ProcessDefinition> getAllProcDefs(boolean onlyLatestVersion) {
+        log.debug("Lookign up all process definitions with latestVersion={}", onlyLatestVersion);
+        ProcessDefinitionQuery query = repoSrvc.createProcessDefinitionQuery();
+        if (onlyLatestVersion){
+            query.latestVersion();
+        }
+        List<ProcessDefinition> definitions = query.list();
+        log.debug("Found {} definitions.", definitions.size());
+        return definitions;
+    }
 
     public void updateWorkflow(BpmnModel model, String group) {
         String modelName = String.format("%s-doc-approve-model.bpmn", group);
