@@ -26,6 +26,8 @@ public class WorkflowBuilder {
 
     /**
      * Build the minimal base document definition needed for dynamic tasks ({@code NONE} group is used).
+     * The ID is set to {@code WFConstants.WORKFLOW_GROUP_NONE} and
+     * the category (i.e. Namespace) set to {@code DocType.GENERAL};
      *
      * @param name
      * @return BpmnModel
@@ -34,7 +36,7 @@ public class WorkflowBuilder {
         BpmnModel model = new BpmnModel();
         model.setTargetNamespace(DocType.GENERAL.name());
         org.activiti.bpmn.model.Process process = new Process();
-        process.setId(Workflow.WORKFLOW_GROUP_NONE);
+        process.setId(WFConstants.WORKFLOW_GROUP_NONE);
         process.setName(name);
         model.addProcess(process);
 
@@ -153,8 +155,8 @@ public class WorkflowBuilder {
 
     protected SubProcess createEmptyDynamicSubProcess(ErrorEventDefinition errorDef) {
         SubProcess sub = new SubProcess();
-        sub.setId(Workflow.SUBPROCESS_ID_DYNAMIC);
-        sub.setName(Workflow.SUBPROCESS_NAME_DYNAMIC);
+        sub.setId(WFConstants.SUBPROCESS_ID_DYNAMIC);
+        sub.setName(WFConstants.SUBPROCESS_NAME_DYNAMIC);
 
         StartEvent start = new StartEvent();
         start.setId("dynamic_sub_process_start_event");
@@ -180,8 +182,8 @@ public class WorkflowBuilder {
 
     protected SubProcess createDynamicSubProcess(List<UserTask> userTasks, ErrorEventDefinition errorDef) {
         SubProcess sub = new SubProcess();
-        sub.setId(Workflow.SUBPROCESS_ID_DYNAMIC);
-        sub.setName(Workflow.SUBPROCESS_NAME_DYNAMIC);
+        sub.setId(WFConstants.SUBPROCESS_ID_DYNAMIC);
+        sub.setName(WFConstants.SUBPROCESS_NAME_DYNAMIC);
 
         StartEvent start = new StartEvent();
         start.setId("dynamic_sub_process_start_event");
@@ -243,7 +245,7 @@ public class WorkflowBuilder {
 
     protected org.activiti.bpmn.model.UserTask approvalTask(SubProcess sub, EndEvent errorEnd, UserTask from, int current, int total) {
         org.activiti.bpmn.model.UserTask to = new org.activiti.bpmn.model.UserTask();
-        to.setId(String.format("%s_%d", Workflow.TASK_ID_DOC_APPROVAL, current));
+        to.setId(String.format("%s_%d", WFConstants.TASK_ID_DOC_APPROVAL, current));
         if (StringUtils.isBlank(from.getName())) {
             to.setName(String.format("Approve Document (%d / %d)", current, total));
         } else {
@@ -312,7 +314,7 @@ public class WorkflowBuilder {
 
     protected org.activiti.bpmn.model.UserTask collaborationTask(SubProcess sub, UserTask from, int current, int total) {
         org.activiti.bpmn.model.UserTask to = new org.activiti.bpmn.model.UserTask();
-        to.setId(String.format("%s_%d", Workflow.TASK_ID_DOC_COLLABORATE, current));
+        to.setId(String.format("%s_%d", WFConstants.TASK_ID_DOC_COLLABORATE, current));
         if (StringUtils.isBlank(from.getName())) {
             to.setName(String.format("Document Collaboration (%d / %d)", current, total));
         } else {

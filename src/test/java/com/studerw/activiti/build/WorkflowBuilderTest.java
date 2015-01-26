@@ -4,19 +4,21 @@ import com.google.common.collect.Lists;
 import com.studerw.activiti.model.document.DocType;
 import com.studerw.activiti.model.workflow.UserTask;
 import com.studerw.activiti.model.workflow.UserTaskType;
-import com.studerw.activiti.workflow.Workflow;
+import com.studerw.activiti.workflow.WFConstants;
 import com.studerw.activiti.workflow.WorkflowBuilder;
 import org.activiti.bpmn.converter.BpmnXMLConverter;
-import org.activiti.bpmn.model.*;
+import org.activiti.bpmn.model.BpmnModel;
+import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.Process;
+import org.activiti.bpmn.model.SubProcess;
 import org.activiti.engine.*;
+import org.activiti.engine.repository.Model;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.image.impl.DefaultProcessDiagramGenerator;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +33,7 @@ import java.util.List;
 
 /**
  * @author William Studer
- * Date: 5/25/14
+ *         Date: 5/25/14
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"classpath:spring/testAppContext.xml"})
@@ -45,13 +47,14 @@ public class WorkflowBuilderTest {
     @Autowired RepositoryService repositoryService;
 
     @Test
-    @Ignore
     public void testRepoService() throws IOException {
         List<ProcessDefinition> pds = this.repositoryService.createProcessDefinitionQuery().list();
         log.debug("Number of pds: " + pds.size());
         for (ProcessDefinition pd : pds) {
-            BpmnModel model = repositoryService.getBpmnModel(pd.getId());
-            InputStream in = new DefaultProcessDiagramGenerator().generatePngDiagram(model);
+
+//            BpmnModel model = repositoryService.getBpmnModel(pd.getId());
+//            InputStream in = new DefaultProcessDiagramGenerator().generatePngDiagram(model);
+            InputStream in = repositoryService.getProcessDiagram(pd.getId());
             FileUtils.copyInputStreamToFile(in, new File("target/" + pd.getName() + "_diagram.png"));
             IOUtils.closeQuietly(in);
         }
@@ -61,7 +64,7 @@ public class WorkflowBuilderTest {
     public void testBuildDefault() {
         BpmnModel model = workflowBldr.defaultDocument("foo");
         Process process = model.getProcesses().get(0);
-        SubProcess sub = (SubProcess) process.getFlowElement(Workflow.SUBPROCESS_ID_DYNAMIC);
+        SubProcess sub = (SubProcess) process.getFlowElement(WFConstants.SUBPROCESS_ID_DYNAMIC);
         log.debug(sub.getName());
         Collection<FlowElement> flowElements = sub.getFlowElements();
         List<org.activiti.bpmn.model.UserTask> userTasks = Lists.newArrayList();
@@ -71,15 +74,6 @@ public class WorkflowBuilderTest {
                 userTasks.add((org.activiti.bpmn.model.UserTask) (el));
             }
         }
-
-//        int i = 1;
-//        for (UserTask uTask : userTasks) {
-//            Approval approval = new Approval();
-//            approval.setPosition(i);
-//            i++;
-//            approval.setCandidateGroups(Lists.newArrayList(uTask.getCandidateGroups()));
-//            approval.setCandidateUsers(Lists.newArrayList(uTask.getCandidateUsers()));
-//        }
     }
 
 

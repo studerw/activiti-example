@@ -1,9 +1,7 @@
 package com.studerw.activiti.workflow;
 
-import com.google.common.collect.Lists;
 import com.studerw.activiti.model.document.DocType;
-import com.studerw.activiti.model.workflow.UserTask;
-import org.activiti.bpmn.model.*;
+import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.impl.RepositoryServiceImpl;
@@ -13,7 +11,6 @@ import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.image.impl.DefaultProcessDiagramGenerator;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +18,10 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * @author William Studer
- * Date: 5/29/14
+ *         Date: 5/29/14
  */
 @Service("workflowService")
 public class WorkflowService {

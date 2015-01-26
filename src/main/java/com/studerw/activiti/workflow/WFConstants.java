@@ -4,7 +4,8 @@ package com.studerw.activiti.workflow;
  * @author William Studer
  * Date: 5/24/14
  */
-public class Workflow {
+public class WFConstants {
+    public static final String NAMESPACE_PREFIX = "http://studerw.org/";
     public static final String WORKFLOW_GROUP_NONE = "NONE";
     public static final String SUBPROCESS_ID_DYNAMIC = "DYNAMIC_SUB_PROCESS";
     public static final String SUBPROCESS_NAME_DYNAMIC = "Dynamic Document Subprocess";

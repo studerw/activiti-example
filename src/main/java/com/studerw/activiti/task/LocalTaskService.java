@@ -5,7 +5,7 @@ import com.studerw.activiti.model.task.AssignedTask;
 import com.studerw.activiti.model.task.HistoricTask;
 import com.studerw.activiti.model.task.TaskApprovalForm;
 import com.studerw.activiti.user.UserService;
-import com.studerw.activiti.workflow.Workflow;
+import com.studerw.activiti.workflow.WFConstants;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.RuntimeService;
@@ -92,13 +92,13 @@ public class LocalTaskService {
                 throw new RuntimeException("Unable to find task - it's possible another user has already completed it");
             }
             Map<String, Object> vars = task.getProcessVariables();
-            runtimeService.setVariable(task.getExecutionId(), Workflow.PROCESS_VAR_APPROVED_OR_REJECTED, approved);
+            runtimeService.setVariable(task.getExecutionId(), WFConstants.PROCESS_VAR_APPROVED_OR_REJECTED, approved);
             if (StringUtils.equalsIgnoreCase((String) vars.get("initiator"), userDetails.getUsername())) {
                 throw new RuntimeException("The author of a document cannot perform approvals of the same document");
             }
             taskService.setAssignee(task.getId(), userDetails.getUsername());
             taskService.addComment(task.getId(), task.getProcessInstanceId(), comment);
-            taskService.setVariableLocal(task.getId(), Workflow.TASK_VAR_APPROVED_OR_REJECTED, Boolean.valueOf(approved));
+            taskService.setVariableLocal(task.getId(), WFConstants.TASK_VAR_APPROVED_OR_REJECTED, Boolean.valueOf(approved));
             taskService.complete(task.getId());
         }
         finally {
@@ -178,7 +178,7 @@ public class LocalTaskService {
     boolean isDocAuthor(Task task, String userId) {
         log.debug("********** " + task.getTaskDefinitionKey() + " ********");
         //is not docApprove Task
-        if (!StringUtils.startsWithIgnoreCase(task.getTaskDefinitionKey(), Workflow.TASK_ID_DOC_APPROVAL)) {
+        if (!StringUtils.startsWithIgnoreCase(task.getTaskDefinitionKey(), WFConstants.TASK_ID_DOC_APPROVAL)) {
             return false;
         }
         String author = (String) task.getProcessVariables().get("initiator");

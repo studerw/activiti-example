@@ -1,7 +1,7 @@
 package com.studerw.activiti.build;
 
 import com.google.common.collect.Lists;
-import com.studerw.activiti.workflow.Workflow;
+import com.studerw.activiti.workflow.WFConstants;
 import org.activiti.bpmn.BpmnAutoLayout;
 import org.activiti.bpmn.constants.BpmnXMLConstants;
 import org.activiti.bpmn.model.*;
@@ -43,7 +43,7 @@ public class DocApproveTest {
     @Test
     public void testDynamicDeploy() throws Exception {
         String fakeGroup = "fakeGroup";
-        String procId = Workflow.PROCESS_ID_USER_APPROVAL + "-" + fakeGroup;
+        String procId = WFConstants.PROCESS_ID_USER_APPROVAL + "-" + fakeGroup;
         // 1. Build up the model from scratch
         BpmnModel model = new BpmnModel();
         Process process = new Process();
