@@ -51,10 +51,9 @@ public class WorkflowBuilderTest {
         List<ProcessDefinition> pds = this.repositoryService.createProcessDefinitionQuery().list();
         log.debug("Number of pds: " + pds.size());
         for (ProcessDefinition pd : pds) {
-
-//            BpmnModel model = repositoryService.getBpmnModel(pd.getId());
-//            InputStream in = new DefaultProcessDiagramGenerator().generatePngDiagram(model);
-            InputStream in = repositoryService.getProcessDiagram(pd.getId());
+            BpmnModel model = repositoryService.getBpmnModel(pd.getId());
+            InputStream in = new DefaultProcessDiagramGenerator().generatePngDiagram(model);
+//            InputStream in = repositoryService.getProcessDiagram(pd.getId());
             FileUtils.copyInputStreamToFile(in, new File("target/" + pd.getName() + "_diagram.png"));
             IOUtils.closeQuietly(in);
         }

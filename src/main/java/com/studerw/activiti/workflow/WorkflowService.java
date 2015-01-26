@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * @author William Studer
@@ -66,11 +67,35 @@ public class WorkflowService {
         return bytes;
     }
 
+    /**
+     *
+     * @param docType
+     * @param group
+     * @return true of the specific {@code DocType} and Group workflow exists, false if not
+     */
     public boolean groupWorkflowExists(DocType docType, String group) {
-        ProcessDefinition pd = this.repoSrvc.createProcessDefinitionQuery().processDefinitionKey(group).
-                processDefinitionCategory(docType.name()).latestVersion().singleResult();
+        //e.g. http://studerw.org/BOOK_REPORT/engineering
+        String processIdStr = String.format("%s%s/%s", WFConstants.NAMESPACE_PREFIX, docType.name(), group);
+        ProcessDefinition pd = this.repoSrvc.createProcessDefinitionQuery().processDefinitionKey(processIdStr).
+                latestVersion().singleResult();
         return pd != null;
     }
+
+    /**
+     *
+     * @param docType
+     * @return List (may be empty) of process definitions for the given doc type.
+     */
+    public List<ProcessDefinition> getProcDefByDocType(DocType docType) {
+        //e.g. http://studerw.org/BOOK_REPORT/engineering
+        String proessDefKey = String.format("%s%s", WFConstants.NAMESPACE_PREFIX, docType.name());
+        log.debug("Finding workflows of id: {}", proessDefKey);
+        List<ProcessDefinition> pds = this.repoSrvc.createProcessDefinitionQuery().processDefinitionKeyLike(proessDefKey).
+                latestVersion().list();
+        log.debug("Found {} of id={}", pds.size(), proessDefKey);
+        return pds;
+    }
+
 
     public void updateGroupDocApproveWorkflow(BpmnModel model, String group) {
         String modelName = String.format("%s-doc-approve-model.bpmn", group);
