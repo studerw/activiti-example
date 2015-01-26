@@ -4,6 +4,8 @@ import com.studerw.activiti.document.DocumentService;
 import com.studerw.activiti.model.document.DocType;
 import org.activiti.engine.*;
 import org.activiti.engine.repository.ProcessDefinition;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,12 +15,16 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.List;
+
 import static org.junit.Assert.*;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"classpath:spring/testAppContext.xml"})
 public class WorkflowServiceTest {
+    private static final Logger LOG = LogManager.getLogger(WorkflowServiceTest.class);
+
     @Autowired RuntimeService runtimeService;
     @Autowired TaskService taskService;
     @Autowired HistoryService historyService;
@@ -30,6 +36,10 @@ public class WorkflowServiceTest {
 
     @Before
     public void setUp() throws Exception {
+        List<ProcessDefinition> definitions = repositoryService.createProcessDefinitionQuery().list();
+        for (ProcessDefinition definition : definitions) {
+            LOG.debug("{} - {}", definition.getId(), definition.getKey());
+        }
 
     }
 
@@ -38,13 +48,65 @@ public class WorkflowServiceTest {
 
     }
 
+
     @Test
-    public void testFindDefinitionByDocType() throws Exception {
-        ProcessDefinition pd = this.workflowService.findDefinitionByDocType(DocType.BOOK_REPORT);
-        assertNotNull(pd);
+    public void testGetProcessDefinitionDiagram() throws Exception {
+        fail("not implemented");
+    }
 
-        ProcessDefinition pd1 = this.workflowService.findDefinitionByDocType(DocType.RECEIPT);
-        assertNull(pd1);
+    @Test
+    public void testGetActiveDocumentDiagram() throws Exception {
+        fail("not implemented");
+    }
 
+    @Test
+    public void testGroupWorkflowExists() throws Exception {
+        String group = "engineering";
+        boolean exists = this.workflowService.groupWorkflowExists(DocType.BOOK_REPORT, group);
+        assertTrue("BOOK_WORKFLOW_engineering should exist.", exists);
+
+        group = "FOO_SDFSFSF_SDFSDF";
+        exists = this.workflowService.groupWorkflowExists(DocType.BOOK_REPORT, group);
+        assertFalse("random group workflow should NOT exist.", exists);
+
+    }
+
+    @Test
+    public void testDocTypeWorkflowsExist() throws Exception {
+        boolean exists = this.workflowService.docTypeWorkflowsExist(DocType.BOOK_REPORT);
+        assertTrue("BOOK_REPORT workflows should exist.", exists);
+
+        exists = this.workflowService.docTypeWorkflowsExist(DocType.UNIT_TEST_NO_EXIST);
+        assertFalse("NO_EXIST docType workflow(s) should NOT exist.", exists);
+
+    }
+
+    @Test
+    public void testFindProcDefinitionsByDocType() throws Exception {
+        List<ProcessDefinition> processDefs = this.workflowService.findProcDefinitionsByDocType(DocType.BOOK_REPORT);
+        assertTrue("should have 3 process defs", processDefs.size() == 3);
+
+        processDefs = this.workflowService.findProcDefinitionsByDocType(DocType.UNIT_TEST_NO_EXIST);
+        assertTrue("should have no process defs", processDefs.isEmpty());
+
+    }
+
+    @Test
+    public void testUpdateWorkflow() throws Exception {
+        fail("not implemented");
+    }
+
+    @Test
+    public void testBaseDocTypeWorkflowExists() throws Exception {
+        boolean exists = this.workflowService.baseDocTypeWorkflowExists(DocType.BOOK_REPORT);
+        assertTrue("BOOK_REPORT base workflow should exist.", exists);
+
+        exists = this.workflowService.baseDocTypeWorkflowExists(DocType.UNIT_TEST_NO_EXIST);
+        assertFalse("NO_EXIST docType base workflow should NOT exist.", exists);
+    }
+
+    @Test
+    public void testFindProcessByBusinessKey() throws Exception {
+        fail("not implemented");
     }
 }

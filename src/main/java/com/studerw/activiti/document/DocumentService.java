@@ -87,6 +87,7 @@ public class DocumentService {
         return newId;
     }
 
+    @Transactional
     public void submitToWorkflow(String docId) {
         Document doc = this._getDocument(docId);
         log.debug("beginning (or continuing) doc workflow for doc {}. ", doc.getId());
@@ -94,31 +95,35 @@ public class DocumentService {
         if (!StringUtils.equals(userDetails.getUsername(), doc.getAuthor())) {
             throw new InvalidAccessException("Only the author of a doc can submit for approval");
         }
-        //Workflow
-        //TODO check author and currentUser
-        Map<String, Object> processVariables = Maps.newHashMap();
-        processVariables.put("initiator", doc.getAuthor());
-        processVariables.put("businessKey", doc.getId());
-        processVariables.put("docAuthor", doc.getAuthor());
+
         try {
             identityService.setAuthenticatedUserId(userDetails.getUsername());
             ProcessInstance current = workflowService.findProcessByBusinessKey(docId);
             if (current != null) {
                 throw new IllegalStateException("Running WF Process with key: " + docId + " already exists.");
             }
-            ProcessDefinition procDef = this.findProcDefByTypeAndGroup(doc.getDocType(), doc.getGroupId());
+            DocType docType = doc.getDocType();
+            String group = doc.getGroupId();
+            ProcessDefinition procDef = this.workflowService.findProcDefByGroup(docType, group);
+            if (procDef == null) {
+                throw new IllegalArgumentException("No workflow exists for doctype=" + docType.name() + " and group=" + group);
+            }
             current = runtimeService.startProcessInstanceByKey(procDef.getKey());
             Task task = taskService.createTaskQuery().processInstanceId(current.getProcessInstanceId()).singleResult();
             taskService.setAssignee(task.getId(), userDetails.getUsername());
 
-            if (DocType.BOOK_REPORT.equals(doc.getDocType())) {
+            /*if (DocType.BOOK_REPORT.equals(doc.getDocType())) {
                 this.bookReportDao.update((BookReport) doc);
             } else if (DocType.INVOICE.equals(doc.getDocType())) {
                 this.invoiceDao.update((Invoice) doc);
             } else {
                 throw new IllegalArgumentException("Unknown doc type: " + doc.getDocType());
-            }
+            }*/
             taskService.setVariableLocal(task.getId(), "taskOutcome", "Submitted for Approval");
+            Map<String, Object> processVariables = Maps.newHashMap();
+            processVariables.put("initiator", doc.getAuthor());
+            processVariables.put("businessKey", doc.getId());
+            processVariables.put("docAuthor", doc.getAuthor());
             taskService.setVariables(task.getId(), processVariables);
             taskService.complete(task.getId());
         }
@@ -165,9 +170,10 @@ public class DocumentService {
      * @param group
      * @return a valid process definition by DocType and Group or null if none exits
      */
+    /*
     public ProcessDefinition findProcDefByTypeAndGroup(DocType docType, String group) {
         log.debug("Finding process definition by docType={} and group={}", docType.name(), group);
         return repositoryService.createProcessDefinitionQuery().processDefinitionCategory(docType.name()).
                 processDefinitionKey(group).singleResult();
-    }
+    }*/
 }

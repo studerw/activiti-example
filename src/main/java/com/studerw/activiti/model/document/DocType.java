@@ -11,7 +11,8 @@ public enum DocType {
     INVOICE,
     RECEIPT,
     GENERAL,
-    UNIT_TEST;
+    //Just for unit tests - do not use in production
+    UNIT_TEST_NO_EXIST;
 
     public static List<DocType> asList(){
         return Arrays.asList(DocType.values());

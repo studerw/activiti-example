@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+             xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="studerw.com">
+    <process id="BOOK_REPORT_NONE" name="Book Report Workflow" isExecutable="true">
+        <documentation>This process is initiated when a book report is created.</documentation>
+        <startEvent id="startevent" name="Start" activiti:initiator="initiator"></startEvent>
+        <serviceTask id="publishBookReport" name="Publish Book Report"
+                     activiti:expression="${docWorkflowListener.publish(execution)}"></serviceTask>
+        <userTask id="submitToWorkflow" name="Submit Book Report to Workflow"></userTask>
+        <endEvent id="endevent" name="End"></endEvent>
+        <subProcess id="DYNAMIC_SUB_PROCESS" name="Dynamic Document Subprocess">
+            <startEvent id="dynamic_sub_process_start_event" name="Start Dynamic SubProcess"></startEvent>
+            <endEvent id="dynamic_sub_process_end_event" name="End Dynamic SubProcess"></endEvent>
+            <endEvent id="rejectedErrorEndEvent" name="ErrorEnd">
+                <errorEventDefinition errorRef="errorDocRejected"></errorEventDefinition>
+            </endEvent>
+        </subProcess>
+        <boundaryEvent id="rejectedErrorBoundaryEvent" name="Rejected Error Event" attachedToRef="DYNAMIC_SUB_PROCESS">
+            <errorEventDefinition errorRef="errorDocRejected"></errorEventDefinition>
+        </boundaryEvent>
+        <sequenceFlow id="flow1" sourceRef="startevent" targetRef="submitToWorkflow"></sequenceFlow>
+        <sequenceFlow id="flow2" sourceRef="submitToWorkflow" targetRef="DYNAMIC_SUB_PROCESS"></sequenceFlow>
+        <sequenceFlow id="flow3" sourceRef="DYNAMIC_SUB_PROCESS" targetRef="publishBookReport"></sequenceFlow>
+        <sequenceFlow id="flow4" sourceRef="publishBookReport" targetRef="endevent"></sequenceFlow>
+    </process>
+</definitions>

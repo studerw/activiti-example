@@ -62,7 +62,7 @@ public class WorkflowController extends BaseController {
             @PathVariable(value = "docType") DocType docType) throws InterruptedException {
         log.debug(userTasks.toString());
         BpmnModel model = this.workflowBldr.documentWithTasks(userTasks, docType, group);
-        this.workflowSrvc.updateGroupDocApproveWorkflow(model, group);
+        this.workflowSrvc.updateWorkflow(model, group);
 
         //wait for the model diagram to catch up (maybe)
         Response res = new Response(true, group);

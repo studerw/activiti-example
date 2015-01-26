@@ -27,11 +27,8 @@ import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.Model;
 import org.activiti.engine.runtime.Job;
 import org.activiti.engine.task.Task;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 
 import java.io.InputStream;
 import java.util.*;
@@ -48,19 +45,12 @@ public class DemoDataGenerator implements ModelDataJsonConstants {
     protected transient IdentityService identityService;
     protected transient RepositoryService repositoryService;
 
-    //if this is false, none of the other properties will be evaluated
-    protected boolean addDemoData;
     protected boolean createDemoUsersAndGroups;
     protected boolean createDemoProcessDefinitions;
     protected boolean createDemoModels;
     protected boolean generateReportData;
 
     public void init() {
-        if (!addDemoData) {
-            LOGGER.info("Ignoring demo creation due to activiti.demo = undefined / false");
-            return;
-        }
-
 
         this.identityService = processEngine.getIdentityService();
         this.repositoryService = processEngine.getRepositoryService();
@@ -98,10 +88,6 @@ public class DemoDataGenerator implements ModelDataJsonConstants {
 
     public void setCreateDemoProcessDefinitions(boolean createDemoProcessDefinitions) {
         this.createDemoProcessDefinitions = createDemoProcessDefinitions;
-    }
-
-    public void setAddDemoData(boolean addDemoData) {
-        this.addDemoData = addDemoData;
     }
 
     public void setCreateDemoModels(boolean createDemoModels) {
@@ -326,16 +312,14 @@ public class DemoDataGenerator implements ModelDataJsonConstants {
             try {
                 InputStream svgStream = this.getClass().getClassLoader().getResourceAsStream("org/activiti/explorer/demo/model/test.svg");
                 repositoryService.addModelEditorSourceExtra(model.getId(), org.apache.commons.io.IOUtils.toByteArray(svgStream));
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 LOGGER.warn("Failed to read SVG", e);
             }
 
             try {
                 InputStream editorJsonStream = this.getClass().getClassLoader().getResourceAsStream(jsonFile);
                 repositoryService.addModelEditorSource(model.getId(), org.apache.commons.io.IOUtils.toByteArray(editorJsonStream));
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 LOGGER.warn("Failed to read editor JSON", e);
             }
         }

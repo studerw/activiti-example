@@ -71,14 +71,28 @@ public class WorkflowService {
      *
      * @param docType
      * @param group
-     * @return true of the specific {@code DocType} and Group workflow exists, false if not
+     * @return true if the specific {@code DocType} and Group workflow exists, false if not
+     * e.g. process Id of deployed definition would equal {@code BOOK_REPORT_engineering}
      */
     public boolean groupWorkflowExists(DocType docType, String group) {
-        //e.g. http://studerw.org/BOOK_REPORT/engineering
-        String processIdStr = String.format("%s%s/%s", WFConstants.NAMESPACE_PREFIX, docType.name(), group);
-        ProcessDefinition pd = this.repoSrvc.createProcessDefinitionQuery().processDefinitionKey(processIdStr).
-                latestVersion().singleResult();
-        return pd != null;
+        log.debug("Checking for workflow exists of doctype={} and group={}", docType.name(), group);
+        String processIdStr = String.format("%s_%s", docType.name(), group);
+        return (this.repoSrvc.createProcessDefinitionQuery().processDefinitionCategory(WFConstants.NAMESPACE_CATEGORY).
+                processDefinitionKey(processIdStr).latestVersion().singleResult()) != null;
+    }
+
+    /**
+     *
+     * @param docType
+     * @return true if one or more workflows of the specific {@code DocType} exists, false if not.
+     * e.g. process Id of deployed definition(s) would be like {@code BOOK_REPORT_engineering} or just {@code BOOK_REPORT}
+     */
+    public boolean docTypeWorkflowsExist(DocType docType){
+        log.debug("Checking for workflow exists of doctype={}.", docType.name());
+        String processIdStr = String.format("%s_%s", docType.name(), "%");
+        log.info("using key LIKE={}", processIdStr);
+        return !(this.repoSrvc.createProcessDefinitionQuery().processDefinitionCategory(WFConstants.NAMESPACE_CATEGORY).
+                processDefinitionKeyLike(processIdStr).latestVersion().list().isEmpty());
     }
 
     /**
@@ -86,18 +100,47 @@ public class WorkflowService {
      * @param docType
      * @return List (may be empty) of process definitions for the given doc type.
      */
-    public List<ProcessDefinition> getProcDefByDocType(DocType docType) {
-        //e.g. http://studerw.org/BOOK_REPORT/engineering
-        String proessDefKey = String.format("%s%s", WFConstants.NAMESPACE_PREFIX, docType.name());
-        log.debug("Finding workflows of id: {}", proessDefKey);
-        List<ProcessDefinition> pds = this.repoSrvc.createProcessDefinitionQuery().processDefinitionKeyLike(proessDefKey).
+    public List<ProcessDefinition> findProcDefinitionsByDocType(DocType docType) {
+        log.debug("Checking for workflow exists of doctype={}.", docType.name());
+        String processIdStr = String.format("%s_%s", docType.name(), "%");
+        log.debug("Finding workflows of id: {}", processIdStr);
+        List<ProcessDefinition> pds = this.repoSrvc.createProcessDefinitionQuery().processDefinitionCategory(WFConstants.NAMESPACE_CATEGORY).
+                processDefinitionKeyLike(processIdStr).
                 latestVersion().list();
-        log.debug("Found {} of id={}", pds.size(), proessDefKey);
+        log.debug("Found {} of id={}", pds.size(), processIdStr);
         return pds;
     }
 
+    /**
+     *
+     * @param docType
+     * @return true if the base workflow for the {@code DocType} exists. Essentially, this is a process definition
+     * with the {@code processId=DOC_TYPE_NONE} and the namespace set to default namespace
+     * @see {@link com.studerw.activiti.workflow.WFConstants#NAMESPACE_CATEGORY}
+     */
+    public boolean baseDocTypeWorkflowExists(DocType docType){
+        log.debug("Checking for base workflow exists of doctype={}.", docType.name());
+        String processIdStr = String.format("%s_%s", docType.name(), WFConstants.WORKFLOW_GROUP_NONE);
+        log.info("search for base doc workflow using processId={}", processIdStr);
+        return !(this.repoSrvc.createProcessDefinitionQuery().processDefinitionCategory(WFConstants.NAMESPACE_CATEGORY).
+                processDefinitionKey(processIdStr).latestVersion().singleResult() != null);
+    }
 
-    public void updateGroupDocApproveWorkflow(BpmnModel model, String group) {
+    /**
+     *
+     * @param docType
+     * @return latest process definition for the given doc type and group or null if none exits.
+     */
+    public ProcessDefinition findProcDefByGroup(DocType docType, String group) {
+        log.debug("Checking for workflow exists of doctype={} and group={}", docType.name(), group);
+        String processIdStr = String.format("%s_%s", docType.name(), group);
+        ProcessDefinition pd = this.repoSrvc.createProcessDefinitionQuery().processDefinitionCategory(WFConstants.NAMESPACE_CATEGORY).
+                processDefinitionKey(processIdStr).latestVersion().singleResult();
+        return pd;
+    }
+
+
+    public void updateWorkflow(BpmnModel model, String group) {
         String modelName = String.format("%s-doc-approve-model.bpmn", group);
         String deployName = String.format("Group %s Document Approve", group);
 
@@ -120,13 +163,13 @@ public class WorkflowService {
      * @return returns the matching {@code ProcessDefinition} based on the namespace (i.e. category) which must
      * be a valid {@link com.studerw.activiti.model.document.DocType} or null if no definition exists.
      */
-    public ProcessDefinition findDefinitionByDocType(DocType docType) {
+    /*public ProcessDefinition findDefinitionByDocType(DocType docType) {
         log.debug("searching for process definition for docType={}", docType);
         ProcessDefinition pd = repoSrvc.createProcessDefinitionQuery().processDefinitionCategory(docType.name()).singleResult();
         return pd;
 
     }
-
+    */
     /**
      * @param group - If no {@code Group} is passed, the default document approval workflow will be used.
      * @return a sorted list of approvals contained in the workflow associated with the given group

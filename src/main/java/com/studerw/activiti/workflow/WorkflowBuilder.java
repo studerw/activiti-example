@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.util.List;
 
@@ -34,9 +35,9 @@ public class WorkflowBuilder {
      */
     public BpmnModel defaultDocument(String name) {
         BpmnModel model = new BpmnModel();
-        model.setTargetNamespace(DocType.GENERAL.name());
+        model.setTargetNamespace(WFConstants.NAMESPACE_CATEGORY);
         org.activiti.bpmn.model.Process process = new Process();
-        process.setId(WFConstants.WORKFLOW_GROUP_NONE);
+        process.setId(String.format("%s_%s", DocType.GENERAL.name(), WFConstants.WORKFLOW_GROUP_NONE));
         process.setName(name);
         model.addProcess(process);
 
@@ -96,12 +97,14 @@ public class WorkflowBuilder {
      * @return fully populated BpmnModel with appropriate ids, namespace, sub process tasks, etc.
      */
     public BpmnModel documentWithTasks(List<UserTask> userTasks, DocType docType, String group) {
+        Assert.notNull(docType);
+        Assert.hasText(group);
         BpmnModel model = new BpmnModel();
-        model.setTargetNamespace(docType.name());
-        Process process = new Process();
-        process.setId(group);
-        String name = String.format("Dynamic Workflow for DocType: %s and Group: %s", docType.name(), group);
-        process.setName(name);
+        model.setTargetNamespace(WFConstants.NAMESPACE_CATEGORY);
+        org.activiti.bpmn.model.Process process = new Process();
+        process.setId(String.format("%s_%s", docType.name(), group));
+        process.setName(String.format("Generated workflow for docType=%s and Group=%s", docType.name(), group));
+
         model.addProcess(process);
 
         StartEvent startEvent = new StartEvent();
