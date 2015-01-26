@@ -140,7 +140,6 @@ public class WorkflowService {
     }
 
     /**
-     *
      * @param docType
      * @return the base workflow for a given document type (i.e. the process id of the process is {@code DocType_NONE})
      * or null if no base document exists.
@@ -171,15 +170,14 @@ public class WorkflowService {
     }
 
     /**
-     *
      * @param onlyLatestVersion retrieve only the latest version of each Process Definition
      * @return all process definitions in the Activiti workflow
      */
     //TODO this should be protected by admin only
     public List<ProcessDefinition> getAllProcDefs(boolean onlyLatestVersion) {
         log.debug("Lookign up all process definitions with latestVersion={}", onlyLatestVersion);
-        ProcessDefinitionQuery query = repoSrvc.createProcessDefinitionQuery();
-        if (onlyLatestVersion){
+        ProcessDefinitionQuery query = repoSrvc.createProcessDefinitionQuery().processDefinitionCategory(WFConstants.NAMESPACE_CATEGORY);
+        if (onlyLatestVersion) {
             query.latestVersion();
         }
         List<ProcessDefinition> definitions = query.list();

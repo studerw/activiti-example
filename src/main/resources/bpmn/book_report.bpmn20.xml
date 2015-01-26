@@ -4,7 +4,7 @@
              xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
              xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
              typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath"
-             targetNamespace="com.studerw">
+             targetNamespace="studerw.com">
     <process id="BOOK_REPORT_NONE" name="Book Report Workflow" isExecutable="true">
         <documentation>This process is initiated when a book report is created.</documentation>
         <startEvent id="startevent" name="Start" activiti:initiator="initiator"></startEvent>
@@ -27,6 +27,7 @@
         <sequenceFlow id="flow3" sourceRef="DYNAMIC_SUB_PROCESS" targetRef="publishBookReport"></sequenceFlow>
         <sequenceFlow id="flow4" sourceRef="publishBookReport" targetRef="endevent"></sequenceFlow>
     </process>
+    <!--
     <bpmndi:BPMNDiagram id="BPMNDiagram_bookReportWorkflow">
         <bpmndi:BPMNPlane bpmnElement="bookReportWorkflow" id="BPMNPlane_bookReportWorkflow">
             <bpmndi:BPMNShape bpmnElement="startevent" id="BPMNShape_startevent">
@@ -75,4 +76,5 @@
             </bpmndi:BPMNEdge>
         </bpmndi:BPMNPlane>
     </bpmndi:BPMNDiagram>
+    -->
 </definitions>

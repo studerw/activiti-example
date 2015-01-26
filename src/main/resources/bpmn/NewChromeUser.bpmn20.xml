@@ -7,9 +7,9 @@
              xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
              typeLanguage="http://www.w3.org/2001/XMLSchema"
              expressionLanguage="http://www.w3.org/1999/XPath"
-             targetNamespace="http://activiti.org/bpmn20"
              xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/DI
-             http://www.omg.org/spec/BPMN/20100524/MODEL">
+             http://www.omg.org/spec/BPMN/20100524/MODEL"
+             targetNamespace="studerw.com">
     <process id="newChromeUser" name="Approve New Chrome User" isExecutable="true">
         <documentation>This process is initiated when a user enters the system but is not found yet in the Chrome User
             repository. Upon submitting the standard registration information,
@@ -44,52 +44,53 @@
         <sequenceFlow id="flow5" sourceRef="newUserDenied" targetRef="endevent1"></sequenceFlow>
         <sequenceFlow id="flow6" sourceRef="newUserApproved" targetRef="endevent1"></sequenceFlow>
     </process>
-    <bpmndi:BPMNDiagram id="BPMNDiagram_newChromeUser">
-        <bpmndi:BPMNPlane bpmnElement="newChromeUser" id="BPMNPlane_newChromeUser">
-            <bpmndi:BPMNShape bpmnElement="startChromeUser" id="BPMNShape_startChromeUser">
-                <omgdc:Bounds height="35.0" width="35.0" x="90.0" y="240.0"></omgdc:Bounds>
-            </bpmndi:BPMNShape>
-            <bpmndi:BPMNShape bpmnElement="approveUserTask" id="BPMNShape_approveUserTask">
-                <omgdc:Bounds height="111.0" width="105.0" x="370.0" y="203.0"></omgdc:Bounds>
-            </bpmndi:BPMNShape>
-            <bpmndi:BPMNShape bpmnElement="approvalExclusiveGateway" id="BPMNShape_exclusivegateway1">
-                <omgdc:Bounds height="40.0" width="40.0" x="520.0" y="239.0"></omgdc:Bounds>
-            </bpmndi:BPMNShape>
-            <bpmndi:BPMNShape bpmnElement="newUserApproved" id="BPMNShape_newUserApproved">
-                <omgdc:Bounds height="55.0" width="105.0" x="660.0" y="149.0"></omgdc:Bounds>
-            </bpmndi:BPMNShape>
-            <bpmndi:BPMNShape bpmnElement="newUserDenied" id="BPMNShape_newUserDenied">
-                <omgdc:Bounds height="55.0" width="105.0" x="660.0" y="279.0"></omgdc:Bounds>
-            </bpmndi:BPMNShape>
-            <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
-                <omgdc:Bounds height="35.0" width="35.0" x="990.0" y="230.0"></omgdc:Bounds>
-            </bpmndi:BPMNShape>
-            <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
-                <omgdi:waypoint x="125.0" y="257.0"></omgdi:waypoint>
-                <omgdi:waypoint x="370.0" y="258.0"></omgdi:waypoint>
-            </bpmndi:BPMNEdge>
-            <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
-                <omgdi:waypoint x="475.0" y="258.0"></omgdi:waypoint>
-                <omgdi:waypoint x="520.0" y="259.0"></omgdi:waypoint>
-            </bpmndi:BPMNEdge>
-            <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
-                <omgdi:waypoint x="540.0" y="239.0"></omgdi:waypoint>
-                <omgdi:waypoint x="540.0" y="176.0"></omgdi:waypoint>
-                <omgdi:waypoint x="660.0" y="176.0"></omgdi:waypoint>
-            </bpmndi:BPMNEdge>
-            <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
-                <omgdi:waypoint x="540.0" y="279.0"></omgdi:waypoint>
-                <omgdi:waypoint x="540.0" y="306.0"></omgdi:waypoint>
-                <omgdi:waypoint x="660.0" y="306.0"></omgdi:waypoint>
-            </bpmndi:BPMNEdge>
-            <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
-                <omgdi:waypoint x="712.0" y="279.0"></omgdi:waypoint>
-                <omgdi:waypoint x="1007.0" y="265.0"></omgdi:waypoint>
-            </bpmndi:BPMNEdge>
-            <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
-                <omgdi:waypoint x="712.0" y="204.0"></omgdi:waypoint>
-                <omgdi:waypoint x="1007.0" y="230.0"></omgdi:waypoint>
-            </bpmndi:BPMNEdge>
-        </bpmndi:BPMNPlane>
-    </bpmndi:BPMNDiagram>
+
+    <!--<bpmndi:BPMNDiagram id="BPMNDiagram_newChromeUser">-->
+        <!--<bpmndi:BPMNPlane bpmnElement="newChromeUser" id="BPMNPlane_newChromeUser">-->
+            <!--<bpmndi:BPMNShape bpmnElement="startChromeUser" id="BPMNShape_startChromeUser">-->
+                <!--<omgdc:Bounds height="35.0" width="35.0" x="90.0" y="240.0"></omgdc:Bounds>-->
+            <!--</bpmndi:BPMNShape>-->
+            <!--<bpmndi:BPMNShape bpmnElement="approveUserTask" id="BPMNShape_approveUserTask">-->
+                <!--<omgdc:Bounds height="111.0" width="105.0" x="370.0" y="203.0"></omgdc:Bounds>-->
+            <!--</bpmndi:BPMNShape>-->
+            <!--<bpmndi:BPMNShape bpmnElement="approvalExclusiveGateway" id="BPMNShape_exclusivegateway1">-->
+                <!--<omgdc:Bounds height="40.0" width="40.0" x="520.0" y="239.0"></omgdc:Bounds>-->
+            <!--</bpmndi:BPMNShape>-->
+            <!--<bpmndi:BPMNShape bpmnElement="newUserApproved" id="BPMNShape_newUserApproved">-->
+                <!--<omgdc:Bounds height="55.0" width="105.0" x="660.0" y="149.0"></omgdc:Bounds>-->
+            <!--</bpmndi:BPMNShape>-->
+            <!--<bpmndi:BPMNShape bpmnElement="newUserDenied" id="BPMNShape_newUserDenied">-->
+                <!--<omgdc:Bounds height="55.0" width="105.0" x="660.0" y="279.0"></omgdc:Bounds>-->
+            <!--</bpmndi:BPMNShape>-->
+            <!--<bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">-->
+                <!--<omgdc:Bounds height="35.0" width="35.0" x="990.0" y="230.0"></omgdc:Bounds>-->
+            <!--</bpmndi:BPMNShape>-->
+            <!--<bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">-->
+                <!--<omgdi:waypoint x="125.0" y="257.0"></omgdi:waypoint>-->
+                <!--<omgdi:waypoint x="370.0" y="258.0"></omgdi:waypoint>-->
+            <!--</bpmndi:BPMNEdge>-->
+            <!--<bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">-->
+                <!--<omgdi:waypoint x="475.0" y="258.0"></omgdi:waypoint>-->
+                <!--<omgdi:waypoint x="520.0" y="259.0"></omgdi:waypoint>-->
+            <!--</bpmndi:BPMNEdge>-->
+            <!--<bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">-->
+                <!--<omgdi:waypoint x="540.0" y="239.0"></omgdi:waypoint>-->
+                <!--<omgdi:waypoint x="540.0" y="176.0"></omgdi:waypoint>-->
+                <!--<omgdi:waypoint x="660.0" y="176.0"></omgdi:waypoint>-->
+            <!--</bpmndi:BPMNEdge>-->
+            <!--<bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">-->
+                <!--<omgdi:waypoint x="540.0" y="279.0"></omgdi:waypoint>-->
+                <!--<omgdi:waypoint x="540.0" y="306.0"></omgdi:waypoint>-->
+                <!--<omgdi:waypoint x="660.0" y="306.0"></omgdi:waypoint>-->
+            <!--</bpmndi:BPMNEdge>-->
+            <!--<bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">-->
+                <!--<omgdi:waypoint x="712.0" y="279.0"></omgdi:waypoint>-->
+                <!--<omgdi:waypoint x="1007.0" y="265.0"></omgdi:waypoint>-->
+            <!--</bpmndi:BPMNEdge>-->
+            <!--<bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">-->
+                <!--<omgdi:waypoint x="712.0" y="204.0"></omgdi:waypoint>-->
+                <!--<omgdi:waypoint x="1007.0" y="230.0"></omgdi:waypoint>-->
+            <!--</bpmndi:BPMNEdge>-->
+        <!--</bpmndi:BPMNPlane>-->
+    <!--</bpmndi:BPMNDiagram>-->
 </definitions>

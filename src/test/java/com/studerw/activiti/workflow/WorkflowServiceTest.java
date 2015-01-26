@@ -49,15 +49,6 @@ public class WorkflowServiceTest {
 
 
     @Test
-    public void testGetAllProcDefs() {
-        List<ProcessDefinition> definitions = this.workflowService.getAllProcDefs(false);
-        assertTrue(definitions.size() == 4);
-
-        definitions = this.workflowService.getAllProcDefs(true);
-        assertTrue(definitions.size() == 4);
-    }
-
-    @Test
     public void testGetProcessDefinitionDiagram() throws Exception {
         fail("not implemented");
     }
@@ -65,6 +56,15 @@ public class WorkflowServiceTest {
     @Test
     public void testGetActiveDocumentDiagram() throws Exception {
         fail("not implemented");
+    }
+
+    @Test
+    public void testGetAllProcDefs() {
+        List<ProcessDefinition> definitions = this.workflowService.getAllProcDefs(false);
+        assertTrue(definitions.size() == 3);
+
+        definitions = this.workflowService.getAllProcDefs(true);
+        assertTrue(definitions.size() == 3);
     }
 
     @Test

@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-             xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
-             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-             typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath"
-             targetNamespace="studerw.com">
+<definitions xmlns:activiti="http://activiti.org/bpmn"
+        xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+        typeLanguage="http://www.w3.org/2001/XMLSchema"
+        expressionLanguage="http://www.w3.org/1999/XPath"
+        targetNamespace="studerw.com">
     <process id="BOOK_REPORT_engineering" name="Book Report Engineering Workflow" isExecutable="true">
         <documentation>This process is initiated when a book report is created.</documentation>
         <startEvent id="startevent" name="Start" activiti:initiator="initiator"></startEvent>
