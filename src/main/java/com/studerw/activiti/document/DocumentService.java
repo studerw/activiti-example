@@ -98,13 +98,16 @@ public class DocumentService {
 
         try {
             identityService.setAuthenticatedUserId(userDetails.getUsername());
+
+            //make sure we aren't submitting more than once
             ProcessInstance current = workflowService.findProcessByBusinessKey(docId);
             if (current != null) {
                 throw new IllegalStateException("Running WF Process with key: " + docId + " already exists.");
             }
             DocType docType = doc.getDocType();
             String group = doc.getGroupId();
-            ProcessDefinition procDef = this.workflowService.findProcDefByGroup(docType, group);
+            //try for
+            ProcessDefinition procDef = this.workflowService.findProcDef(docType, group);
             if (procDef == null) {
                 throw new IllegalArgumentException("No workflow exists for doctype=" + docType.name() + " and group=" + group);
             }

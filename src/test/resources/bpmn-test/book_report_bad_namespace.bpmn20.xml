@@ -4,7 +4,7 @@
         xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
         typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath"
         targetNamespace="SOMETHING_ELSE">
-    <process id="BOOK_REPORT_engineering" name="Book Report Workflow" isExecutable="true">
+    <process id="BOOK_REPORT_foo" name="Book Report Workflow" isExecutable="true">
         <documentation>This process is initiated when a book report is created.</documentation>
         <startEvent id="startevent" name="Start" activiti:initiator="initiator"></startEvent>
         <serviceTask id="publishBookReport" name="Publish Book Report"

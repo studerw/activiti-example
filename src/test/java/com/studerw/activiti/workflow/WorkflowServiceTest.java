@@ -45,7 +45,6 @@ public class WorkflowServiceTest {
 
     @After
     public void tearDown() throws Exception {
-
     }
 
 
@@ -78,7 +77,6 @@ public class WorkflowServiceTest {
 
         exists = this.workflowService.docTypeWorkflowsExist(DocType.UNIT_TEST_NO_EXIST);
         assertFalse("NO_EXIST docType workflow(s) should NOT exist.", exists);
-
     }
 
     @Test
@@ -103,6 +101,31 @@ public class WorkflowServiceTest {
 
         exists = this.workflowService.baseDocTypeWorkflowExists(DocType.UNIT_TEST_NO_EXIST);
         assertFalse("NO_EXIST docType base workflow should NOT exist.", exists);
+    }
+
+    @Test
+    public void testFindProcDef() {
+        ProcessDefinition pd = this.workflowService.findProcDef(DocType.BOOK_REPORT, "engineering");
+        LOG.debug("found {}", pd.getKey());
+        assertNotNull("Should have engineering workflow for BOOK_REPORT", pd);
+
+        ProcessDefinition pd1 = this.workflowService.findProcDef(DocType.BOOK_REPORT, "foo");
+        LOG.debug("found {}", pd1.getKey());
+        assertNotNull("Should have base workflow for BOOK_REPORT", pd1);
+
+        assertNotEquals("engineering and base should be different", pd.getId(), pd1.getId());
+
+        ProcessDefinition pd2 = this.workflowService.findProcDef(DocType.UNIT_TEST_NO_EXIST, "foo");
+        assertNull(pd2);
+    }
+
+    @Test
+    public void testFindBaseProcDef() {
+        ProcessDefinition pd = this.workflowService.findBaseProcDef(DocType.BOOK_REPORT);
+        assertNotNull(pd);
+
+        pd = this.workflowService.findBaseProcDef(DocType.UNIT_TEST_NO_EXIST);
+        assertNull(pd);
     }
 
     @Test
