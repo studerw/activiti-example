@@ -26,9 +26,9 @@ import org.springframework.stereotype.Service;
  * within the BPMN workflow definitions.
  * </p>
  */
-@Service("documentWorkflow")
+@Service("docWorkflowListener")
 public class DocWorkflowListener {
-    private static final Logger log = LoggerFactory.getLogger(DocWorkflowListener.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DocWorkflowListener.class);
 
     @Autowired protected IdentityService identityService;
     @Autowired protected RuntimeService runtimeService;
@@ -43,7 +43,7 @@ public class DocWorkflowListener {
      * @param execution
      */
     public void onApproved(DelegateExecution execution) {
-        log.debug("doc approved - process id: " + execution.getProcessInstanceId());
+        LOG.debug("doc approved - process id: {}", execution.getProcessInstanceId());
         ProcessInstance pi = runtimeService.createProcessInstanceQuery().
                 processInstanceId(execution.getProcessInstanceId()).singleResult();
         String docId = pi.getBusinessKey();
@@ -53,23 +53,23 @@ public class DocWorkflowListener {
 
         doc.setDocState(DocState.APPROVED);
         this.docSrvc.updateDocument(doc);
-        log.info("{} approved: {}", doc.getDocType().name(), doc.getTitle());
+        LOG.info("{} approved: {}", doc.getDocType().name(), doc.getTitle());
 
     }
 
     public void onRejected(DelegateExecution execution) {
-        log.debug("doc rejected - process id: " + execution.getProcessInstanceId());
+        LOG.debug("doc rejected - process id: {}",execution.getProcessInstanceId());
         ProcessInstance pi = runtimeService.createProcessInstanceQuery().
                 processInstanceId(execution.getProcessInstanceId()).singleResult();
         String docId = pi.getBusinessKey();
         Document doc = this.docSrvc.getDocument(docId);
-        log.debug("setting doc {} with title = {}: state set to REJECTED", doc.getId(), doc.getId());
+        LOG.debug("setting doc {} with title = {}: state set to REJECTED", doc.getId(), doc.getId());
         String message = String.format("Document entitled '%s' has been rejected", doc.getId());
         this.alertService.sendAlert(doc.getAuthor(), Alert.DANGER, message);
 
         doc.setDocState(DocState.REJECTED);
         this.docSrvc.updateDocument(doc);
-        log.info("{} rejected: {}", doc.getDocType().name(), doc.getTitle());
+        LOG.info("{} rejected: {}", doc.getDocType().name(), doc.getTitle());
     }
 
     /**
@@ -79,13 +79,13 @@ public class DocWorkflowListener {
      */
     public void publish(Execution execution) {
         String pId = execution.getProcessInstanceId();
-        log.debug("doc being published - procId={}", pId);
+        LOG.debug("doc being published - procId={}", pId);
         ProcessInstance pi = runtimeService.createProcessInstanceQuery().
                 processInstanceId(execution.getProcessInstanceId()).singleResult();
         String docId = pi.getBusinessKey();
         Document doc = this.docSrvc.getDocument(docId);
         doc.setDocState(DocState.PUBLISHED);
-        String message = String.format("%s entitled '%s' has been successfully published ", doc.getDocType().name(), doc.getId());
+        String message = String.format("%s entitled '%s' has been successfully published ", doc.getDocType().name(), doc.getTitle());
         this.alertService.sendAlert(doc.getAuthor(), Alert.SUCCESS, message);
         this.docSrvc.updateDocument(doc);
     }
@@ -97,7 +97,7 @@ public class DocWorkflowListener {
      */
     public void email(Execution execution) {
         String pId = execution.getProcessInstanceId();
-        log.debug("doc being emailed - procId={}", pId);
+        LOG.debug("doc being emailed - procId={}", pId);
         ProcessInstance pi = runtimeService.createProcessInstanceQuery().
                 processInstanceId(execution.getProcessInstanceId()).singleResult();
         String docId = pi.getBusinessKey();
@@ -127,7 +127,7 @@ public class DocWorkflowListener {
         if (doc == null) {
             return;
         }
-        log.debug("Setting doc: {} to state = {}", doc.getTitle(), DocState.WAITING_FOR_COLLABORATION.name());
+        LOG.debug("Setting doc: {} to state = {}", doc.getTitle(), DocState.WAITING_FOR_COLLABORATION.name());
         doc.setDocState(DocState.WAITING_FOR_COLLABORATION);
         this.docSrvc.updateDocument(doc);
     }
@@ -150,7 +150,7 @@ public class DocWorkflowListener {
         if (doc == null) {
             return;
         }
-        log.debug("Setting doc: {} to state = {}", doc.getTitle(), DocState.COLLABORATED.name());
+        LOG.debug("Setting doc: {} to state = {}", doc.getTitle(), DocState.COLLABORATED.name());
         doc.setDocState(DocState.COLLABORATED);
         this.docSrvc.updateDocument(doc);
 
@@ -180,7 +180,7 @@ public class DocWorkflowListener {
             return;
         }
 
-        log.debug("Setting doc: {} to state = {}", doc.getTitle(), DocState.WAITING_FOR_APPROVAL.name());
+        LOG.debug("Setting doc: {} to state = {}", doc.getTitle(), DocState.WAITING_FOR_APPROVAL.name());
         doc.setDocState(DocState.WAITING_FOR_APPROVAL);
         this.docSrvc.updateDocument(doc);
     }

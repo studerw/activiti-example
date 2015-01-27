@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -22,7 +23,7 @@ import java.util.List;
  */
 @Service("alertService")
 public class AlertService {
-    private static final Logger log = LoggerFactory.getLogger(AlertService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AlertService.class);
 
     protected IdentityService identityService;
     protected RuntimeService runtimeService;
@@ -61,10 +62,11 @@ public class AlertService {
      * @param to
      * @param priority
      * @param message
-     * @return
+     * @return id of new alert
      */
+    @Transactional
     public String sendSystemAlert(String to, int priority, String message) {
-        log.debug("sending system alert to: {} at priority {}", to, priority);
+        LOG.debug("sending system alert to: {} at priority {}", to, priority);
         Alert alert = new Alert();
         alert.setCreatedBy(UserService.SYSTEM_USER);
         alert.setPriority(priority);
@@ -83,10 +85,11 @@ public class AlertService {
      * @param to
      * @param priority
      * @param message
-     * @return
+     * @return id of new alert
      */
+    @Transactional
     public String sendAlert(String to, int priority, String message) {
-        log.debug("sending alert to: {} at priority {}", to, priority);
+        LOG.debug("sending alert to: {} at priority {}", to, priority);
         Alert alert = new Alert();
         UserDetails from = this.userService.currentUser();
         alert.setCreatedBy(from.getUsername());
@@ -99,8 +102,9 @@ public class AlertService {
         return this.alertDao.create(alert);
     }
 
+    @Transactional
     public void acknowledgeAlert(String alertId, String userId) {
-        log.debug("acknowledging alert {} for user {}", alertId, userId);
+        LOG.debug("acknowledging alert {} for user {}", alertId, userId);
         Alert alert = this.alertDao.read(alertId);
         if (!StringUtils.equals(userId, alert.getUserId())) {
             throw new InvalidAccessException("Only the alert owner may acknowledge an alert");
@@ -114,8 +118,9 @@ public class AlertService {
      * @return a list of alerts, sorted ascending by creation date, for a given user.
      * Only the actual user him/herself can obtain his/her own alerts
      */
+    @Transactional( readOnly = true)
     public List<Alert> readActiveAlertsByUser(String userId) {
-        log.debug("reading alerts for user: {}", userId);
+        LOG.debug("reading alerts for user: {}", userId);
         UserDetails user = this.userService.currentUser();
         if (!StringUtils.equals(user.getUsername(), userId)) {
             throw new InvalidAccessException("Alerts may only be accessed by the alert recipient itself");

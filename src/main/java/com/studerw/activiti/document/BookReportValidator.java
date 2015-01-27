@@ -11,7 +11,7 @@ import org.springframework.validation.Validator;
  * @author William Studer
  */
 public class BookReportValidator implements Validator {
-    private static final Logger log = LoggerFactory.getLogger(BookReportValidator.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BookReportValidator.class);
 
     @Override public boolean supports(Class<?> clazz) {
         return BookReport.class.isAssignableFrom(clazz);
@@ -19,7 +19,7 @@ public class BookReportValidator implements Validator {
 
     @Override public void validate(Object target, Errors errors) {
         BookReport bookReport = (BookReport)target;
-        log.debug("Validating book report: {}", bookReport);
+        LOG.debug("Validating book report: {}", bookReport);
 
         ValidationUtils.rejectIfEmpty(errors, "author", "required");
         ValidationUtils.rejectIfEmpty(errors, "groupId", "required");

@@ -17,7 +17,7 @@ import java.util.List;
 @Controller
 @RequestMapping("/index.htm")
 public class IndexController extends BaseController {
-    private static final Logger log = LoggerFactory.getLogger(IndexController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(IndexController.class);
 
     @Autowired
     LocalTaskService localTaskSrvc;

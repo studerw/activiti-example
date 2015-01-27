@@ -25,14 +25,11 @@ import static org.junit.Assert.assertNotNull;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"classpath:spring/testAppContext.xml"})
 public class ActivitiSpringTest {
-    private static final Logger log = LogManager.getLogger(ActivitiSpringTest.class);
+    private static final Logger LOG = LogManager.getLogger(ActivitiSpringTest.class);
 
     @Autowired RuntimeService runtimeService;
-
     @Autowired TaskService taskService;
-
     @Autowired HistoryService historyService;
-
     @Autowired IdentityService identityService;
 
     @Test
@@ -58,7 +55,7 @@ public class ActivitiSpringTest {
         List<HistoricProcessInstance> instances;
         instances = historyService.createHistoricProcessInstanceQuery().finished().list();
         for (HistoricProcessInstance instance : instances) {
-            log.debug(instance.getId());
+            LOG.debug(instance.getId());
         }
     }
 
@@ -67,9 +64,9 @@ public class ActivitiSpringTest {
     public void testUsers() {
         List<User> users = identityService.createUserQuery().list();
         int originalCount = users.size();
-        log.debug("count:  " + users.size());
+        LOG.debug("count:  {}", users.size());
         for (User user : users) {
-            log.debug(user.getId());
+            LOG.debug(user.getId());
         }
 
         User user = identityService.newUser("newUser");
@@ -81,10 +78,10 @@ public class ActivitiSpringTest {
 
         List<User> users2 = identityService.createUserQuery().list();
         for (User user2 : users2) {
-            log.debug(user2.getId());
+            LOG.debug(user2.getId());
             List<Group> groups = this.identityService.createGroupQuery().groupMember(user2.getId()).groupType("security-role").list();
             for (Group group : groups) {
-                log.debug("    " + group.getId() + " - " + group.getType());
+                LOG.debug("{} - {}", group.getId(), group.getType());
             }
         }
 

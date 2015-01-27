@@ -29,7 +29,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"classpath:spring/testAppContext.xml"})
 public class SimpleWorkflowTest {
-    private static final Logger log = LogManager.getLogger(SimpleWorkflowTest.class);
+    private static final Logger LOG = LogManager.getLogger(SimpleWorkflowTest.class);
     @Autowired
     RuntimeService runtimeService;
     @Autowired

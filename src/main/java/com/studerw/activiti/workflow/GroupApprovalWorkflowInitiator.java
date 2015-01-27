@@ -23,7 +23,7 @@
 //@Lazy(value = false)
 //@Deprecated
 //public class GroupApprovalWorkflowInitiator {
-//    private static final Logger log = LoggerFactory.getLogger(GroupApprovalWorkflowInitiator.class);
+//    private static final Logger LOG = LoggerFactory.getLogger(GroupApprovalWorkflowInitiator.class);
 //    @Autowired com.studerw.activiti.user.UserService userSrvc;
 //    @Autowired WorkflowBuilder workflowBldr;
 //    @Autowired RepositoryService repoSrvc;
@@ -34,7 +34,7 @@
 //        List<Group> groups = userSrvc.getAllAssignmentGroups();
 //        for(Group group: groups){
 //            if (!workflowSrvc.groupDocApproveWorkflowExists(group.getId())){
-//                log.info("Creating default doc approval workflow deployment for group {}", group.getId());
+//                LOG.info("Creating default doc approval workflow deployment for group {}", group.getId());
 //                Approval approval = new Approval();
 //                approval.getCandidateGroups().add(group.getId());
 //

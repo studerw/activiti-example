@@ -23,7 +23,7 @@ import java.util.List;
 
 @Controller
 public class UserController extends BaseController {
-    private static final Logger log = LoggerFactory.getLogger(UserController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(UserController.class);
 
     @Autowired UserService userService;
 
@@ -35,7 +35,7 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/users", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Response<List<UserForm>>> getUsers(HttpServletRequest request) {
         List<UserForm> users = userService.getAllUsers();
-        log.debug("returning json response of {} users",  users.size());
+        LOG.debug("returning json response of {} users",  users.size());
         Response res = new Response(true, "users",  users);
         return new ResponseEntity<Response<List<UserForm>>>(res, HttpStatus.OK);
     }
@@ -43,7 +43,7 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/groups", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Response<List<Group>>> getGroups(HttpServletRequest request) {
         List<Group> groups = userService.getAllAssignmentGroups();
-        log.debug("returning json response of {} groups",  groups.size());
+        LOG.debug("returning json response of {} groups",  groups.size());
         Response res = new Response(true, "groups",  groups);
         return new ResponseEntity<Response<List<Group>>>(res, HttpStatus.OK);
     }

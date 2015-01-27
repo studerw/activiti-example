@@ -6,6 +6,7 @@ import com.studerw.activiti.model.task.HistoricTask;
 import com.studerw.activiti.model.task.TaskApprovalForm;
 import com.studerw.activiti.user.UserService;
 import com.studerw.activiti.workflow.WFConstants;
+import com.studerw.activiti.workflow.WorkflowService;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.RuntimeService;
@@ -31,13 +32,14 @@ import java.util.Objects;
  */
 @Service("localTaskService")
 public class LocalTaskService {
-    private static final Logger log = LoggerFactory.getLogger(LocalTaskService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(LocalTaskService.class);
 
-    @Autowired TaskService taskService;
-    @Autowired IdentityService identityService;
-    @Autowired RuntimeService runtimeService;
-    @Autowired UserService userService;
-    @Autowired HistoryService historyService;
+    @Autowired protected TaskService taskService;
+    @Autowired protected IdentityService identityService;
+    @Autowired protected RuntimeService runtimeService;
+    @Autowired protected UserService userService;
+    @Autowired protected HistoryService historyService;
+    @Autowired protected WorkflowService workflowService;
 
     /**
      * @param userId
@@ -46,7 +48,7 @@ public class LocalTaskService {
      * assume the document author cannot also be an approver. This may change in the future.
      */
     public List<AssignedTask> getTasks(String userId) {
-        log.debug("Getting tasks for user: {}", userId);
+        LOG.debug("Getting tasks for user: {}", userId);
         List<Task> tasks = taskService.createTaskQuery().
                 includeProcessVariables().
                 taskCandidateOrAssigned(userId).
@@ -62,7 +64,7 @@ public class LocalTaskService {
         catch (Exception e) {
             throw new RuntimeException("Error converting task to Task Form", e);
         }
-        log.debug("got {} tasks for user {}", assignedTasks.size(), userId);
+        LOG.debug("got {} tasks for user {}", assignedTasks.size(), userId);
         return assignedTasks;
     }
 
@@ -83,7 +85,7 @@ public class LocalTaskService {
      * @param taskId
      */
     public void approveOrRejectDoc(boolean approved, String comment, String taskId) {
-        log.debug("Approve Task completion?: " + approved);
+        LOG.debug("Approve Task completion?: " + approved);
         UserDetails userDetails = userService.currentUser();
         try {
             identityService.setAuthenticatedUserId(userDetails.getUsername());
@@ -113,7 +115,7 @@ public class LocalTaskService {
      * @param taskId
      */
     public void collaborateTask(String comment, String taskId) {
-        log.debug("Collaboration Task completion");
+        LOG.debug("Collaboration Task completion");
         UserDetails userDetails = userService.currentUser();
         try {
             identityService.setAuthenticatedUserId(userDetails.getUsername());
@@ -136,47 +138,40 @@ public class LocalTaskService {
      * @param businessKey
      * @return
      */
-    public List<HistoricTask> getDocApprovalHistory(String businessKey) {
-        log.debug("getting historic tasks for doc: " + businessKey);
-        HistoricProcessInstance pi = historyService.createHistoricProcessInstanceQuery().
+    public List<HistoricTask> getTaskHistory(String businessKey) {
+        LOG.debug("getting historic tasks for doc: {}", businessKey);
+
+        HistoricProcessInstance historicPI = historyService.createHistoricProcessInstanceQuery().
                 includeProcessVariables().processInstanceBusinessKey(businessKey).singleResult();
 
-        if (pi == null) {
+        if (historicPI == null) {
             return Collections.emptyList();
         }
-        log.debug("Duration time in millis: " + pi.getDurationInMillis());
-        List<HistoricTaskInstance> hTasks;
-        hTasks = historyService.createHistoricTaskInstanceQuery().includeTaskLocalVariables().processInstanceBusinessKey(businessKey).list();
+        LOG.debug("Duration time in millis: {}", historicPI.getDurationInMillis());
+        List<HistoricTaskInstance> hTasks = historyService.createHistoricTaskInstanceQuery().includeTaskLocalVariables().
+                processInstanceBusinessKey(businessKey).list();
         List<HistoricTask> historicTasks = Lists.newArrayList();
         for (HistoricTaskInstance hti : hTasks) {
-//            if (StringUtils.startsWith(hti.getProcessDefinitionId(), "FOO")//TODOWorkflow.PROCESS_ID_DOC_APPROVAL)
-//                    && hti.getEndTime() != null) {
-//                historicTasks.add(fromActiviti(hti));
-//            }
-            if (hti.getEndTime() != null) {
-                historicTasks.add(fromActiviti(hti));
-
-            }
+            historicTasks.add(fromActiviti(hti));
         }
         Collections.sort(historicTasks);
         return historicTasks;
     }
 
-    protected HistoricTask fromActiviti(HistoricTaskInstance hti) {
+    protected HistoricTask fromActiviti(HistoricTaskInstance historicTI) {
         HistoricTask ht = new HistoricTask();
-        ht.setId(hti.getId());
-        ht.setName(hti.getName());
-        ht.setUserId(hti.getAssignee());
-        ht.setComments(taskService.getTaskComments(hti.getId()));
-        Map<String, Object> vars = hti.getTaskLocalVariables();
+        ht.setId(historicTI.getId());
+        ht.setName(historicTI.getName());
+        ht.setUserId(historicTI.getAssignee());
+        ht.setComments(taskService.getTaskComments(historicTI.getId()));
+        Map<String, Object> vars = historicTI.getTaskLocalVariables();
         ht.setLocalVars(vars);
-        ht.setCompletedDate(hti.getEndTime());
-
+        ht.setCompletedDate(historicTI.getEndTime());
         return ht;
     }
 
     boolean isDocAuthor(Task task, String userId) {
-        log.debug("********** " + task.getTaskDefinitionKey() + " ********");
+        LOG.debug("********** {} **********", task.getTaskDefinitionKey());
         //is not docApprove Task
         if (!StringUtils.startsWithIgnoreCase(task.getTaskDefinitionKey(), WFConstants.TASK_ID_DOC_APPROVAL)) {
             return false;

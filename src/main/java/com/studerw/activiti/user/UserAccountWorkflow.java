@@ -19,7 +19,7 @@ import java.util.Map;
  */
 @Service("userAccountWorkflow")
 public class UserAccountWorkflow {
-    private static final Logger log = LoggerFactory.getLogger(UserAccountWorkflow.class);
+    private static final Logger LOG = LoggerFactory.getLogger(UserAccountWorkflow.class);
 
     @Autowired
     IdentityService identityService;
@@ -28,7 +28,7 @@ public class UserAccountWorkflow {
 
 
     public void approved(Execution execution) {
-        log.debug("process id: " + execution.getProcessInstanceId());
+        LOG.debug("process id: " + execution.getProcessInstanceId());
         ProcessInstance pi = runtimeService.createProcessInstanceQuery().
                 processInstanceId(execution.getProcessInstanceId()).singleResult();
         Map<String, Object> vars = runtimeService.getVariables(execution.getId());
@@ -41,11 +41,11 @@ public class UserAccountWorkflow {
         identityService.saveUser(user);
         identityService.createMembership(userForm.getUserName(), "user");
         identityService.createMembership(userForm.getUserName(), userForm.getGroup());
-        log.info("user account approved - new user with name {} created", user.getId());
+        LOG.info("user account approved - new user with name {} created", user.getId());
     }
 
     public void denied(Execution execution) {
-        log.debug("process id: " + execution.getProcessInstanceId());
-        log.debug("user account denied");
+        LOG.debug("process id: " + execution.getProcessInstanceId());
+        LOG.debug("user account denied");
     }
 }

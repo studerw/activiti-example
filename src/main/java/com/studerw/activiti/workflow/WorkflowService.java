@@ -31,9 +31,10 @@ import java.util.List;
  */
 @Service("workflowService")
 public class WorkflowService {
-    private static final Logger log = LoggerFactory.getLogger(WorkflowService.class);
-    @Autowired RuntimeService runtimeService;
-    @Autowired RepositoryService repoSrvc;
+    private static final Logger LOG = LoggerFactory.getLogger(WorkflowService.class);
+
+    @Autowired protected RuntimeService runtimeService;
+    @Autowired protected RepositoryService repoSrvc;
 
 
     /**
@@ -43,12 +44,12 @@ public class WorkflowService {
     public byte[] getProcessDefinitionDiagram(String processId) throws IOException {
         ProcessDefinition pd =
                 this.repoSrvc.createProcessDefinitionQuery().processDefinitionKey(processId).latestVersion().singleResult();
-        log.debug("Getting process diagram for processId: " + pd.getId());
+        LOG.debug("Getting process diagram for processId: {}", pd.getId());
         BpmnModel model = repoSrvc.getBpmnModel(pd.getId());
         InputStream in = new DefaultProcessDiagramGenerator().generatePngDiagram(model);
         byte[] bytes = IOUtils.toByteArray(in);
         IOUtils.closeQuietly(in);
-        log.debug("Got bytes of size: " + bytes.length);
+        LOG.debug("Got bytes of size: {}", bytes.length);
         return bytes;
     }
 
@@ -57,7 +58,7 @@ public class WorkflowService {
      * @return png image of diagram with current activity highlighted.
      */
     public byte[] getActiveDocumentDiagram(String docId) throws IOException {
-        log.debug("getting active diagram for doc: " + docId);
+        LOG.debug("getting active diagram for doc: {}", docId);
         //http://forums.activiti.org/content/process-diagram-highlighting-current-process
         ProcessInstance pi =
                 runtimeService.createProcessInstanceQuery().processInstanceBusinessKey(docId).singleResult();
@@ -68,7 +69,7 @@ public class WorkflowService {
         InputStream in = new DefaultProcessDiagramGenerator().generateDiagram(bpmnModel, "png", runtimeService.getActiveActivityIds(pi.getProcessInstanceId()));
         byte[] bytes = IOUtils.toByteArray(in);
         IOUtils.closeQuietly(in);
-        log.debug("Got bytes of size: " + bytes.length);
+        LOG.debug("Got bytes of size: " + bytes.length);
         return bytes;
     }
 
@@ -79,7 +80,7 @@ public class WorkflowService {
      * e.g. process Id of deployed definition would equal {@code BOOK_REPORT_engineering}
      */
     public boolean groupWorkflowExists(DocType docType, String group) {
-        log.debug("Checking for workflow exists of doctype={} and group={}", docType.name(), group);
+        LOG.debug("Checking for workflow exists of doctype={} and group={}", docType.name(), group);
         String processIdStr = String.format("%s_%s", docType.name(), group);
         return (this.repoSrvc.createProcessDefinitionQuery().processDefinitionCategory(WFConstants.NAMESPACE_CATEGORY).
                 processDefinitionKey(processIdStr).latestVersion().singleResult()) != null;
@@ -91,9 +92,9 @@ public class WorkflowService {
      * e.g. process Id of deployed definition(s) would be like {@code BOOK_REPORT_engineering} or just {@code BOOK_REPORT}
      */
     public boolean docTypeWorkflowsExist(DocType docType) {
-        log.debug("Checking for workflow exists of doctype={}.", docType.name());
+        LOG.debug("Checking for workflow exists of doctype={}.", docType.name());
         String processIdStr = String.format("%s_%s", docType.name(), "%");
-        log.info("using key LIKE={}", processIdStr);
+        LOG.info("using key LIKE={}", processIdStr);
         return !(this.repoSrvc.createProcessDefinitionQuery().processDefinitionCategory(WFConstants.NAMESPACE_CATEGORY).
                 processDefinitionKeyLike(processIdStr).latestVersion().list().isEmpty());
     }
@@ -103,13 +104,13 @@ public class WorkflowService {
      * @return List (may be empty) of process definitions for the given doc type.
      */
     public List<ProcessDefinition> findProcDefinitionsByDocType(DocType docType) {
-        log.debug("Checking for workflow exists of doctype={}.", docType.name());
+        LOG.debug("Checking for workflow exists of doctype={}.", docType.name());
         String processIdStr = String.format("%s_%s", docType.name(), "%");
-        log.debug("Finding workflows of id: {}", processIdStr);
+        LOG.debug("Finding workflows of id: {}", processIdStr);
         List<ProcessDefinition> pds = this.repoSrvc.createProcessDefinitionQuery().processDefinitionCategory(WFConstants.NAMESPACE_CATEGORY).
                 processDefinitionKeyLike(processIdStr).
                 latestVersion().list();
-        log.debug("Found {} of id={}", pds.size(), processIdStr);
+        LOG.debug("Found {} of id={}", pds.size(), processIdStr);
         return pds;
     }
 
@@ -120,9 +121,9 @@ public class WorkflowService {
      * @see {@link com.studerw.activiti.workflow.WFConstants#NAMESPACE_CATEGORY}
      */
     public boolean baseDocTypeWorkflowExists(DocType docType) {
-        log.debug("Checking for base workflow exists of doctype={}.", docType.name());
+        LOG.debug("Checking for base workflow exists of doctype={}.", docType.name());
         String processIdStr = String.format("%s_%s", docType.name(), WFConstants.WORKFLOW_GROUP_NONE);
-        log.info("search for base doc workflow using processId={}", processIdStr);
+        LOG.info("search for base doc workflow using processId={}", processIdStr);
         return this.repoSrvc.createProcessDefinitionQuery().processDefinitionCategory(WFConstants.NAMESPACE_CATEGORY).
                 processDefinitionKey(processIdStr).latestVersion().singleResult() != null;
     }
@@ -132,7 +133,7 @@ public class WorkflowService {
      * @return latest process definition for the given doc type and group or null if none exits.
      */
     public ProcessDefinition findProcDefByDocTypeAndGroup(DocType docType, String group) {
-        log.debug("Checking for workflow exists of doctype={} and group={}", docType.name(), group);
+        LOG.debug("Checking for workflow exists of doctype={} and group={}", docType.name(), group);
         String processIdStr = String.format("%s_%s", docType.name(), group);
         ProcessDefinition pd = this.repoSrvc.createProcessDefinitionQuery().processDefinitionCategory(WFConstants.NAMESPACE_CATEGORY).
                 processDefinitionKey(processIdStr).latestVersion().singleResult();
@@ -145,7 +146,7 @@ public class WorkflowService {
      * or null if no base document exists.
      */
     public ProcessDefinition findBaseProcDef(DocType docType) {
-        log.debug("Checking for base workflow exists of doctype={}", docType.name());
+        LOG.debug("Checking for base workflow exists of doctype={}", docType.name());
         String processIdStr = String.format("%s_%s", docType.name(), WFConstants.WORKFLOW_GROUP_NONE);
         ProcessDefinition pd = this.repoSrvc.createProcessDefinitionQuery().processDefinitionCategory(WFConstants.NAMESPACE_CATEGORY).
                 processDefinitionKey(processIdStr).latestVersion().singleResult();
@@ -163,7 +164,7 @@ public class WorkflowService {
     public ProcessDefinition findProcDef(DocType docType, String group) {
         ProcessDefinition pd = this.findProcDefByDocTypeAndGroup(docType, group);
         if (pd == null) {
-            log.debug("no group workflow exists of doctype={} and group={} -> checking for base wf.", docType.name(), group);
+            LOG.debug("no group workflow exists of doctype={} and group={} -> checking for base wf.", docType.name(), group);
             pd = this.findBaseProcDef(docType);
         }
         return pd;
@@ -175,13 +176,13 @@ public class WorkflowService {
      */
     //TODO this should be protected by admin only
     public List<ProcessDefinition> getAllProcDefs(boolean onlyLatestVersion) {
-        log.debug("Lookign up all process definitions with latestVersion={}", onlyLatestVersion);
+        LOG.debug("Lookign up all process definitions with latestVersion={}", onlyLatestVersion);
         ProcessDefinitionQuery query = repoSrvc.createProcessDefinitionQuery().processDefinitionCategory(WFConstants.NAMESPACE_CATEGORY);
         if (onlyLatestVersion) {
             query.latestVersion();
         }
         List<ProcessDefinition> definitions = query.list();
-        log.debug("Found {} definitions.", definitions.size());
+        LOG.debug("Found {} definitions.", definitions.size());
         return definitions;
     }
 
@@ -189,7 +190,7 @@ public class WorkflowService {
         String modelName = String.format("%s-doc-approve-model.bpmn", group);
         String deployName = String.format("Group %s Document Approve", group);
 
-        log.info("updating doc approval for group: {}", group);
+        LOG.info("updating doc approval for group: {}", group);
         Deployment deployment = this.repoSrvc.createDeployment()
                 .addBpmnModel(modelName, model).name(deployName)
                 .deploy();
@@ -209,7 +210,7 @@ public class WorkflowService {
      * be a valid {@link com.studerw.activiti.model.document.DocType} or null if no definition exists.
      */
     /*public ProcessDefinition findDefinitionByDocType(DocType docType) {
-        log.debug("searching for process definition for docType={}", docType);
+        LOG.debug("searching for process definition for docType={}", docType);
         ProcessDefinition pd = repoSrvc.createProcessDefinitionQuery().processDefinitionCategory(docType.name()).singleResult();
         return pd;
 
@@ -222,14 +223,14 @@ public class WorkflowService {
     /*public List<UserTask> getDocApprovalsByGroup(String group) {
         String base = "FOO";//TODOWorkflow.PROCESS_ID_DOC_APPROVAL;
         String procId = StringUtils.isBlank(group) ? base : base + "-" + group;
-        log.debug("building approval list for procDef: " + procId);
+        LOG.debug("building approval list for procDef: " + procId);
         ProcessDefinition pd =
                 this.repoSrvc.createProcessDefinitionQuery().processDefinitionKey(procId).latestVersion().singleResult();
         BpmnModel model = this.repoSrvc.getBpmnModel(pd.getId());
         org.activiti.bpmn.model.Process process = model.getProcesses().get(0);
 
         SubProcess sub = (SubProcess) process.getFlowElement(Workflow.SUBPROCESS_ID_DYNAMIC);
-        log.debug(sub.getName());
+        LOG.debug(sub.getName());
         Collection<FlowElement> flowElements = sub.getFlowElements();
         List<org.activiti.bpmn.model.UserTask> userTasks = Lists.newArrayList();
         for (FlowElement el : flowElements) {

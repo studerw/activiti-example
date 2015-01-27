@@ -20,7 +20,7 @@ import java.util.Set;
 
 @Controller
 public class DebugController extends BaseController{
-    private static final Logger log = LoggerFactory.getLogger(DebugController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DebugController.class);
 
     @Autowired SpringContextListener springContextListener;
     @Autowired WorkflowService workflowService;

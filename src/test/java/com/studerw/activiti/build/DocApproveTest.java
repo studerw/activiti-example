@@ -28,7 +28,7 @@ import java.io.InputStream;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"classpath:spring/testAppContext.xml"})
 public class DocApproveTest {
-    private static final Logger log = LogManager.getLogger(DocApproveTest.class);
+    private static final Logger LOG = LogManager.getLogger(DocApproveTest.class);
     @Autowired
     RuntimeService runtimeService;
     @Autowired

@@ -20,9 +20,9 @@ import static org.junit.Assert.*;
 @ContextConfiguration({"classpath:spring/testAppContext.xml"})
 //@TransactionConfiguration(defaultRollback=true)
 public class IdentityServiceTest {
-    private static final Logger log = LogManager.getLogger(IdentityServiceTest.class);
-    @Autowired
-    IdentityService identityService;
+    private static final Logger LOG = LogManager.getLogger(IdentityServiceTest.class);
+
+    @Autowired IdentityService identityService;
 
     @Test
     public void testSetup() {
@@ -35,7 +35,7 @@ public class IdentityServiceTest {
         List<User> users = identityService.createUserQuery().list();
         int originalCount = users.size();
         for (User user : users) {
-            log.debug(user.getId());
+            LOG.debug(user.getId());
         }
 
         User user = identityService.newUser("newUser");
@@ -47,10 +47,10 @@ public class IdentityServiceTest {
 
         List<User> users2 = identityService.createUserQuery().list();
         for (User user2 : users2) {
-            log.debug(user2.getId());
+            LOG.debug(user2.getId());
             List<Group> groups = this.identityService.createGroupQuery().groupMember(user2.getId()).groupType("security-role").list();
             for (Group group : groups) {
-                log.debug("    " + group.getId() + " - " + group.getType());
+                LOG.debug("{} - {}", group.getId(), group.getType());
             }
         }
 
@@ -58,7 +58,7 @@ public class IdentityServiceTest {
         assertTrue(finalCount == originalCount + 1);
 
         User user2 = this.identityService.createUserQuery().userId("newUser").singleResult();
-        log.debug("user pws: " + user2.getPassword());
+        LOG.debug("user pws: {}", user2.getPassword());
         assertEquals(user2.getPassword(), "password");
 
     }
@@ -67,10 +67,10 @@ public class IdentityServiceTest {
     public void testGroups() {
         List<User> users2 = identityService.createUserQuery().list();
         for (User user2 : users2) {
-            log.debug(user2.getId());
+            LOG.debug(user2.getId());
             List<Group> groups = this.identityService.createGroupQuery().groupMember(user2.getId()).groupType("security-role").list();
             for (Group group : groups) {
-                log.debug("    " + group.getId() + " - " + group.getType());
+                LOG.debug("{} - {}", group.getId(), group.getType());
             }
         }
     }

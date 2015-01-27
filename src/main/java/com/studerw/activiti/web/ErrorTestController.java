@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletRequest;
  * up in mvc-dispatcher-servlet.xml
  */
 public class ErrorTestController {
-    private static final Logger log = LoggerFactory.getLogger(ErrorTestController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ErrorTestController.class);
 
     @RequestMapping(value = "/error", method = RequestMethod.GET)
     public String error(ModelMap model, HttpServletRequest request) {

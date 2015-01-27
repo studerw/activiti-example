@@ -24,7 +24,7 @@ import java.util.List;
 @Controller
 @RequestMapping
 public class UserRegistrationController {
-    private static final Logger log = LoggerFactory.getLogger(UserRegistrationController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(UserRegistrationController.class);
 
     @Autowired
     UserService userService;
@@ -38,7 +38,7 @@ public class UserRegistrationController {
 
     @RequestMapping(value = "/userRegistration.htm", method = RequestMethod.GET)
     public String get(ModelMap model, HttpServletRequest request) {
-        log.debug("userRegistration");
+        LOG.debug("userRegistration");
         if (request.getRemoteUser() != null) {
             return "redirect:j_spring_security_logout";
         }
@@ -52,7 +52,7 @@ public class UserRegistrationController {
                        BindingResult result,
                        final RedirectAttributes redirectAttributes,
                        HttpServletRequest request) {
-        log.debug("userRegistration: " + userForm);
+        LOG.debug("userRegistration: " + userForm);
         if (request.getRemoteUser() != null) {
             return "redirect:j_spring_security_logout";
         }

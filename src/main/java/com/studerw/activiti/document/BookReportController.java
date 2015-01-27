@@ -24,7 +24,7 @@ import java.util.List;
 @Controller
 @RequestMapping("/document/bookReport")
 public class BookReportController extends DocumentController {
-    private static final Logger log = LoggerFactory.getLogger(BookReportController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BookReportController.class);
 
     @Autowired DocumentService docService;
     @Autowired LocalTaskService localTaskSrvc;
@@ -52,7 +52,7 @@ public class BookReportController extends DocumentController {
                                    @RequestParam(required = false, value = "isSubmit") boolean isSubmit,
                                    final RedirectAttributes redirectAttributes,
                                    HttpServletRequest request) {
-        log.debug("submitting bookReport: {}", bookReport);
+        LOG.debug("submitting bookReport: {}", bookReport);
 
         if (result.hasErrors()) {
             return "document/bookReport/create";
@@ -60,7 +60,7 @@ public class BookReportController extends DocumentController {
         String docId = this.docService.createDocument(bookReport);
 
         if (isSubmit) {
-            log.debug("Submitting to dynamic workflow docId {}", docId);
+            LOG.debug("Submitting to dynamic workflow docId {}", docId);
             this.docService.submitToWorkflow(docId);
         }
         if (isSubmit) {
@@ -80,13 +80,13 @@ public class BookReportController extends DocumentController {
 //                                 final RedirectAttributes redirectAttributes,
 //                                 ModelMap model,
 //                                 HttpServletRequest request) {
-//        log.debug("updating bookReport: " + bookReport);
+//        LOG.debug("updating bookReport: " + bookReport);
 //        if (result.hasErrors()) {
 //            return "bookReport/view";
 //        }
 //        this.docService.updateDocument(bookReport);
 //        if (isSubmit) {
-//            log.debug("Submitting to dynamic workflow docId {}", bookReport.getId());
+//            LOG.debug("Submitting to dynamic workflow docId {}", bookReport.getId());
 //            this.docService.submitToWorkflow(bookReport.getId());
 //        }
 //        if (isSubmit) {
@@ -104,10 +104,10 @@ public class BookReportController extends DocumentController {
                                @PathVariable(value = "id") String id,
                                final RedirectAttributes redirectAttributes,
                                HttpServletRequest request) {
-        log.debug("viewing doc {} ", id);
+        LOG.debug("viewing doc {} ", id);
         Document doc = docService.getDocument(id);
         model.addAttribute("document", doc);
-        List<HistoricTask> hts = this.localTaskSrvc.getDocApprovalHistory(id);
+        List<HistoricTask> hts = this.localTaskSrvc.getTaskHistory(id);
         model.addAttribute("historicTasks", hts);
         if (doc.getAuthor().equals(currentUserName()) && doc.isEditable()) {
             return "document/bookReport/edit";
@@ -125,7 +125,7 @@ public class BookReportController extends DocumentController {
                          @RequestParam(required = false, value = "isSubmit") boolean isSubmit,
                          final RedirectAttributes redirectAttributes,
                          HttpServletRequest request) {
-        log.debug("updating bookReport: {}", bookReport);
+        LOG.debug("updating bookReport: {}", bookReport);
 
         if (!bookReport.isEditable()){
             redirectAttributes.addFlashAttribute("msg", "This document cannot currently be edited by you.</p>");
@@ -139,14 +139,14 @@ public class BookReportController extends DocumentController {
         String docId = bookReport.getId();
 
         if (isSubmit) {
-            log.debug("Submitting to dynamic workflow docId {}", docId);
+            LOG.debug("Submitting to dynamic workflow docId {}", docId);
             this.docService.submitToWorkflow(docId);
         }
         if (isSubmit) {
-            redirectAttributes.addFlashAttribute("msg", "<p>Your Document has been submitted for approval.<p/>" +
-                    "<p>You will receive alerts when it has been reviewed.</p>");
+            redirectAttributes.addFlashAttribute("msg", "Your Book Report has been submitted to the workflow.</br>" +
+                    "You will receive alerts as it is worked on.");
         } else {
-            redirectAttributes.addFlashAttribute("msg", "Your Document has been Updated");
+            redirectAttributes.addFlashAttribute("msg", "Your Book Report has been Updated");
         }
 
         return "redirect:/document/list.htm";

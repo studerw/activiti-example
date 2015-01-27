@@ -44,7 +44,7 @@
 //@RunWith(SpringJUnit4ClassRunner.class)
 //@ContextConfiguration({"classpath:spring/testAppContext.xml"})
 //public class DocumentApproveTest {
-//    private static final Logger log = LogManager.getLogger(ActivitiSpringTest.class);
+//    private static final Logger LOG = LogManager.getLogger(ActivitiSpringTest.class);
 //    @Autowired
 //    RuntimeService runtimeService;
 //    @Autowired
@@ -72,19 +72,19 @@
 //        doc.setAuthor("kermit");
 //        String docId;
 //        docId = documentService.createDocument(doc);
-//        log.debug("new doc id: " + docId);
+//        LOG.debug("new doc id: " + docId);
 //        this.documentService.submitToWorkflow(docId);
 //
 //        setSpringSecurity("fozzie");
 //        List<TaskForm> tasks = this.localTaskService.getTasks("fozzie");
 //        assertTrue(tasks.size() == 1);
-//        log.debug("got task: " + tasks.get(0).getName());
+//        LOG.debug("got task: " + tasks.get(0).getName());
 //        localTaskService.approveOrRejectDoc(true, "task approved blah blah blah", tasks.get(0).getId());
 //        HistoricProcessInstance pi = historyService.createHistoricProcessInstanceQuery().
 //                includeProcessVariables().processInstanceBusinessKey(docId).singleResult();
 //
 //        assertNotNull(pi);
-//        log.debug("Duration time in millis: " + pi.getDurationInMillis());
+//        LOG.debug("Duration time in millis: " + pi.getDurationInMillis());
 //        List<HistoricTaskInstance> hTasks;
 //        hTasks = historyService.createHistoricTaskInstanceQuery().includeTaskLocalVariables().processInstanceBusinessKey(docId).list();
 //        assertTrue(hTasks.size() == 2);

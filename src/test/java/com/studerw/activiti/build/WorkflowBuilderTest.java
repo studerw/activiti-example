@@ -12,7 +12,6 @@ import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.Process;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.engine.*;
-import org.activiti.engine.repository.Model;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.image.impl.DefaultProcessDiagramGenerator;
 import org.apache.commons.io.FileUtils;
@@ -38,7 +37,7 @@ import java.util.List;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"classpath:spring/testAppContext.xml"})
 public class WorkflowBuilderTest {
-    private static final Logger log = LogManager.getLogger(WorkflowBuilderTest.class);
+    private static final Logger LOG = LogManager.getLogger(WorkflowBuilderTest.class);
     @Autowired public WorkflowBuilder workflowBldr;
     @Autowired RuntimeService runtimeService;
     @Autowired TaskService taskService;
@@ -49,7 +48,7 @@ public class WorkflowBuilderTest {
     @Test
     public void testRepoService() throws IOException {
         List<ProcessDefinition> pds = this.repositoryService.createProcessDefinitionQuery().list();
-        log.debug("Number of pds: " + pds.size());
+        LOG.debug("Number of pds: {}", pds.size());
         for (ProcessDefinition pd : pds) {
             BpmnModel model = repositoryService.getBpmnModel(pd.getId());
             InputStream in = new DefaultProcessDiagramGenerator().generatePngDiagram(model);
@@ -64,11 +63,11 @@ public class WorkflowBuilderTest {
         BpmnModel model = workflowBldr.defaultDocument("foo");
         Process process = model.getProcesses().get(0);
         SubProcess sub = (SubProcess) process.getFlowElement(WFConstants.SUBPROCESS_ID_DYNAMIC);
-        log.debug(sub.getName());
+        LOG.debug(sub.getName());
         Collection<FlowElement> flowElements = sub.getFlowElements();
         List<org.activiti.bpmn.model.UserTask> userTasks = Lists.newArrayList();
         for (FlowElement el : flowElements) {
-            log.debug(el.getClass().getName() + " -- " + el.getId());
+            LOG.debug(el.getClass().getName() + " -- " + el.getId());
             if (el.getClass().equals(org.activiti.bpmn.model.UserTask.class)) {
                 userTasks.add((org.activiti.bpmn.model.UserTask) (el));
             }

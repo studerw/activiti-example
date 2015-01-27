@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
 public class AlertController extends BaseController {
-    private static final Logger log = LoggerFactory.getLogger(AlertController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AlertController.class);
 
     @InitBinder
     protected void initBinder(WebDataBinder binder) {
@@ -33,7 +33,7 @@ public class AlertController extends BaseController {
     @RequestMapping(value = "/alerts/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Response> acknowledgeAlert(
             @PathVariable("id") String alertId) {
-        log.debug("acknowledging alert {}", alertId);
+        LOG.debug("acknowledging alert {}", alertId);
         this.alertService.acknowledgeAlert(alertId, this.currentUserName());
         Response res = new Response(true, "Alert acknowledged");
         return new ResponseEntity<Response>(res, HttpStatus.OK);

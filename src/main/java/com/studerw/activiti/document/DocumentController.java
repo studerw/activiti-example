@@ -23,7 +23,7 @@ import java.util.List;
 @Controller
 @RequestMapping("/document")
 public class DocumentController extends BaseController {
-    private static final Logger log = LoggerFactory.getLogger(DocumentController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DocumentController.class);
 
     @Autowired
     DocumentService docService;

@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Component
 public class SpringContextListener implements ApplicationListener<ApplicationEvent> {
-    private static final Logger log = LoggerFactory.getLogger(SpringContextListener.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SpringContextListener.class);
     Map<String, List<String>> appContexts = new ConcurrentHashMap<String, List<String>>();
 
     @Override
@@ -35,11 +35,11 @@ public class SpringContextListener implements ApplicationListener<ApplicationEve
             doRefresh(event);
         } else if (event instanceof ContextStartedEvent) {
             ApplicationContext appContext = ((ContextStartedEvent) event).getApplicationContext();
-            log.debug("**********************STARTED Context [{}] ***********************************", appContext.getDisplayName());
+            LOG.debug("**********************STARTED Context [{}] ***********************************", appContext.getDisplayName());
 
         } else if (event instanceof ContextStoppedEvent) {
             ApplicationContext appContext = ((ContextStoppedEvent) event).getApplicationContext();
-            log.debug("**********************STOPPED Context [{}] ***********************************", appContext.getDisplayName());
+            LOG.debug("**********************STOPPED Context [{}] ***********************************", appContext.getDisplayName());
 
         }
     }
@@ -48,23 +48,23 @@ public class SpringContextListener implements ApplicationListener<ApplicationEve
         ApplicationContext appContext = ((ContextRefreshedEvent) event).getApplicationContext();
         ApplicationContext parent = appContext.getParent();
         String parentName = parent == null ? "[none]" : parent.getApplicationName();
-        log.debug("**********************REFRESHED Context [{}] of parent [{}] ***********************************", appContext.getDisplayName(), parent);
-        log.info("AppContext {}: beans({})", appContext.getId(), appContext.getBeanDefinitionCount());
+        LOG.debug("**********************REFRESHED Context [{}] of parent [{}] ***********************************", appContext.getDisplayName(), parent);
+        LOG.info("AppContext {}: beans({})", appContext.getId(), appContext.getBeanDefinitionCount());
         List beans = new ArrayList<String>();
         for (String bean : appContext.getBeanDefinitionNames()) {
             try {
                 Object obj = appContext.getBean(bean);
 //                if (!obj.getClass().getName().startsWith("org.springframework")) {
-                    log.trace("bean: {} ", bean);
+                    LOG.trace("bean: {} ", bean);
                     beans.add(bean);
 //                }
             } catch (Exception e) {
                 // TODO log and continue for now
-                log.error("Error getting bean " + bean, e);
+                LOG.error("Error getting bean " + bean, e);
             }
         }
         appContexts.put(appContext.getDisplayName(), beans);
-        log.debug("******");
+        LOG.debug("******");
     }
 
     public Map<String, List<String>> getAppContexts() {

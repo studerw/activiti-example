@@ -38,7 +38,7 @@ import static org.junit.Assert.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"classpath:spring/testAppContext.xml"})
 public class BookReportTest {
-    private static final Logger log = LogManager.getLogger(BookReportTest.class);
+    private static final Logger LOG = LogManager.getLogger(BookReportTest.class);
     @Autowired RuntimeService runtimeService;
     @Autowired TaskService taskService;
     @Autowired LocalTaskService localTaskService;
@@ -60,9 +60,9 @@ public class BookReportTest {
 //        assertNotNull("Book Report Process Definition is not null", processDefinition);
 //
 //        String category = processDefinition.getCategory();
-//        log.debug("Category: {}", category);
+//        LOG.debug("Category: {}", category);
 //        final Map<String, String> map = Splitter.on('&').trimResults().withKeyValueSeparator("=").split(category);
-//        log.debug(map);
+//        LOG.debug(map);
 //        assertTrue(map.keySet().containsAll(Arrays.asList(Workflow.CATEGORY_DOC_TYPE, Workflow.CATEGORY_GROUP)));
 //        String docType = map.get(Workflow.CATEGORY_DOC_TYPE);
 //        String group = map.get(Workflow.CATEGORY_GROUP);
@@ -82,7 +82,7 @@ public class BookReportTest {
         assertNotNull("Book Report Process Definition is not null", processDefinition);
 
         String category = processDefinition.getCategory();
-        log.debug("Category: {}", category);
+        LOG.debug("Category: {}", category);
     }
 
     @Test
@@ -96,7 +96,7 @@ public class BookReportTest {
         bookReport.setBookTitle("Some title");
         bookReport.setBookAuthor("John Smith");
         bookReport.setGroupId("engineering");
-        log.debug(bookReport.toString());
+        LOG.debug(bookReport.toString());
 
         String id = this.documentService.createDocument(bookReport);
 
@@ -105,7 +105,7 @@ public class BookReportTest {
         assertNotNull(task);
         taskService.complete(task.getId());
         BookReport updated = (BookReport) this.documentService.getDocument(id);
-        log.debug(updated);
+        LOG.debug(updated);
 
         assertNotNull("should have returned valid doc", updated);
         assertTrue("Should have state=Published", updated.getDocState() == DocState.PUBLISHED);
@@ -125,7 +125,7 @@ public class BookReportTest {
         bookReport.setBookTitle("Some title");
         bookReport.setBookAuthor("John Smith");
         bookReport.setGroupId("engineering");
-        log.debug(bookReport.toString());
+        LOG.debug(bookReport.toString());
 
         String id = this.documentService.createDocument(bookReport);
 
@@ -135,14 +135,14 @@ public class BookReportTest {
         taskService.complete(task.getId());
 
         updated = (BookReport) this.documentService.getDocument(id);
-        log.debug(updated);
+        LOG.debug(updated);
         assertTrue("Should have state=WAITING_FOR_COLLABORATION", updated.getDocState() == DocState.WAITING_FOR_COLLABORATION);
 
         task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertEquals(task.getTaskDefinitionKey(), "COLLABORATE_DOC_USER_TASK_1");
         localTaskService.collaborateTask("some colloboration comment 1", task.getId());
         updated = (BookReport) this.documentService.getDocument(id);
-        log.debug(updated);
+        LOG.debug(updated);
         assertTrue("Should have state=WAITING_FOR_COLLABORATION", updated.getDocState() == DocState.WAITING_FOR_COLLABORATION);
 
 
@@ -150,7 +150,7 @@ public class BookReportTest {
         assertEquals(task.getTaskDefinitionKey(), "COLLABORATE_DOC_USER_TASK_2");
         localTaskService.collaborateTask("some colloboration comment 2", task.getId());
         updated = (BookReport) this.documentService.getDocument(id);
-        log.debug(updated);
+        LOG.debug(updated);
         assertTrue("Should have state=WAITING_FOR_APPROVAL", updated.getDocState() == DocState.WAITING_FOR_APPROVAL);
 
 
@@ -158,17 +158,17 @@ public class BookReportTest {
         assertEquals(task.getTaskDefinitionKey(), "APPROVE_REJECT_DOC_USER_TASK_1");
         localTaskService.approveOrRejectDoc(true, "some comment 1", task.getId());
         updated = (BookReport) this.documentService.getDocument(id);
-        log.debug(updated);
+        LOG.debug(updated);
         assertTrue("Should have state=WAITING_FOR_APPROVAL", updated.getDocState() == DocState.WAITING_FOR_APPROVAL);
 
         task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertEquals(task.getTaskDefinitionKey(), "APPROVE_REJECT_DOC_USER_TASK_2");
         localTaskService.approveOrRejectDoc(true, "some comment 2", task.getId());
         updated = (BookReport) this.documentService.getDocument(id);
-        log.debug(updated);
+        LOG.debug(updated);
 
         updated = (BookReport) this.documentService.getDocument(id);
-        log.debug(updated);
+        LOG.debug(updated);
         assertTrue("Should have state=Published", updated.getDocState() == DocState.PUBLISHED);
     }
 

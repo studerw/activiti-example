@@ -13,7 +13,6 @@ import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
 import java.sql.Types;
@@ -32,7 +31,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 @Repository
 @Component("bookReportDao")
 public class JdbcBookReportDao implements BookReportDao {
-    private static final Logger log = LoggerFactory.getLogger(JdbcBookReportDao.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JdbcBookReportDao.class);
     protected DataSource ds;
     protected NamedParameterJdbcTemplate namedJdbcTemplate;
 
@@ -48,41 +47,40 @@ public class JdbcBookReportDao implements BookReportDao {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public int getCount() {
         String sql = "SELECT count(*) FROM BOOK_REPORT";
         @SuppressWarnings("unchecked")
         int count = this.namedJdbcTemplate.queryForObject(sql, Collections.EMPTY_MAP, Integer.class);
-        log.debug("Got count: " + count + " of book reports");
+        LOG.debug("Got count: {} of book reports", count);
         return count;
     }
 
     @Override public List<BookReport> readAll() {
         String sql = "SELECT * FROM BOOK_REPORT ORDER BY created_date ASC";
         List<BookReport> reports = this.namedJdbcTemplate.query(sql, new BookReportRowMapper());
-        log.debug("got all book reports: {}", reports.size());
+        LOG.debug("got all book reports: {}", reports.size());
         return reports;
     }
 
 
     @Override public List<BookReport> readPage(PagingCriteria criteria) {
-        log.debug("reading page with criteria: " + criteria);
+        LOG.debug("reading page with criteria: {}", criteria);
         if (criteria == null || criteria.getLimit() == null || criteria.getStart() == null) {
-            log.warn("criteria invalid - reading all instead of subset");
+            LOG.warn("criteria invalid - reading all instead of subset");
             return readAll();
         }
         String sql = "SELECT LIMIT :start :limit * FROM BOOK_REPORT ORDER BY created_date ASC";
         BeanPropertySqlParameterSource source = new BeanPropertySqlParameterSource(criteria);
 
         List<BookReport> documents = this.namedJdbcTemplate.query(sql, source, new BookReportRowMapper());
-        log.debug("{} reports returned using criteria: {}", documents.size(), criteria);
+        LOG.debug("{} reports returned using criteria: {}", documents.size(), criteria);
 
         return documents;
 
     }
 
     @Override public String create(BookReport obj) {
-        log.debug("Inserting Document into SQL backend: " + obj);
+        LOG.debug("Inserting Document into SQL backend: {}",obj);
         checkArgument(StringUtils.isBlank(obj.getId()), "Document id cannot be already set");
 
         String id = UUID.randomUUID().toString();
@@ -94,7 +92,7 @@ public class JdbcBookReportDao implements BookReportDao {
         source.registerSqlType("docState", Types.VARCHAR);
         source.registerSqlType("docType", Types.VARCHAR);
         int results = this.namedJdbcTemplate.update(sql, source);
-        log.debug("Got: " + results + " results");
+        LOG.debug("Got: {} results", results);
         obj.setId(id);
         return id;
     }
@@ -105,20 +103,20 @@ public class JdbcBookReportDao implements BookReportDao {
 
     @Override public void update(BookReport obj) {
         checkArgument(StringUtils.isNotBlank(obj.getId()), "book report id cannot be blank");
-        String sql = "UPDATE BOOK_REPORT SET author=:author, title=:title, content=:content, summary=:summary," +
-                " group_Id=:groupId, doc_state=:docState, book_author=:bookAuthor, book_title=:bookTitle WHERE id=:id";
+        String sql = "UPDATE BOOK_REPORT SET author=:author, title=:title, content=:content, summary=:summary, doc_state=:docState, " +
+                "book_author=:bookAuthor, book_title=:bookTitle WHERE id=:id";
 
         BeanPropertySqlParameterSource source = new BeanPropertySqlParameterSource(obj);
         source.registerSqlType("docState", Types.VARCHAR);
         int results = this.namedJdbcTemplate.update(sql, source);
-        log.debug("Updated: {} Book Reports", results);
+        LOG.debug("Updated: {} Book Reports", results);
     }
 
     @Override public void delete(String id) {
         String sql = "DELETE FROM BOOK_REPORT WHERE id = :id";
         Map<String, String> params = ImmutableMap.of("id", id);
         int deleted = this.namedJdbcTemplate.update(sql, params);
-        log.debug("Deleted: {} BookReports", deleted);
+        LOG.debug("Deleted: {} BookReports", deleted);
     }
 
     @Override public BookReport read(String id) {

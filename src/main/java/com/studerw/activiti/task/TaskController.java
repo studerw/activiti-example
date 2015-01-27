@@ -31,7 +31,7 @@ import java.util.List;
  */
 @Controller
 public class TaskController extends BaseController {
-    private static final Logger log = LoggerFactory.getLogger(TaskController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TaskController.class);
 
     @Autowired protected LocalTaskService taskService;
 
@@ -52,9 +52,9 @@ public class TaskController extends BaseController {
     public ResponseEntity<Response<List<AssignedTask>>> getTasks(
             HttpServletRequest request) {
         String userName = currentUserName();
-        log.debug("TaskController: tasks for user: " + userName);
+        LOG.debug("TaskController: tasks for user: " + userName);
         List<AssignedTask> tasks = taskService.getTasks(userName);
-        log.debug("returning json response of: " + tasks.size() + " for user : " + userName);
+        LOG.debug("returning json response of: " + tasks.size() + " for user : " + userName);
         Response res = new Response(true, "tasks for user: " + userName, tasks);
         return new ResponseEntity<Response<List<AssignedTask>>>(res, HttpStatus.OK);
     }
@@ -63,7 +63,7 @@ public class TaskController extends BaseController {
     public String approve(@Valid @ModelAttribute TaskApprovalForm taskApprovalForm,
                           BindingResult result,
                           final RedirectAttributes redirectAttributes){
-        log.debug("task approval: {}", taskApprovalForm.toString());
+        LOG.debug("task approval: {}", taskApprovalForm.toString());
 
         if (result.hasFieldErrors()) {
             redirectAttributes.addFlashAttribute("error", true);

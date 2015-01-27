@@ -3,7 +3,6 @@ package com.studerw.activiti.document;
 import com.studerw.activiti.model.document.DocType;
 import com.studerw.activiti.model.document.Document;
 import com.studerw.activiti.model.document.Invoice;
-import com.studerw.activiti.model.task.HistoricTask;
 import com.studerw.activiti.task.LocalTaskService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,17 +18,13 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.Date;
-import java.util.List;
 
 @Controller
 @RequestMapping("/document/invoice")
 public class InvoiceController extends DocumentController {
-    private static final Logger log = LoggerFactory.getLogger(InvoiceController.class);
-
-    @Autowired
-    DocumentService docService;
-    @Autowired
-    LocalTaskService localTaskSrvc;
+    private static final Logger LOG = LoggerFactory.getLogger(InvoiceController.class);
+    @Autowired protected DocumentService docService;
+    @Autowired protected LocalTaskService localTaskSrvc;
 
     @Override
     @ModelAttribute
@@ -52,59 +47,45 @@ public class InvoiceController extends DocumentController {
     public String create(@Valid @ModelAttribute Invoice invoice,
                          BindingResult result,
                          @RequestParam(required = false, value = "isSubmit") boolean isSubmit,
-                         final RedirectAttributes redirectAttributes,
-                         HttpServletRequest request) {
-        log.debug("submitting invoice: {}", invoice);
-
+                         final RedirectAttributes redirectAttributes) {
+        LOG.debug("submitting invoice: {}", invoice);
         if (result.hasErrors()) {
             return "document/invoice/create";
         }
         String docId = this.docService.createDocument(invoice);
-
-        if (isSubmit) {
-            log.debug("Submitting to dynamic workflow docId {}", docId);
-            this.docService.submitToWorkflow(docId);
-        }
-        if (isSubmit) {
-            redirectAttributes.addFlashAttribute("msg", "<p>Your Document has been submitted for approval.<p/>" +
-                    "<p>You will receive alerts when it has been reviewed.</p>");
-        } else {
-            redirectAttributes.addFlashAttribute("msg", "Your Document has been Saved");
-        }
-
+        checkSubmit(isSubmit, docId, redirectAttributes);
         return "redirect:/document/list.htm";
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public String view(ModelMap model,
-                       @PathVariable(value = "id") String id,
-                       final RedirectAttributes redirectAttributes,
-                       HttpServletRequest request) {
-        log.debug("viewing doc {} ", id);
+    public String view(ModelMap model, @PathVariable(value = "id") String id) {
+        LOG.debug("viewing doc {} ", id);
+
         Document doc = docService.getDocument(id);
         model.addAttribute("document", doc);
-        List<HistoricTask> hts = this.localTaskSrvc.getDocApprovalHistory(id);
-        model.addAttribute("historicTasks", hts);
+        model.addAttribute("historicTasks", this.localTaskSrvc.getTaskHistory(id));
+
         if (doc.getAuthor().equals(currentUserName()) && doc.isEditable()) {
             return "document/invoice/edit";
-        } else if (doc.getAuthor().equals(currentUserName())) {
-            model.addAttribute("msg", "The invoice cannot be edited in its current state.");
         } else {
-            model.addAttribute("msg", "Only the original author may edit the invoice.");
+            if (doc.getAuthor().equals(currentUserName())) {
+                model.addAttribute("msg", "The invoice cannot be edited in its current state.");
+            } else {
+                model.addAttribute("msg", "Only the original author may edit the invoice.");
+            }
+            return "document/invoice/view";
         }
-        return "document/invoice/view";
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.POST)
     public String update(@Valid @ModelAttribute Invoice invoice,
                          BindingResult result,
                          @RequestParam(required = false, value = "isSubmit") boolean isSubmit,
-                         final RedirectAttributes redirectAttributes,
-                         HttpServletRequest request) {
-        log.debug("updating invoice: {}", invoice);
+                         final RedirectAttributes redirectAttributes) {
+        LOG.debug("updating invoice: {}", invoice);
 
         if (!invoice.isEditable()) {
-            redirectAttributes.addFlashAttribute("msg", "This document cannot currently be edited by you.</p>");
+            redirectAttributes.addFlashAttribute("msg", "This invoice cannot currently be edited by you.");
             return "redirect:/document/list.htm";
         }
         if (result.hasErrors()) {
@@ -113,21 +94,23 @@ public class InvoiceController extends DocumentController {
 
         this.docService.updateDocument(invoice);
         String docId = invoice.getId();
-
-        if (isSubmit) {
-            log.debug("Submitting to dynamic workflow docId {}", docId);
-            this.docService.submitToWorkflow(docId);
-        }
-        if (isSubmit) {
-            redirectAttributes.addFlashAttribute("msg", "<p>Your Document has been submitted for approval.<p/>" +
-                    "<p>You will receive alerts when it has been reviewed.</p>");
-        } else {
-            redirectAttributes.addFlashAttribute("msg", "Your Document has been Updated");
-        }
-
+        checkSubmit(isSubmit, docId, redirectAttributes);
         return "redirect:/document/list.htm";
     }
 
+
+    private void checkSubmit(boolean isSubmit, String docId, RedirectAttributes redirAttr) {
+        if (isSubmit) {
+            LOG.debug("Submitting to dynamic workflow docId {}", docId);
+            this.docService.submitToWorkflow(docId);
+        }
+        if (isSubmit) {
+            redirAttr.addFlashAttribute("msg", "Your Invoice has been submitted to the workflow.</br>" +
+                    "You will receive alerts as it is worked on.");
+        } else {
+            redirAttr.addFlashAttribute("msg", "Your invoice has been Saved");
+        }
+    }
 
     private Document newInvoice() {
         Document document = new Invoice();

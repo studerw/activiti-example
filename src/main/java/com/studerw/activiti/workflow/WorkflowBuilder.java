@@ -23,7 +23,7 @@ import java.util.List;
  */
 @Service("workflowBuilder")
 public class WorkflowBuilder {
-    private static final Logger log = LoggerFactory.getLogger(WorkflowBuilder.class);
+    private static final Logger LOG = LoggerFactory.getLogger(WorkflowBuilder.class);
 
     /**
      * Build the minimal base document definition needed for dynamic tasks ({@code NONE} group is used).

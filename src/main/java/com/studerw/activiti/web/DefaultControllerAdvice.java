@@ -20,13 +20,13 @@ import java.util.Map;
 @ControllerAdvice
 public class DefaultControllerAdvice {
 
-    private static final Logger log = LoggerFactory.getLogger(DefaultControllerAdvice.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultControllerAdvice.class);
 
 //
 //    @ExceptionHandler(InvalidAccessException.class)
 //    @ResponseStatus(HttpStatus.FORBIDDEN)
 //    public void handlePermissionException(InvalidAccessException ex) {
-//        log.warn(ex.getMessage());
+//        LOG.warn(ex.getMessage());
 //    }
 
 
@@ -35,8 +35,8 @@ public class DefaultControllerAdvice {
      */
     @ExceptionHandler(Exception.class)
     public ModelAndView handleException(Exception ex) {
-        log.error("Caught Exception - returning error response: {}", ex.getMessage());
-        log.error("Root cause: {}", ExceptionUtils.getRootCauseMessage(ex));
+        LOG.error("Caught Exception - returning error response: {}", ex.getMessage());
+        LOG.error("Root cause: {}", ExceptionUtils.getRootCauseMessage(ex));
         ex.printStackTrace();
         Map<String, Object> model = Maps.newHashMap();
         Response response = new Response(false, ex.getMessage() + "    Root Cause: " + ExceptionUtils.getRootCauseMessage(ex));

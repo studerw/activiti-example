@@ -29,25 +29,21 @@ import static com.google.common.base.Preconditions.checkArgument;
 @Repository
 @Component("alertDao")
 public class JdbcAlertDao implements AlertDao {
-    private static final Logger log = LoggerFactory.getLogger(JdbcAlertDao.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JdbcAlertDao.class);
+
     protected DataSource ds;
     protected NamedParameterJdbcTemplate namedJdbcTemplate;
 
-    @Autowired
-    @Qualifier("dataSource")
+    @Autowired @Qualifier("dataSource")
     public void setDataSource(DataSource datasource) {
         this.ds = datasource;
         this.namedJdbcTemplate = new NamedParameterJdbcTemplate(this.ds);
     }
 
-    public DataSource getDataSource() {
-        return this.ds;
-    }
 
-    @Override
-    @Transactional
+    @Override @Transactional
     public String create(Alert alert) {
-        log.debug("Inserting alert into SQL backend: " + alert);
+        LOG.debug("Inserting alert into SQL backend: {}", alert);
         checkArgument(StringUtils.isBlank(alert.getId()), "alert id cannot be already set");
 
         String id = UUID.randomUUID().toString();
@@ -57,7 +53,7 @@ public class JdbcAlertDao implements AlertDao {
 
         BeanPropertySqlParameterSource source = new BeanPropertySqlParameterSource(alert);
         int results = this.namedJdbcTemplate.update(sql, source);
-        log.debug("Got: " + results + " results");
+        LOG.debug("Got: {} results", results);
 
         return id;
     }
@@ -69,7 +65,6 @@ public class JdbcAlertDao implements AlertDao {
 
 
     @Override
-    @Transactional(readOnly = true)
     public Alert read(String alertId) {
         String sql = "SELECT * FROM Alert where id = :id";
         Map<String, String> params = ImmutableMap.of("id", alertId);
@@ -78,38 +73,33 @@ public class JdbcAlertDao implements AlertDao {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<Alert> readAll() {
         String sql = "SELECT * FROM Alert ORDER BY created_date ASC";
         List<Alert> alerts = this.namedJdbcTemplate.query(sql, new AlertRowMapper());
-        log.debug("got all alerts: " + alerts.size());
+        LOG.debug("got all alerts: {}", alerts.size());
         return alerts;
     }
 
-
     @Override
-    @Transactional(readOnly = true)
     public int getCount() {
         String sql = "SELECT count(*) FROM Alert";
         @SuppressWarnings("unchecked")
         int count = this.namedJdbcTemplate.queryForObject(sql, Collections.EMPTY_MAP, Integer.class);
-        log.debug("Got count: " + count + " of Alerts");
+        LOG.debug("Got count: {} of Alerts", count);
         return count;
     }
 
 
     @Override
-    @Transactional
     public void delete(String alertId) {
         String sql = "DELETE FROM Alert WHERE id = :id";
         Map<String, String> params = ImmutableMap.of("id", alertId);
         int deleted = this.namedJdbcTemplate.update(sql, params);
-        log.debug("Deleted: " + deleted + " alerts");
+        LOG.debug("Deleted: {} alerts", deleted);
     }
 
 
     @Override
-    @Transactional
     public void update(Alert alert) {
         checkArgument(StringUtils.isNotBlank(alert.getId()), "alert id cannot be blank");
         String sql = "UPDATE Alert SET created_by=:createdBy, user_id=:userId, message=:message, priority=:priority," +
@@ -117,42 +107,39 @@ public class JdbcAlertDao implements AlertDao {
 
         BeanPropertySqlParameterSource source = new BeanPropertySqlParameterSource(alert);
         int results = this.namedJdbcTemplate.update(sql, source);
-        log.debug("Updated: " + results + " alerts");
+        LOG.debug("Updated: {} alerts", results);
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<Alert> readPage(PagingCriteria criteria) {
-        log.debug("reading page with criteria: " + criteria);
+        LOG.debug("reading page with criteria: {}", criteria);
         if (criteria == null || criteria.getLimit() == null || criteria.getStart() == null) {
-            log.warn("criteria invalid - reading all instead of subset");
+            LOG.warn("criteria invalid - reading all instead of subset");
             return readAll();
         }
         String sql = "SELECT LIMIT :start :limit * FROM Alert ORDER BY created_date ASC";
         BeanPropertySqlParameterSource source = new BeanPropertySqlParameterSource(criteria);
 
         List<Alert> alerts = this.namedJdbcTemplate.query(sql, source, new AlertRowMapper());
-        log.debug(alerts.size() + " alerts returned using criteria: " + criteria);
+        LOG.debug("{} alerts returned using criteria: {}", alerts.size(), criteria);
 
         return alerts;
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<Alert> readActiveAlertsByUserId(String userId) {
         String sql = "SELECT * FROM Alert WHERE user_id = :userId AND acknowledged = FALSE ORDER BY created_date ASC";
         Map<String, String> params = ImmutableMap.of("userId", userId);
         List<Alert> alerts = this.namedJdbcTemplate.query(sql, params, new AlertRowMapper());
-        log.debug("got {} active alerts for user {}: ", alerts.size(), userId);
+        LOG.debug("got {} active alerts for user {}: ", alerts.size(), userId);
         return alerts;
     }
 
-    @Transactional
     @Override
     public void acknowledgeAlert(String alertId) {
         String sql = "UPDATE Alert SET acknowledged=:acknowledged  WHERE id=:id";
         Map<String, Boolean> params = ImmutableMap.of("acknowledged", Boolean.TRUE);
         int results = this.namedJdbcTemplate.update(sql, params);
-        log.debug("Updated: " + results + " alerts");
+        LOG.debug("Updated: {} alerts", results);
     }
 }

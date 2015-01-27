@@ -28,7 +28,7 @@ import java.util.List;
 @Controller
 @RequestMapping("/workflow")
 public class WorkflowController extends BaseController {
-    private static final Logger log = LoggerFactory.getLogger(WorkflowController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(WorkflowController.class);
 
     @Autowired WorkflowService workflowSrvc;
     @Autowired WorkflowBuilder workflowBldr;
@@ -60,7 +60,7 @@ public class WorkflowController extends BaseController {
             @RequestBody List<UserTask> userTasks,
             @PathVariable(value = "group") String group,
             @PathVariable(value = "docType") DocType docType) throws InterruptedException {
-        log.debug(userTasks.toString());
+        LOG.debug(userTasks.toString());
         BpmnModel model = this.workflowBldr.documentWithTasks(userTasks, docType, group);
         this.workflowSrvc.updateWorkflow(model, group);
 
@@ -79,7 +79,7 @@ public class WorkflowController extends BaseController {
         }
 
         List<UserTask> userTasks = Lists.newArrayList();//TODO workflowBldr.getDocApprovalsByGroup(groupId);
-        log.debug("returning json response of {} approvals", userTasks.size());
+        LOG.debug("returning json response of {} approvals", userTasks.size());
         Response res = new Response(true, groupId, userTasks);
         return new ResponseEntity<Response<List<UserTask>>>(res, HttpStatus.OK);
     }
@@ -89,7 +89,7 @@ public class WorkflowController extends BaseController {
     public ResponseEntity<byte[]> getDiagram(
             @PathVariable("id") String id) throws IOException {
 
-        log.debug("fetching diagram for process {}", id);
+        LOG.debug("fetching diagram for process {}", id);
 
         byte[] bytes = workflowSrvc.getProcessDefinitionDiagram(id);
 
@@ -101,7 +101,7 @@ public class WorkflowController extends BaseController {
     @RequestMapping(value = "/document/{docId}/diagram", method = RequestMethod.GET)
     public ResponseEntity<byte[]> getActiveDocDiagram(
             @PathVariable("docId") String docId) throws IOException {
-        log.debug("fetching diagram for docId{}", docId);
+        LOG.debug("fetching diagram for docId{}", docId);
 
         byte[] bytes = workflowSrvc.getActiveDocumentDiagram(docId);
 

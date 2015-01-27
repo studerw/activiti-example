@@ -11,7 +11,7 @@ import java.beans.PropertyEditorSupport;
 */
 public class DocTypeEditor extends PropertyEditorSupport {
 
-    private static final Logger log = LoggerFactory.getLogger(DocTypeEditor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DocTypeEditor.class);
 
     @Override
     public String getAsText() {
@@ -19,7 +19,7 @@ public class DocTypeEditor extends PropertyEditorSupport {
         if (DocType == null) {
             return null;
         }
-        log.trace("Converted DocType: " + DocType.name() + "  to string: " + DocType.toString());
+        LOG.trace("Converted DocType: {} to string={}", DocType.name(), DocType.toString());
         return DocType.toString();
     }
 
@@ -30,7 +30,7 @@ public class DocTypeEditor extends PropertyEditorSupport {
             return;
         }
         DocType docType = DocType.valueOf(s);
-        log.trace("Converted DocType: {} ---> {}", s, docType.name());
+        LOG.trace("Converted DocType: {} ---> {}", s, docType.name());
         setValue(docType);
     }
 

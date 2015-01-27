@@ -106,7 +106,7 @@ public abstract class Document implements Serializable, Comparable<Document> {
 
     public boolean isEditable() {
         return DocState.DRAFT.equals(this.docState) || DocState.REJECTED.equals(this.docState)
-                || DocState.WAITING_FOR_COLLABORATION.equals(this.docState);
+                /*|| DocState.WAITING_FOR_COLLABORATION.equals(this.docState)*/;
     }
 
     @Override public String toString() {

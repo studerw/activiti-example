@@ -18,7 +18,7 @@ import static org.junit.Assert.assertNotNull;
  * @author William Studer
  */
 public class ValidatorTest {
-    private static final Logger log = LogManager.getLogger(ValidatorTest.class);
+    private static final Logger LOG = LogManager.getLogger(ValidatorTest.class);
 
     @Test
     public void testValidateBookReport(){
@@ -30,7 +30,7 @@ public class ValidatorTest {
         Set<ConstraintViolation<BookReport>> violations = validator.validate(bookReport);
 //          Document doc = new Document();
 //        Set<ConstraintViolation<BookReport>> violations = validator.validate(bookReport);
-        log.debug(violations.size());
+        LOG.debug(violations.size());
         //assertEquals(violations.size(), 5);
     }
 }

@@ -11,7 +11,7 @@ import java.beans.PropertyEditorSupport;
  */
 public class UserTaskTypeEditor extends PropertyEditorSupport {
 
-    private static final Logger log = LoggerFactory.getLogger(UserTaskTypeEditor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(UserTaskTypeEditor.class);
 
     @Override
     public String getAsText() {
@@ -19,7 +19,7 @@ public class UserTaskTypeEditor extends PropertyEditorSupport {
         if (userTaskType == null) {
             return null;
         }
-        log.trace("Converted UserTaskType: {}", userTaskType.name());
+        LOG.trace("Converted UserTaskType: {}", userTaskType.name());
         return userTaskType.toString();
     }
 
@@ -30,7 +30,7 @@ public class UserTaskTypeEditor extends PropertyEditorSupport {
             return;
         }
         UserTaskType userTaskType = UserTaskType.valueOf(s);
-        log.trace("Converted UserTaskType: {} ---> {}", s, userTaskType.name());
+        LOG.trace("Converted UserTaskType: {} ---> {}", s, userTaskType.name());
         setValue(userTaskType);
     }
 

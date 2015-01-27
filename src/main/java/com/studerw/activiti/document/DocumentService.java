@@ -37,7 +37,7 @@ import java.util.Map;
  */
 @Service("documentService")
 public class DocumentService {
-    private static final Logger log = LoggerFactory.getLogger(DocumentService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DocumentService.class);
     @Autowired protected IdentityService identityService;
     @Autowired protected RuntimeService runtimeService;
     @Autowired protected RepositoryService repositoryService;
@@ -90,7 +90,7 @@ public class DocumentService {
     @Transactional
     public void submitToWorkflow(String docId) {
         Document doc = this._getDocument(docId);
-        log.debug("beginning (or continuing) doc workflow for doc {}. ", doc.getId());
+        LOG.debug("beginning (or continuing) doc workflow for doc {}. ", doc.getId());
         UserDetails userDetails = this.userService.currentUser();
         if (!StringUtils.equals(userDetails.getUsername(), doc.getAuthor())) {
             throw new InvalidAccessException("Only the author of a doc can submit for approval");
@@ -111,7 +111,7 @@ public class DocumentService {
             if (procDef == null) {
                 throw new IllegalArgumentException("No workflow exists for doctype=" + docType.name() + " and group=" + group);
             }
-            current = runtimeService.startProcessInstanceByKey(procDef.getKey());
+            current = runtimeService.startProcessInstanceByKey(procDef.getKey(), docId);
             Task task = taskService.createTaskQuery().processInstanceId(current.getProcessInstanceId()).singleResult();
             taskService.setAssignee(task.getId(), userDetails.getUsername());
 
@@ -122,7 +122,7 @@ public class DocumentService {
             } else {
                 throw new IllegalArgumentException("Unknown doc type: " + doc.getDocType());
             }*/
-            taskService.setVariableLocal(task.getId(), "taskOutcome", "Submitted for Approval");
+            taskService.setVariableLocal(task.getId(), "taskOutcome", "Submitted to Workflow");
             Map<String, Object> processVariables = Maps.newHashMap();
             processVariables.put("initiator", doc.getAuthor());
             processVariables.put("businessKey", doc.getId());
@@ -175,7 +175,7 @@ public class DocumentService {
      */
     /*
     public ProcessDefinition findProcDefByTypeAndGroup(DocType docType, String group) {
-        log.debug("Finding process definition by docType={} and group={}", docType.name(), group);
+        LOG.debug("Finding process definition by docType={} and group={}", docType.name(), group);
         return repositoryService.createProcessDefinitionQuery().processDefinitionCategory(docType.name()).
                 processDefinitionKey(group).singleResult();
     }*/

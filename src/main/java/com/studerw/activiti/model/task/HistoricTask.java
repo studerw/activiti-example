@@ -11,7 +11,7 @@ import java.util.Map;
 
 /**
  * @author William Studer
- * Date: 5/22/14
+ *         Date: 5/22/14
  */
 public class HistoricTask implements Comparable<HistoricTask> {
 
@@ -85,8 +85,18 @@ public class HistoricTask implements Comparable<HistoricTask> {
     }
 
     @Override
-    public int compareTo(HistoricTask o) {
-        return ObjectUtils.compare(this.completedDate, o.completedDate);
+    public int compareTo(HistoricTask that) {
+        if (this.completedDate == null) {
+            if (that.completedDate == null) {
+                return 0; //equal
+            } else {
+                return 1; // null is after other dates
+            }
+        } else // this.member != null
+            if (that.completedDate == null) {
+                return -1;  // all other dates are before null
+            } else {
+                return ObjectUtils.compare(this.completedDate, that.completedDate);
+            }
     }
-
 }

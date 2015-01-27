@@ -1,8 +1,8 @@
 package com.studerw.activiti;
 
 import com.google.common.collect.Maps;
-import com.studerw.activiti.model.task.AssignedTask;
 import com.studerw.activiti.model.UserForm;
+import com.studerw.activiti.model.task.AssignedTask;
 import com.studerw.activiti.task.LocalTaskService;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.IdentityService;
@@ -34,19 +34,13 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"classpath:spring/testAppContext.xml"})
 public class NewUserProcessTest {
-    private static final Logger log = LogManager.getLogger(NewUserProcessTest.class);
-    @Autowired
-    RuntimeService runtimeService;
-    @Autowired
-    TaskService taskService;
-    @Autowired
-    HistoryService historyService;
-    @Autowired
-    IdentityService identityService;
-    @Autowired
-    Validator validator;
-    @Autowired
-    LocalTaskService localTaskService;
+    private static final Logger LOG = LogManager.getLogger(NewUserProcessTest.class);
+    @Autowired RuntimeService runtimeService;
+    @Autowired TaskService taskService;
+    @Autowired HistoryService historyService;
+    @Autowired IdentityService identityService;
+    @Autowired Validator validator;
+    @Autowired LocalTaskService localTaskService;
 
     @Test
     public void testSetup() {
@@ -64,7 +58,7 @@ public class NewUserProcessTest {
         UserForm userForm = new UserForm("newUser324", "pwabcdedfgss", "me@here.com", "jim", "smith", "engineering");
         Set<ConstraintViolation<UserForm>> violations = validator.validate(userForm);
         assertTrue(violations.size() == 0);
-        log.debug(violations.size());
+        LOG.debug(violations.size());
 
         processVariables.put("userForm", userForm);
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("newChromeUser", processVariables);
@@ -74,20 +68,20 @@ public class NewUserProcessTest {
                         singleResult();
         assertNotNull(task);
         AssignedTask assignedTask = AssignedTask.fromTask(task);
-        log.debug(assignedTask);
+        LOG.debug(assignedTask);
         List<Task> tasks = taskService.createTaskQuery().
                 taskCandidateOrAssigned("kermit").
                 orderByTaskCreateTime().asc().list();
-        log.debug("tasks size: " + tasks.size());
+        LOG.debug("tasks size: {}", tasks.size());
 //        assertTrue(tasks.size() == 1);
-        log.debug("owner: " + task.getOwner());
+        LOG.debug("owner: {}",task.getOwner());
         identityService.setAuthenticatedUserId("kermit");
         taskService.setAssignee(task.getId(), "kermit");
         taskService.addComment(task.getId(), pi.getId(), "Here is a comment");
         List<Comment> comments = taskService.getTaskComments(task.getId());
         assertTrue(comments.size() == 1);
-        log.debug(comments.get(0).getFullMessage());
-        log.debug(comments.get(0).getTime().toString());
+        LOG.debug(comments.get(0).getFullMessage());
+        LOG.debug(comments.get(0).getTime().toString());
         Map<String, Object> taskVariables = new HashMap<String, Object>();
         taskVariables.put("approved", true);
         taskService.complete(task.getId(), taskVariables);

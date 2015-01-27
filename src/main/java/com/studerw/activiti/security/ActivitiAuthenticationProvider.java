@@ -30,7 +30,7 @@ import java.util.List;
  */
 @Service("activitiAuthenticationProvider")
 public class ActivitiAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
-    private static final Logger log = LoggerFactory.getLogger(ActivitiAuthenticationProvider.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ActivitiAuthenticationProvider.class);
         protected IdentityService identityService;
 
     @Autowired
@@ -40,8 +40,7 @@ public class ActivitiAuthenticationProvider extends AbstractUserDetailsAuthentic
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        log.trace("authenticate()");
-        log.debug("authenticating: " + authentication);
+        LOG.debug("authenticating: {}",authentication);
         String clearText = String.valueOf(authentication.getCredentials());
         UserDetails userDetails = this.retrieveUser(authentication.getName(), (UsernamePasswordAuthenticationToken) authentication);
 
@@ -56,8 +55,7 @@ public class ActivitiAuthenticationProvider extends AbstractUserDetailsAuthentic
 
     @Override
     protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
-        log.trace("additionalAuthenticationChecks()");
-        log.debug("isEnabled: " + userDetails.isEnabled());
+        LOG.debug("isEnabled: {}", userDetails.isEnabled());
         if (!userDetails.isEnabled()) {
             throw new BadCredentialsException("User not enabled");
         }
@@ -66,8 +64,7 @@ public class ActivitiAuthenticationProvider extends AbstractUserDetailsAuthentic
     @Override
     @Transactional(readOnly = true)
     protected UserDetails retrieveUser(String username, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
-        log.trace("retrieveUser()");
-        log.debug("retrieving user: " + username);
+        LOG.debug("retrieving user: {}",username);
         User user;
         try {
             user = this.read(username);
@@ -89,14 +86,13 @@ public class ActivitiAuthenticationProvider extends AbstractUserDetailsAuthentic
         boolean enabled = groupStr.contains("user");
 
         UserDetails userDetails = new org.springframework.security.core.userdetails.User(userName, pw, enabled, true, true, true, auths);
-        log.debug("returning new userDetails: " + userDetails);
+        LOG.debug("returning new userDetails: {}", userDetails);
         return userDetails;
     }
 
     @Transactional(readOnly = true)
     protected User read(String name) {
-        log.trace("read()");
-        log.debug("reading user: " + name);
+        LOG.debug("reading user: {}", name);
         User user = this.identityService.createUserQuery().userId(name).singleResult();
         return user;
     }

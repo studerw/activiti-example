@@ -49,7 +49,7 @@
 //@RunWith(SpringJUnit4ClassRunner.class)
 //@ContextConfiguration({"classpath:spring/testAppContext.xml"})
 //public class DocumentApproveSubProcessTest {
-//    private static final Logger log = LogManager.getLogger(DocumentApproveSubProcessTest.class);
+//    private static final Logger LOG = LogManager.getLogger(DocumentApproveSubProcessTest.class);
 //
 //    @Autowired
 //    RuntimeService runtimeService;
@@ -87,7 +87,7 @@
 //        doc.setAuthor("kermit");
 //        String docId;
 //        docId = documentService.createDocument(doc);
-//        log.debug("new doc id: " + docId);
+//        LOG.debug("new doc id: " + docId);
 //        this.documentService.submitToWorkflow(docId);
 //
 //
@@ -95,7 +95,7 @@
 //        List<TaskForm> tasks = this.localTaskService.getTasks("fozzie");
 //        assertTrue(tasks.size() == 1);
 //        TaskForm currentTask = tasks.get(0);
-//        log.debug("got task: " + tasks.get(0).getName());
+//        LOG.debug("got task: " + tasks.get(0).getName());
 //
 //        //http://forums.activiti.org/content/process-diagram-highlighting-current-process
 //        RepositoryServiceImpl impl = (RepositoryServiceImpl) repoSrvc;
@@ -109,7 +109,7 @@
 //                includeProcessVariables().processInstanceBusinessKey(docId).singleResult();
 //
 //        assertNotNull(pi);
-//        log.debug("Duration time in millis: " + pi.getDurationInMillis());
+//        LOG.debug("Duration time in millis: " + pi.getDurationInMillis());
 //        List<HistoricTaskInstance> hTasks;
 //        hTasks = historyService.createHistoricTaskInstanceQuery().includeTaskLocalVariables().processInstanceBusinessKey(docId).list();
 //        assertTrue(hTasks.size() == 2);

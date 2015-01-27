@@ -18,14 +18,14 @@ import java.util.Map;
 
 @Controller
 public class LoginController {
-    private static final Logger log = LoggerFactory.getLogger(LoginController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(LoginController.class);
 
     @Autowired
     UserService userService;
 
     @RequestMapping(value = "/login.htm", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
     public String login(Model model, HttpServletRequest request) throws Exception {
-        log.debug("login()");
+        LOG.debug("login()");
         model.addAttribute("error", false);
         model.addAttribute("users", userWithGroups());
         return "login";
@@ -34,7 +34,7 @@ public class LoginController {
 
     @RequestMapping(value = "/loginfailed.htm", method = RequestMethod.GET)
     public String loginFail(ModelMap model) {
-        log.debug("loginFail()");
+        LOG.debug("loginFail()");
         model.addAttribute("error", true);
         model.addAttribute("users", userWithGroups());
         return "login";

@@ -131,7 +131,7 @@
                     </div>
                 </div>
                 <div class="pull-right">
-                    <button type="submit" class="btn btn-primary btn-default">Save Document</button>
+                    <button type="submit" class="btn btn-primary btn-default">Update Invoice</button>
                 </div>
                 <%--<div class="pull-right">--%>
                 <%--<button type="submit" class="btn btn-primary btn-lg">Submit for Approval</button>--%>
