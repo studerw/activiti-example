@@ -225,15 +225,6 @@ public class WorkflowService {
         return runtimeService.createProcessInstanceQuery().processInstanceBusinessKey(businessKey).singleResult();
     }
 
-    public String getProcessDefXml(String key){
-        ProcessDefinition defintion = this.repoSrvc.createProcessDefinitionQuery().processDefinitionKey(key).singleResult();
-        if (defintion == null) {
-            throw new IllegalArgumentException("Invalid process defintion key: " + key);
-        }
-        ProcessDefinitionEntity entity = (ProcessDefinitionEntity)defintion;
-        entity.
-        return null;
-    }
 
     protected String[] parseProcessId(String processId) {
         if (!processId.contains("_")) {

@@ -161,4 +161,15 @@ public class WorkflowServiceTest {
     public void testFindProcessByBusinessKey() throws Exception {
         fail("not implemented");
     }
+
+
+    /*public String getProcessDefXml(String key){
+        ProcessDefinition defintion = this.repoSrvc.createProcessDefinitionQuery().processDefinitionKey(key).singleResult();
+        if (defintion == null) {
+            throw new IllegalArgumentException("Invalid process defintion key: " + key);
+        }
+        ProcessDefinitionEntity entity = (ProcessDefinitionEntity)defintion;
+        return null;
+    }*/
+
 }
