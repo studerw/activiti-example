@@ -50,7 +50,6 @@ public class DocWorkflowListener {
         Document doc = this.docSrvc.getDocument(docId);
         String message = String.format("%s entitled '%s'  has been approved. ", doc.getDocType().name(), doc.getTitle());
         this.alertService.sendAlert(doc.getAuthor(), Alert.SUCCESS, message);
-
         doc.setDocState(DocState.APPROVED);
         this.docSrvc.updateDocument(doc);
         LOG.info("{} approved: {}", doc.getDocType().name(), doc.getTitle());
@@ -72,41 +71,6 @@ public class DocWorkflowListener {
         LOG.info("{} rejected: {}", doc.getDocType().name(), doc.getTitle());
     }
 
-    /**
-     * Pseudo publish task (doesn't actually do anything except change the docState = PUBLISHED.
-     *
-     * @param execution
-     */
-    public void publish(Execution execution) {
-        String pId = execution.getProcessInstanceId();
-        LOG.debug("doc being published - procId={}", pId);
-        ProcessInstance pi = runtimeService.createProcessInstanceQuery().
-                processInstanceId(execution.getProcessInstanceId()).singleResult();
-        String docId = pi.getBusinessKey();
-        Document doc = this.docSrvc.getDocument(docId);
-        doc.setDocState(DocState.PUBLISHED);
-        String message = String.format("%s entitled '%s' has been successfully published ", doc.getDocType().name(), doc.getTitle());
-        this.alertService.sendAlert(doc.getAuthor(), Alert.SUCCESS, message);
-        this.docSrvc.updateDocument(doc);
-    }
-
-    /**
-     * Pseudo email task (doesn't actually do anything except change the docState = EMAILED.
-     *
-     * @param execution
-     */
-    public void email(Execution execution) {
-        String pId = execution.getProcessInstanceId();
-        LOG.debug("doc being emailed - procId={}", pId);
-        ProcessInstance pi = runtimeService.createProcessInstanceQuery().
-                processInstanceId(execution.getProcessInstanceId()).singleResult();
-        String docId = pi.getBusinessKey();
-        Document doc = this.docSrvc.getDocument(docId);
-        doc.setDocState(DocState.EMAILED);
-        String message = String.format("%s entitled '%s' has been successfully emailed ", doc.getDocType().name(), doc.getId());
-        this.alertService.sendAlert(doc.getAuthor(), Alert.SUCCESS, message);
-        this.docSrvc.updateDocument(doc);
-    }
 
 
     /**

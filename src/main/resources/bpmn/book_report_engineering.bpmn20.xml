@@ -9,11 +9,11 @@
         <startEvent id="startevent1" name="Start" activiti:initiator="initiator"/>
         <userTask id="submitToWorkflow" name="Submit Book Report to Workflow"/>
         <serviceTask id="publishBookReport" name="Publish Book Report"
-                     activiti:expression="${docWorkflowListener.publish(execution)}"/>
+                     activiti:expression="${documentService.publish(execution)}"/>
         <endEvent id="endevent1" name="End"/>
         <subProcess id="DYNAMIC_SUB_PROCESS" name="Dynamic Document Subprocess">
             <startEvent id="dynamic_sub_process_start_event" name="Start Dynamic SubProcess"/>
-            <userTask id="COLLABORATE_DOC_USER_TASK_1" name="Collaborate Document (1 of 2)">
+            <userTask id="COLLABORATE_DOC_USER_TASK_1" name="Collaborate Document (1 of 2)" activiti:candidateUsers="fozzie,kermit">
                 <extensionElements>
                     <activiti:taskListener event="create"
                                            expression="${docWorkflowListener.onCreateCollaborate(execution, task)}"/>
@@ -21,7 +21,7 @@
                                            expression="${docWorkflowListener.onCompleteCollaborate(execution, task)}"/>
                 </extensionElements>
             </userTask>
-            <userTask id="COLLABORATE_DOC_USER_TASK_2" name="Collaborate Document (2 of 2)">
+            <userTask id="COLLABORATE_DOC_USER_TASK_2" name="Collaborate Document (2 of 2)" activiti:candidateGroups="engineering">
                 <extensionElements>
                     <activiti:taskListener event="create"
                                            expression="${docWorkflowListener.onCreateCollaborate(execution, task)}"/>
@@ -29,13 +29,13 @@
                                            expression="${docWorkflowListener.onCompleteCollaborate(execution, task)}"/>
                 </extensionElements>
             </userTask>
-            <userTask id="APPROVE_REJECT_DOC_USER_TASK_1" name="Approve Document (1 of 2)">
+            <userTask id="APPROVE_REJECT_DOC_USER_TASK_1" name="Approve Document (1 of 2)" activiti:candidateUsers="fozzie,kermit">
                 <extensionElements>
                     <activiti:taskListener event="create"
                                            expression="${docWorkflowListener.onCreateApproval(execution, task)}"/>
                 </extensionElements>
             </userTask>
-            <userTask id="APPROVE_REJECT_DOC_USER_TASK_2" name="Approve Document (2 of 2)">
+            <userTask id="APPROVE_REJECT_DOC_USER_TASK_2" name="Approve Document (2 of 2)" activiti:candidateGroups="sales">
                 <extensionElements>
                     <activiti:taskListener event="create"
                                            expression="${docWorkflowListener.onCreateApproval(execution, task)}"/>

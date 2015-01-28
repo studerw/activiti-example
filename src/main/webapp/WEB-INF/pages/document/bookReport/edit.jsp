@@ -67,7 +67,7 @@
                     <label for="title" class="col-sm-2 control-label">Doc Title</label>
 
                     <div class="col-sm-10">
-                        <form:input path="title" id="title" cssClass="form-control"/>
+                        <form:input path="title" id="title" cssClass="form-control" autofocus="true"/>
                     </div>
                 </div>
                 <div class="form-group">
@@ -170,7 +170,7 @@
             <div class="panel-heading">
                 <span class="glyphicon glyphicon-time pull-right"></span>
 
-                <h3 class="panel-title">Approval History</h3>
+                <h3 class="panel-title">Workflow History</h3>
             </div>
             <div class="panel-body">
                 <table class="table table-striped">

@@ -9,7 +9,7 @@
         <documentation>This Base Invoice Workflow.</documentation>
         <startEvent id="startevent" name="Start" activiti:initiator="initiator"></startEvent>
         <serviceTask id="emailInvoice" name="Email Invoice"
-                     activiti:expression="${docWorkflowListener.email(execution)}"/>
+                     activiti:expression="${documentService.email(execution)}"/>
         <userTask id="submitToWorkflow" name="Submit Invoice to Workflow"></userTask>
         <endEvent id="endevent" name="End"></endEvent>
         <subProcess id="DYNAMIC_SUB_PROCESS" name="Dynamic Document Subprocess">

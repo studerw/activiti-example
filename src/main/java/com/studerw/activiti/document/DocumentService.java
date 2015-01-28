@@ -2,12 +2,11 @@ package com.studerw.activiti.document;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.studerw.activiti.alert.AlertService;
 import com.studerw.activiti.document.dao.BookReportDao;
 import com.studerw.activiti.document.dao.InvoiceDao;
-import com.studerw.activiti.model.document.BookReport;
-import com.studerw.activiti.model.document.DocType;
-import com.studerw.activiti.model.document.Document;
-import com.studerw.activiti.model.document.Invoice;
+import com.studerw.activiti.model.Alert;
+import com.studerw.activiti.model.document.*;
 import com.studerw.activiti.user.InvalidAccessException;
 import com.studerw.activiti.user.UserService;
 import com.studerw.activiti.workflow.WorkflowService;
@@ -17,6 +16,7 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.identity.Group;
 import org.activiti.engine.repository.ProcessDefinition;
+import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.apache.commons.lang3.StringUtils;
@@ -33,19 +33,19 @@ import java.util.Map;
 
 /**
  * @author William Studer
- * Date: 5/18/14
+ *         Date: 5/18/14
  */
 @Service("documentService")
 public class DocumentService {
     private static final Logger LOG = LoggerFactory.getLogger(DocumentService.class);
     @Autowired protected IdentityService identityService;
     @Autowired protected RuntimeService runtimeService;
-    @Autowired protected RepositoryService repositoryService;
     @Autowired protected TaskService taskService;
     @Autowired protected UserService userService;
     @Autowired protected InvoiceDao invoiceDao;
     @Autowired protected BookReportDao bookReportDao;
     @Autowired protected WorkflowService workflowService;
+    @Autowired protected AlertService alertService;
 
     @Transactional(readOnly = true)
     public List<Document> getGroupDocumentsByUser(String userId) {
@@ -106,7 +106,6 @@ public class DocumentService {
             }
             DocType docType = doc.getDocType();
             String group = doc.getGroupId();
-            //try for
             ProcessDefinition procDef = this.workflowService.findProcDef(docType, group);
             if (procDef == null) {
                 throw new IllegalArgumentException("No workflow exists for doctype=" + docType.name() + " and group=" + group);
@@ -138,13 +137,45 @@ public class DocumentService {
 
     @Transactional
     public void updateDocument(Document document) {
-        if (DocType.BOOK_REPORT.equals(document.getDocType())) {
-            this.bookReportDao.update((BookReport) document);
-        } else if (DocType.INVOICE.equals(document.getDocType())) {
-            this.invoiceDao.update((Invoice) document);
-        } else {
-            throw new IllegalArgumentException("Unknown doc type: " + document.getDocType());
-        }
+        this._updateDocument(document);
+    }
+
+    /**
+     * Pseudo publish task (doesn't actually do anything except change the docState = PUBLISHED.
+     *
+     * @param execution
+     */
+    @Transactional
+    public void publish(Execution execution) {
+        String pId = execution.getProcessInstanceId();
+        LOG.debug("doc being published - procId={}", pId);
+        ProcessInstance pi = runtimeService.createProcessInstanceQuery().
+                processInstanceId(execution.getProcessInstanceId()).singleResult();
+        String docId = pi.getBusinessKey();
+        Document doc = this._getDocument(docId);
+        doc.setDocState(DocState.PUBLISHED);
+        String message = String.format("%s entitled '%s' has been successfully published ", doc.getDocType().name(), doc.getTitle());
+        this.alertService.sendAlert(doc.getAuthor(), Alert.SUCCESS, message);
+        this._updateDocument(doc);
+    }
+
+    /**
+     * Pseudo email task (doesn't actually do anything except change the docState = EMAILED.
+     *
+     * @param execution
+     */
+    @Transactional
+    public void email(Execution execution) {
+        String pId = execution.getProcessInstanceId();
+        LOG.debug("doc being emailed - procId={}", pId);
+        ProcessInstance pi = runtimeService.createProcessInstanceQuery().
+                processInstanceId(execution.getProcessInstanceId()).singleResult();
+        String docId = pi.getBusinessKey();
+        Document doc = this._getDocument(docId);
+        doc.setDocState(DocState.EMAILED);
+        String message = String.format("%s entitled '%s' has been successfully emailed ", doc.getDocType().name(), doc.getId());
+        this.alertService.sendAlert(doc.getAuthor(), Alert.SUCCESS, message);
+        this._updateDocument(doc);
     }
 
     @Transactional(readOnly = true)
@@ -152,12 +183,11 @@ public class DocumentService {
         return this._getDocument(id);
     }
 
-
     /**
      * We use a private method here to enable internal calls without messing with spring proxies.
      *
      * @param id
-     * @return null
+     * @return document with given id
      */
     private Document _getDocument(String id) {
         try {
@@ -168,15 +198,19 @@ public class DocumentService {
         return this.invoiceDao.read(id);
     }
 
+
     /**
-     * @param docType
-     * @param group
-     * @return a valid process definition by DocType and Group or null if none exits
+     * We use a private method here to enable internal calls without messing with spring proxies.
+     *
+     * @param document
      */
-    /*
-    public ProcessDefinition findProcDefByTypeAndGroup(DocType docType, String group) {
-        LOG.debug("Finding process definition by docType={} and group={}", docType.name(), group);
-        return repositoryService.createProcessDefinitionQuery().processDefinitionCategory(docType.name()).
-                processDefinitionKey(group).singleResult();
-    }*/
+    private void _updateDocument(Document document) {
+        if (DocType.BOOK_REPORT.equals(document.getDocType())) {
+            this.bookReportDao.update((BookReport) document);
+        } else if (DocType.INVOICE.equals(document.getDocType())) {
+            this.invoiceDao.update((Invoice) document);
+        } else {
+            throw new IllegalArgumentException("Unknown doc type: " + document.getDocType());
+        }
+    }
 }

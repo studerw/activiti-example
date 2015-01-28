@@ -9,7 +9,7 @@
         <documentation>This process is initiated when a book report is created.</documentation>
         <startEvent id="startevent" name="Start" activiti:initiator="initiator"></startEvent>
         <serviceTask id="publishBookReport" name="Publish Book Report"
-                     activiti:expression="${docWorkflowListener.publish(execution)}"></serviceTask>
+                     activiti:expression="${documentService.publish(execution)}"></serviceTask>
         <userTask id="submitToWorkflow" name="Submit Book Report to Workflow"></userTask>
         <endEvent id="endevent" name="End"></endEvent>
         <subProcess id="DYNAMIC_SUB_PROCESS" name="Dynamic Document Subprocess">

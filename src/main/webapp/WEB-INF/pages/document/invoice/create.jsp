@@ -7,7 +7,7 @@
 <html lang="en">
 <head>
     <jsp:include page="../../fragments/head.jsp"/>
-    <title>New Invoice</title>
+    <title>Invoice Create</title>
 
 </head>
 
@@ -36,7 +36,7 @@
                     <div class="form-group">
                         <label for="title" class="col-sm-2 control-label">Title</label>
                         <div class="col-sm-10">
-                            <form:input cssClass="form-control" id="title" path="title"/>
+                            <form:input cssClass="form-control" id="title" path="title" autofocus="true"/>
                         </div>
                     </div>
                     <div class="form-group">

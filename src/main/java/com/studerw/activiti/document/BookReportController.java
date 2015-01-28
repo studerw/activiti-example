@@ -29,8 +29,7 @@ public class BookReportController extends DocumentController {
     @Autowired DocumentService docService;
     @Autowired LocalTaskService localTaskSrvc;
 
-    @Override
-    @ModelAttribute
+    @Override @ModelAttribute
     public void addModelInfo(ModelMap model, HttpServletRequest request) {
         super.addModelInfo(model, request);
     }
@@ -47,33 +46,85 @@ public class BookReportController extends DocumentController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public String create(@Valid @ModelAttribute BookReport bookReport,
-                                   BindingResult result,
-                                   @RequestParam(required = false, value = "isSubmit") boolean isSubmit,
-                                   final RedirectAttributes redirectAttributes,
-                                   HttpServletRequest request) {
+    public String create(@Valid @ModelAttribute BookReport bookReport, BindingResult result,
+                         @RequestParam(required = false, value = "isSubmit") boolean isSubmit,
+                         final RedirectAttributes redirectAttributes) {
         LOG.debug("submitting bookReport: {}", bookReport);
 
         if (result.hasErrors()) {
             return "document/bookReport/create";
         }
         String docId = this.docService.createDocument(bookReport);
+        checkSubmit(isSubmit, docId, redirectAttributes);
 
+        return "redirect:/document/list.htm";
+    }
+
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    public String view(ModelMap model,
+                       @PathVariable(value = "id") String id,
+                       final RedirectAttributes redirectAttributes,
+                       HttpServletRequest request) {
+        LOG.debug("viewing doc {} ", id);
+        Document doc = docService.getDocument(id);
+        model.addAttribute("document", doc);
+        List<HistoricTask> hts = this.localTaskSrvc.getTaskHistory(id);
+        model.addAttribute("historicTasks", hts);
+        if (doc.getAuthor().equals(currentUserName()) && doc.isEditable()) {
+            return "document/bookReport/edit";
+        } else if (doc.getAuthor().equals(currentUserName())) {
+            model.addAttribute("msg", "The book report cannot be edited in its current state.");
+        } else {
+            model.addAttribute("msg", "Only the original author may edit the bookReport.");
+        }
+        return "document/bookReport/view";
+    }
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.POST)
+    public String update(@Valid @ModelAttribute BookReport bookReport,
+                         BindingResult result,
+                         @RequestParam(required = false, value = "isSubmit") boolean isSubmit,
+                         final RedirectAttributes redirectAttributes) {
+        LOG.debug("updating bookReport: {}", bookReport);
+
+        if (!bookReport.isEditable()) {
+            redirectAttributes.addFlashAttribute("msg", "This book report cannot currently be edited by you.</p>");
+            return "redirect:/document/list.htm";
+        }
+        if (result.hasErrors()) {
+            return "document/bookReport/edit";
+        }
+
+        this.docService.updateDocument(bookReport);
+        String docId = bookReport.getId();
+        checkSubmit(isSubmit, docId, redirectAttributes);
+        return "redirect:/document/list.htm";
+    }
+
+
+    private void checkSubmit(boolean isSubmit, String docId, RedirectAttributes redirAttr) {
         if (isSubmit) {
             LOG.debug("Submitting to dynamic workflow docId {}", docId);
             this.docService.submitToWorkflow(docId);
         }
         if (isSubmit) {
-            redirectAttributes.addFlashAttribute("msg", "<p>Your Document has been submitted for approval.<p/>" +
-                    "<p>You will receive alerts when it has been reviewed.</p>");
+            redirAttr.addFlashAttribute("msg", "Your Book Report has been submitted to the workflow.</br>" +
+                    "You will receive alerts as it is processed.");
         } else {
-            redirectAttributes.addFlashAttribute("msg", "Your Document has been Saved");
+            redirAttr.addFlashAttribute("msg", "Your book report has been Saved");
         }
-
-        return "redirect:/document/list.htm";
     }
 
-//    @RequestMapping(value = "/view.htm", method = RequestMethod.POST)
+    private Document newBookReport() {
+        Document document = new BookReport();
+        document.setAuthor(currentUserName());
+        document.setDocType(DocType.BOOK_REPORT);
+        document.setCreatedDate(new Date());
+        return document;
+    }
+
+    //    @RequestMapping(value = "/view.htm", method = RequestMethod.POST)
 //    public String updateDocument(@Valid @ModelAttribute Document bookReport,
 //                                 @RequestParam(required = false, value = "isSubmit") boolean isSubmit,
 //                                 BindingResult result,
@@ -99,65 +150,4 @@ public class BookReportController extends DocumentController {
 //        return "redirect:/bookReport/list.htm";
 //    }
 //
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public String view(ModelMap model,
-                               @PathVariable(value = "id") String id,
-                               final RedirectAttributes redirectAttributes,
-                               HttpServletRequest request) {
-        LOG.debug("viewing doc {} ", id);
-        Document doc = docService.getDocument(id);
-        model.addAttribute("document", doc);
-        List<HistoricTask> hts = this.localTaskSrvc.getTaskHistory(id);
-        model.addAttribute("historicTasks", hts);
-        if (doc.getAuthor().equals(currentUserName()) && doc.isEditable()) {
-            return "document/bookReport/edit";
-        } else if (doc.getAuthor().equals(currentUserName())) {
-            model.addAttribute("msg", "The bookReport cannot be edited in its current state.");
-        } else {
-            model.addAttribute("msg", "Only the original author may edit the bookReport.");
-        }
-        return "document/bookReport/view";
-    }
-
-    @RequestMapping(value="/{id}", method = RequestMethod.POST)
-    public String update(@Valid @ModelAttribute BookReport bookReport,
-                         BindingResult result,
-                         @RequestParam(required = false, value = "isSubmit") boolean isSubmit,
-                         final RedirectAttributes redirectAttributes,
-                         HttpServletRequest request) {
-        LOG.debug("updating bookReport: {}", bookReport);
-
-        if (!bookReport.isEditable()){
-            redirectAttributes.addFlashAttribute("msg", "This document cannot currently be edited by you.</p>");
-            return "redirect:/document/list.htm";
-        }
-        if (result.hasErrors()) {
-            return "document/bookReport/edit";
-        }
-
-        this.docService.updateDocument(bookReport);
-        String docId = bookReport.getId();
-
-        if (isSubmit) {
-            LOG.debug("Submitting to dynamic workflow docId {}", docId);
-            this.docService.submitToWorkflow(docId);
-        }
-        if (isSubmit) {
-            redirectAttributes.addFlashAttribute("msg", "Your Book Report has been submitted to the workflow.</br>" +
-                    "You will receive alerts as it is worked on.");
-        } else {
-            redirectAttributes.addFlashAttribute("msg", "Your Book Report has been Updated");
-        }
-
-        return "redirect:/document/list.htm";
-    }
-
-
-    private Document newBookReport() {
-        Document document = new BookReport();
-        document.setAuthor(currentUserName());
-        document.setDocType(DocType.BOOK_REPORT);
-        document.setCreatedDate(new Date());
-        return document;
-    }
 }

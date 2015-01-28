@@ -106,7 +106,7 @@ public class InvoiceController extends DocumentController {
         }
         if (isSubmit) {
             redirAttr.addFlashAttribute("msg", "Your Invoice has been submitted to the workflow.</br>" +
-                    "You will receive alerts as it is worked on.");
+                    "You will receive alerts as it processed.");
         } else {
             redirAttr.addFlashAttribute("msg", "Your invoice has been Saved");
         }

@@ -154,7 +154,7 @@
             <div class="panel-heading">
                 <span class="glyphicon glyphicon-time pull-right"></span>
 
-                <h3 class="panel-title">Approval History</h3>
+                <h3 class="panel-title">Workflow History</h3>
             </div>
             <div class="panel-body">
                 <table class="table table-striped">

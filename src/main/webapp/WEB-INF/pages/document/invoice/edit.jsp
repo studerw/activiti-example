@@ -9,7 +9,7 @@
 <html lang="en">
 <head>
     <jsp:include page="../../fragments/head.jsp"/>
-    <title>Document Edit</title>
+    <title>Invoice Edit</title>
 </head>
 
 <body>
@@ -83,7 +83,7 @@
                     <label for="title" class="col-sm-2 control-label">Title</label>
 
                     <div class="col-sm-10">
-                        <form:input cssClass="form-control" id="title" path="title" readonly="false"/>
+                        <form:input cssClass="form-control" id="title" path="title" readonly="false" autofocus="true" />
                     </div>
                 </div>
                 <div class="form-group">
@@ -97,7 +97,7 @@
                     <label for="amount" class="col-sm-2 control-label">Amount</label>
 
                     <div class="col-sm-4">
-                        <form:input cssClass="form-control" id="amount" path="amount" readonly="false"/>
+                        <form:input cssClass="form-control" id="amount" path="amount" readonly="false" />
                     </div>
                 </div>
                 <div class="form-group">
@@ -158,7 +158,7 @@
             <div class="panel-heading">
                 <span class="glyphicon glyphicon-time pull-right"></span>
 
-                <h3 class="panel-title">Approval History</h3>
+                <h3 class="panel-title">Workflow History</h3>
             </div>
             <div class="panel-body">
                 <table class="table table-striped">

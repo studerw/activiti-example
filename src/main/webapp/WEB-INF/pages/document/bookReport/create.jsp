@@ -45,7 +45,7 @@
                         <label for="groupId" class="col-sm-2 control-label">Group</label>
 
                         <div class="col-sm-10">
-                            <form:select path="groupId" cssClass="form-control" id="groupId">
+                            <form:select path="groupId" cssClass="form-control" id="groupId" autofocus="true">
                                 <c:forEach var="group" items="${groups}">
                                     <form:option value="${group.id}" label="${group.name}"/>
                                 </c:forEach>
