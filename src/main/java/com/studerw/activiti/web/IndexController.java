@@ -29,7 +29,7 @@ public class IndexController extends BaseController {
         List<Group> groups = userService.getAssignmentGroups(currentUserName());
         model.addAttribute("groups", groups);
 
-        int taskCount = localTaskSrvc.getTasks(currentUserName()).size();
+        int taskCount = localTaskSrvc.findCandidateTasks(currentUserName()).size();
         model.addAttribute("taskCount", taskCount);
     }
 

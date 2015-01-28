@@ -8,7 +8,7 @@
 <%@ tag body-content="scriptless" trimDirectiveWhitespaces="true" %>
 
 <%--<%@ attribute name="historicTags" required="true" type="org.springframework.validation.BindingResult" %>--%>
-<%@ attribute name="tagList" required="true" %>
+<%@ attribute name="tagList" required="true" type="java.util.Collection"%>
 <%@ attribute name="document" required="true" type="com.studerw.activiti.model.document.Document" %>
 
 <c:if test="${not empty historicTasks}">

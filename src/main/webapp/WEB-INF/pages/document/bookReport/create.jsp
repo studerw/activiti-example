@@ -17,7 +17,7 @@
     <div class="start-template">
         <div class="page-header">
             <h2>New Book Report
-                <small>${userName}</small>
+                <small>${pageContext.request.remoteUser}</small>
             </h2>
         </div>
 

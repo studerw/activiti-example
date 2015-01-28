@@ -20,7 +20,7 @@
     <div class="start-template">
         <div class="page-header">
             <span class="glyphicon glyphicon-paperclip pull-right"></span>
-            <h2>Documents <small>${userName}</small></h2>
+            <h2>Documents <small>${pageContext.request.remoteUser}</small></h2>
         </div>
 
         <div class="centered">

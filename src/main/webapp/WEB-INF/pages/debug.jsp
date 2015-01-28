@@ -48,7 +48,7 @@
             <p>IP address: ${pageContext.request.remoteAddr}</p>
 
             <p><code>request.getRemoteUser()</code>: ${pageContext.request.remoteUser}</p>
-            <%--<p><code>request.getUserPrincipal()</code>: ${pageContext.request.userPrincipal.class.name}</p>--%>
+            <p><code>request.getUserPrincipal()</code>: ${pageContext.request.userPrincipal}</p>
             <%--<p><code>((Authentication)httpServletRequest.getUserPrincipal()).getAuthorities()</code>: <br/>--%>
             <%--${authorities}--%>
             <%--</p>--%>

@@ -25,7 +25,7 @@
             <span class="glyphicon glyphicon-envelope pull-right"></span>
 
             <h2>Alerts
-                <small>${userName}</small>
+                <small>${pageContext.request.remoteUser}</small>
             </h2>
         </div>
 

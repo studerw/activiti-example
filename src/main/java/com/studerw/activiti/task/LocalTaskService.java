@@ -1,7 +1,7 @@
 package com.studerw.activiti.task;
 
 import com.google.common.collect.Lists;
-import com.studerw.activiti.model.task.AssignedTask;
+import com.studerw.activiti.model.task.CandidateTask;
 import com.studerw.activiti.model.task.HistoricTask;
 import com.studerw.activiti.model.task.TaskApprovalForm;
 import com.studerw.activiti.user.UserService;
@@ -47,25 +47,25 @@ public class LocalTaskService {
      * Removes all cases of 'ApproveDoc' tasks where the user is the author of the document, as we
      * assume the document author cannot also be an approver. This may change in the future.
      */
-    public List<AssignedTask> getTasks(String userId) {
+    public List<CandidateTask> findCandidateTasks(String userId) {
         LOG.debug("Getting tasks for user: {}", userId);
         List<Task> tasks = taskService.createTaskQuery().
                 includeProcessVariables().
                 taskCandidateOrAssigned(userId).
                 orderByTaskCreateTime().asc().list();
-        List<AssignedTask> assignedTasks = Lists.newArrayList();
+        List<CandidateTask> candidateTasks = Lists.newArrayList();
         try {
             for (Task task : tasks) {
                 if (!isDocAuthor(task, userId)) {
-                    assignedTasks.add(AssignedTask.fromTask(task));
+                    candidateTasks.add(CandidateTask.fromTask(task));
                 }
             }
         }
         catch (Exception e) {
             throw new RuntimeException("Error converting task to Task Form", e);
         }
-        LOG.debug("got {} tasks for user {}", assignedTasks.size(), userId);
-        return assignedTasks;
+        LOG.debug("got {} tasks for user {}", candidateTasks.size(), userId);
+        return candidateTasks;
     }
 
     /**
@@ -172,11 +172,6 @@ public class LocalTaskService {
     }
 
     boolean isDocAuthor(Task task, String userId) {
-        LOG.debug("********** {} **********", task.getTaskDefinitionKey());
-        //is not docApprove Task
-        if (!StringUtils.startsWithIgnoreCase(task.getTaskDefinitionKey(), WFConstants.TASK_ID_DOC_APPROVAL)) {
-            return false;
-        }
         String author = (String) task.getProcessVariables().get("initiator");
         return Objects.equals(author, userId);
     }

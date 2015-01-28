@@ -2,7 +2,7 @@ package com.studerw.activiti;
 
 import com.google.common.collect.Maps;
 import com.studerw.activiti.model.UserForm;
-import com.studerw.activiti.model.task.AssignedTask;
+import com.studerw.activiti.model.task.CandidateTask;
 import com.studerw.activiti.task.LocalTaskService;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.IdentityService;
@@ -67,8 +67,8 @@ public class NewUserProcessTest {
                 //includeProcessVariables().
                         singleResult();
         assertNotNull(task);
-        AssignedTask assignedTask = AssignedTask.fromTask(task);
-        LOG.debug(assignedTask);
+        CandidateTask candidateTask = CandidateTask.fromTask(task);
+        LOG.debug(candidateTask);
         List<Task> tasks = taskService.createTaskQuery().
                 taskCandidateOrAssigned("kermit").
                 orderByTaskCreateTime().asc().list();

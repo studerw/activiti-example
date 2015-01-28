@@ -76,7 +76,7 @@
 //        this.documentService.submitToWorkflow(docId);
 //
 //        setSpringSecurity("fozzie");
-//        List<TaskForm> tasks = this.localTaskService.getTasks("fozzie");
+//        List<TaskForm> tasks = this.localTaskService.findCandidateTasks("fozzie");
 //        assertTrue(tasks.size() == 1);
 //        LOG.debug("got task: " + tasks.get(0).getName());
 //        localTaskService.approveOrRejectDoc(true, "task approved blah blah blah", tasks.get(0).getId());

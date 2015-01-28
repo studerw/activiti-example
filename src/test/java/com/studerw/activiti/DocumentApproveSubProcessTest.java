@@ -92,7 +92,7 @@
 //
 //
 //        setSpringSecurity("fozzie");
-//        List<TaskForm> tasks = this.localTaskService.getTasks("fozzie");
+//        List<TaskForm> tasks = this.localTaskService.findCandidateTasks("fozzie");
 //        assertTrue(tasks.size() == 1);
 //        TaskForm currentTask = tasks.get(0);
 //        LOG.debug("got task: " + tasks.get(0).getName());

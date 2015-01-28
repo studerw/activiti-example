@@ -23,7 +23,6 @@ public class BaseController {
     public void addModelInfo(ModelMap model, HttpServletRequest request) {
         UserDetails user = userService.currentUser();
         model.addAttribute("userDetails", user);
-        model.addAttribute("userName", user.getUsername());
         //add the jdbcType (e.g. Postgres, H2) to the footer for dev purposes.
         model.addAttribute("jdbcType", jdbcType);
         List<Alert> alerts = alertService.readActiveAlertsByUser(user.getUsername());

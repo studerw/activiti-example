@@ -41,7 +41,7 @@
                 <li><a href="${pageContext.request.contextPath}/tasks.htm">Tasks</a></li>
                 <li><a href="${pageContext.request.contextPath}/j_spring_security_logout">Sign Out</a></li>
             </ul>
-            <p class="navbar-text navbar-right"><a href="#" class="navbar-link">${userName}</a></p>
+            <p class="navbar-text navbar-right"><a href="#" class="navbar-link">${pageContext.request.remoteUser}</a></p>
             <a href="#" class="navbar-text navbar-right navbar-link">Alerts <span class="badge">0</span></a>
 
         </div>

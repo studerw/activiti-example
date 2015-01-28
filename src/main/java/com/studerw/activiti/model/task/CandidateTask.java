@@ -10,10 +10,11 @@ import java.util.Date;
 import java.util.Map;
 
 /**
+ * Basically just a wrapper around a {@link org.activiti.engine.task.Task}
  * @author William Studer
  * Date: 5/18/14
  */
-public class AssignedTask {
+public class CandidateTask {
     private String id;
     private String owner;
     private String delegate;
@@ -31,13 +32,13 @@ public class AssignedTask {
     private boolean suspended;
     private String taskDefinitionKey;
 
-    public AssignedTask() {
+    public CandidateTask() {
     }
 
-    public static AssignedTask fromTask(Task task) throws InvocationTargetException, IllegalAccessException {
-        AssignedTask assignedTask = new AssignedTask();
-        BeanUtils.copyProperties(assignedTask, task);
-        return assignedTask;
+    public static CandidateTask fromTask(Task task) throws InvocationTargetException, IllegalAccessException {
+        CandidateTask candidateTask = new CandidateTask();
+        BeanUtils.copyProperties(candidateTask, task);
+        return candidateTask;
     }
 
     public String getTaskDefinitionKey() {

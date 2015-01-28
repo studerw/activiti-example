@@ -2,7 +2,7 @@ package com.studerw.activiti.task;
 
 import com.studerw.activiti.model.Response;
 import com.studerw.activiti.model.task.TaskApprovalForm;
-import com.studerw.activiti.model.task.AssignedTask;
+import com.studerw.activiti.model.task.CandidateTask;
 import com.studerw.activiti.web.BaseController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,21 +42,20 @@ public class TaskController extends BaseController {
 
     @RequestMapping(value = "/tasks.htm", method = RequestMethod.GET)
     public String index(ModelMap model, HttpServletRequest request) {
-        List<AssignedTask> tasks = this.taskService.getTasks(currentUserName());
+        List<CandidateTask> tasks = this.taskService.findCandidateTasks(currentUserName());
         model.addAttribute("tasks", tasks);
-
         return "tasks";
     }
 
     @RequestMapping(value = "/tasks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Response<List<AssignedTask>>> getTasks(
+    public ResponseEntity<Response<List<CandidateTask>>> getTasks(
             HttpServletRequest request) {
         String userName = currentUserName();
         LOG.debug("TaskController: tasks for user: " + userName);
-        List<AssignedTask> tasks = taskService.getTasks(userName);
+        List<CandidateTask> tasks = taskService.findCandidateTasks(userName);
         LOG.debug("returning json response of: " + tasks.size() + " for user : " + userName);
         Response res = new Response(true, "tasks for user: " + userName, tasks);
-        return new ResponseEntity<Response<List<AssignedTask>>>(res, HttpStatus.OK);
+        return new ResponseEntity<Response<List<CandidateTask>>>(res, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/tasks/approve.htm", method = RequestMethod.POST)
