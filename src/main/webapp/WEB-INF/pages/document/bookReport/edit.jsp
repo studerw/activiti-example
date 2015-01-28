@@ -5,6 +5,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ taglib prefix="t" tagdir="/WEB-INF/tags/tasks" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -153,55 +154,7 @@
     </div>
 
     <hr/>
-    <c:if test="${not empty historicTasks}">
-        <c:if test="${document.docState  ne 'DRAFT' && document.docState ne 'PUBLISHED'}">
-            <div id="diagram" class="center-block">
-                <h4>Default Document Approval Workflow</h4>
-
-                <p>
-                    <img class="img-responsive img-rounded proc-diagram"
-                         src="${pageContext.request.contextPath}/workflow/document/${document.id}/diagram"
-                         alt="Workflow Process Diagram">
-                </p>
-            </div>
-        </c:if>
-
-        <div id="historicTasks" class="panel panel-default">
-            <div class="panel-heading">
-                <span class="glyphicon glyphicon-time pull-right"></span>
-
-                <h3 class="panel-title">Workflow History</h3>
-            </div>
-            <div class="panel-body">
-                <table class="table table-striped">
-                    <thead>
-                    <tr>
-                        <td>Task ID</td>
-                        <td>Description</td>
-                        <td>User</td>
-                        <td>Date Completed</td>
-                        <td>Action</td>
-                        <td>Comment</td>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <c:forEach var="hTask" items="${historicTasks}">
-                        <tr>
-
-                            <td>${hTask.id}</td>
-                            <td>${hTask.name}</td>
-                            <td>${hTask.userId}</td>
-                            <td><spring:eval expression="hTask.completedDate"/></td>
-                            <td>${hTask.localVars['taskOutcome']}</td>
-                            <td>${hTask.comments[0].fullMessage}</td>
-                        </tr>
-                    </c:forEach>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </c:if>
-
+    <t:historic tagList="${historicTasks}" document="${document}"/>
 </div>
 
 <jsp:include page="/WEB-INF/pages/fragments/footer.jsp"/>

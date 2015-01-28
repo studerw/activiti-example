@@ -173,7 +173,7 @@ public class DocumentService {
         String docId = pi.getBusinessKey();
         Document doc = this._getDocument(docId);
         doc.setDocState(DocState.EMAILED);
-        String message = String.format("%s entitled '%s' has been successfully emailed ", doc.getDocType().name(), doc.getId());
+        String message = String.format("%s entitled '%s' has been successfully emailed ", doc.getDocType().name(), doc.getTitle());
         this.alertService.sendAlert(doc.getAuthor(), Alert.SUCCESS, message);
         this._updateDocument(doc);
     }
