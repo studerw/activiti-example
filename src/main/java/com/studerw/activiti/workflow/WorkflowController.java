@@ -45,7 +45,7 @@ public class WorkflowController extends BaseController {
         List<Group> groups = userService.getAllAssignmentGroups();
         model.addAttribute("groups", groups);
         //model.addAttribute("defaultDocProcId", "FOO");//TODOWorkflow.PROCESS_ID_DOC_APPROVAL);
-        model.addAttribute("docTypes", DocType.asList());
+        model.addAttribute("docTypes", this.workflowSrvc.getBaseDocTypes());
         model.addAttribute("userTaskTypes", UserTaskType.asList());
     }
 

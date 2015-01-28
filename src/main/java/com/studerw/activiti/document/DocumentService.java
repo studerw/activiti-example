@@ -11,7 +11,6 @@ import com.studerw.activiti.user.InvalidAccessException;
 import com.studerw.activiti.user.UserService;
 import com.studerw.activiti.workflow.WorkflowService;
 import org.activiti.engine.IdentityService;
-import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.identity.Group;
@@ -100,7 +99,7 @@ public class DocumentService {
             identityService.setAuthenticatedUserId(userDetails.getUsername());
 
             //make sure we aren't submitting more than once
-            ProcessInstance current = workflowService.findProcessByBusinessKey(docId);
+            ProcessInstance current = workflowService.findProcessInstanceByBusinessKey(docId);
             if (current != null) {
                 throw new IllegalStateException("Running WF Process with key: " + docId + " already exists.");
             }

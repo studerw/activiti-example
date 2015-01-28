@@ -22,12 +22,12 @@ public class JsonTest {
 
     @Test
     public void testJsonToMap() throws IOException {
-        String json = "{\"name\":\"foo\", \"age\":\"29\"}";
+        String json = "{\"name\":\"foo\", \"age\":\"29\", \"group\": \"some weired group_blah\"}";
         Map<String, String> map = objectMapper.readValue(json,
                 new TypeReference<HashMap<String,String>>(){});
 
-        assertTrue(map.size() == 2);
-        assertTrue(map.keySet().containsAll(Arrays.asList("name", "age")));
+        assertTrue(map.size() == 3);
+        assertTrue(map.keySet().containsAll(Arrays.asList("name", "age", "group")));
         LOG.debug(map);
     }
 }

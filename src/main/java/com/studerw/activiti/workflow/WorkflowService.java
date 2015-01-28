@@ -221,8 +221,18 @@ public class WorkflowService {
      * @param businessKey the document Id as returned from DAO classes
      * @return the associated ProcessInstance or null if one does not exist
      */
-    public ProcessInstance findProcessByBusinessKey(String businessKey) {
+    public ProcessInstance findProcessInstanceByBusinessKey(String businessKey) {
         return runtimeService.createProcessInstanceQuery().processInstanceBusinessKey(businessKey).singleResult();
+    }
+
+    public String getProcessDefXml(String key){
+        ProcessDefinition defintion = this.repoSrvc.createProcessDefinitionQuery().processDefinitionKey(key).singleResult();
+        if (defintion == null) {
+            throw new IllegalArgumentException("Invalid process defintion key: " + key);
+        }
+        ProcessDefinitionEntity entity = (ProcessDefinitionEntity)defintion;
+        entity.
+        return null;
     }
 
     protected String[] parseProcessId(String processId) {

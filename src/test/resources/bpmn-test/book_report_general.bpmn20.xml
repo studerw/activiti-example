@@ -6,7 +6,7 @@
              typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath"
              targetNamespace="studerw.com">
     <process id="BOOK_REPORT_NONE" name="Book Report Workflow" isExecutable="true">
-        <documentation>This process is initiated when a book report is created.</documentation>
+        <documentation>{"name":"foo", "age":"29", "group": "some weired group_blah"}</documentation>
         <startEvent id="startevent" name="Start" activiti:initiator="initiator"></startEvent>
         <serviceTask id="publishBookReport" name="Publish Book Report"
                      activiti:expression="${documentService.publish(execution)}"></serviceTask>

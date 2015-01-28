@@ -5,7 +5,7 @@
         typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath"
         targetNamespace="SOMETHING_ELSE">
     <process id="BOOK_REPORT_foo" name="Book Report Workflow" isExecutable="true">
-        <documentation>This process is initiated when a book report is created.</documentation>
+        <documentation>This process should never be seen in the app due to the wrong targetNamespace (category in Activiti)</documentation>
         <startEvent id="startevent" name="Start" activiti:initiator="initiator"></startEvent>
         <serviceTask id="publishBookReport" name="Publish Book Report"
                      activiti:expression="${documentService.publish(execution)}"></serviceTask>

@@ -3,6 +3,7 @@ package com.studerw.activiti.workflow;
 import com.studerw.activiti.document.DocumentService;
 import com.studerw.activiti.model.document.DocType;
 import org.activiti.engine.*;
+import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -69,6 +70,11 @@ public class WorkflowServiceTest {
 
         definitions = this.workflowService.getAllProcDefs(true);
         assertTrue(definitions.size() == 5);
+
+        for (ProcessDefinition definition : definitions) {
+            LOG.debug(definition.getDescription());
+        }
+
     }
 
     @Test

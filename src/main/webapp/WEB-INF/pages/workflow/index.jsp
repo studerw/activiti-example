@@ -69,7 +69,7 @@
             </div>
         </div>
 
-        <div id="groupSelForm" style="display:none;">
+        <div id="groupSelForm" class="hidden">
             <div class="form-group">
                 <label for="groupSel" class="">Group</label>
                 <select class="form-control" id="groupSel">
@@ -80,6 +80,8 @@
                 </select>
             </div>
         </div>
+
+
 
         <hr/>
 
@@ -92,8 +94,8 @@
 
         <div id="diagram" class="center-block">
             <p>
-                <img id="proc-main-diagram" class="img-responsive img-rounded proc-diagram" src="${pageContext.request.contextPath}/workflow/diagrams/${defaultDocProcId}"
-                     alt="Workflow Process Diagram">
+                <%--<img id="proc-main-diagram" class="img-responsive img-rounded proc-diagram" src="${pageContext.request.contextPath}/workflow/diagrams/${defaultDocProcId}"--%>
+                     <%--alt="Workflow Process Diagram">--%>
             </p>
         </div>
 

@@ -1,10 +1,10 @@
-var APP = {};
+var APP = APP ||  {};
 APP.currentGroup = null;
 APP.users = [];
 APP.groups = [];
-APP.approvals = [];
+APP.userTasks = [];
 
-APP.approvalsTpl = _.template(
+APP.userTasksTpl = _.template(
     '<table class="table table-striped"> \
         <thead> \
             <tr> \
@@ -17,14 +17,14 @@ APP.approvalsTpl = _.template(
             </tr> \
         </thead> \
         <tbody>  \
-            <% _.each(approvals, function(approval){ %> \
-                <tr data-id="<%= approval.id %>" class="approval-row">  \
-                    <td><%= approval.position %></td> \
+            <% _.each(userTasks, function(userTask){ %> \
+                <tr data-id="<%= userTask.id %>" class="userTask-row">  \
+                    <td><%= userTask.position %></td> \
                     <td>\
-                        <select data-placeholder="Candidate Groups" class="chosen-select candidate-groups" data-position="<%= approval.position %>" multiple>\
+                        <select data-placeholder="Candidate Groups" class="chosen-select candidate-groups" data-position="<%= userTask.position %>" multiple>\
                         <% _.each(groups, function(group){ %> \
                             <option value="<%= group.id %>" \
-                            <% var selected = _.contains(approval.candidateGroups, group.id); %>\
+                            <% var selected = _.contains(userTask.candidateGroups, group.id); %>\
                             <% if(selected){ %>\
                                 selected \
                                 <% } %>\
@@ -33,10 +33,10 @@ APP.approvalsTpl = _.template(
                         </select>\
                     </td> \
                     <td>\
-                        <select data-placeholder="Candidate Users" class="chosen-select candidate-users" data-position="<%= approval.position %>" multiple>\
+                        <select data-placeholder="Candidate Users" class="chosen-select candidate-users" data-position="<%= userTask.position %>" multiple>\
                         <% _.each(users, function(user){ %> \
                             <option value="<%= user.userName %>" \
-                            <% var selected = _.contains(approval.candidateUsers, user.userName); %>\
+                            <% var selected = _.contains(userTask.candidateUsers, user.userName); %>\
                             <% if(selected){ %>\
                                 selected \
                                 <% } %>\
@@ -46,16 +46,16 @@ APP.approvalsTpl = _.template(
                     </td> \
                     <td> \
                        <div class="form-group"> \
-                            <input type="text" class="form-control approval-name" id="approval-name-<%= approval.name %>" data-position="<%= approval.position %>" placeholder="Description" value="<%= approval.name %>"/>\
+                            <input type="text" class="form-control userTask-name" id="userTask-name-<%= userTask.name %>" data-position="<%= userTask.position %>" placeholder="Description" value="<%= userTask.name %>"/>\
                         </div>\
                     </td>\
                     <td> \
-                        <button type="button" class="btn btn-default add-button" data-position="<%= approval.position %>" data-id="<%= approval.id %>"> \
+                        <button type="button" class="btn btn-default add-button" data-position="<%= userTask.position %>" data-id="<%= userTask.id %>"> \
                             <span class="glyphicon glyphicon-plus"></span> \
                         </button>  \
                     </td> \
                     <td> \
-                        <button type="button" class="btn btn-default delete-button" data-position="<%= approval.position %>" data-id="<%= approval.id %>"> \
+                        <button type="button" class="btn btn-default delete-button" data-position="<%= userTask.position %>" data-id="<%= userTask.id %>"> \
                             <span class="glyphicon glyphicon-trash"></span> \
                        </button> \
                     </td> \
@@ -65,13 +65,13 @@ APP.approvalsTpl = _.template(
     </table>'
 );
 
-function addNewApprovalRow(pos) {
+function addNewUserTaskRow(pos) {
     var newList = [];
-    _.each(APP.approvals, function (approval, index, list) {
-        if (approval.position <= pos) {
-            newList.push(approval);
+    _.each(APP.userTasks, function (userTask, index, list) {
+        if (userTask.position <= pos) {
+            newList.push(userTask);
         }
-        if (approval.position === pos) {
+        if (userTask.position === pos) {
             var newPos = pos + 1;
             newList.push({
                 position: newPos,
@@ -81,23 +81,23 @@ function addNewApprovalRow(pos) {
                 name: 'Approve Document'
             });
         }
-        if (approval.position > pos) {
-            approval.position += 1;
-            newList.push(approval);
+        if (userTask.position > pos) {
+            userTask.position += 1;
+            newList.push(userTask);
         }
     });
     console.dir(newList);
-    APP.approvals = newList;
+    APP.userTasks = newList;
 }
 
-function removeApprovalRow(pos) {
-    if (APP.approvals.length < 2) {
-        bootbox.alert("At least one approval is required.", function() {});
+function removeUserTaskRow(pos) {
+    if (APP.userTasks.length < 2) {
+        bootbox.alert("At least one userTask is required.", function() {});
         return;
     }
-    APP.approvals.splice(pos -1, 1);
-    _.each(APP.approvals, function (approval, index, list) {
-        approval.position = index + 1;
+    APP.userTasks.splice(pos -1, 1);
+    _.each(APP.userTasks, function (userTask, index, list) {
+        userTask.position = index + 1;
     });
 }
 
@@ -151,11 +151,11 @@ function getUsers() {
     });
 }
 
-function updateApprovals(group) {
+function updateUserTasks(group) {
     $.ajax({
         type: 'GET',
         dataType: 'json',
-        url: SERVLET_CONTEXT + '/workflow/approvals/' + group,
+        url: SERVLET_CONTEXT + '/workflow/userTasks/' + group,
         headers: {
             Accept: "application/json"
         },
@@ -163,8 +163,8 @@ function updateApprovals(group) {
             if (!data.success) {
                 alert("There was an error updating the workflow");
             }
-            APP.approvals = data.data;
-            updateApprovalsTpl(APP.approvals);
+            APP.userTasks = data.data;
+            updateuserTasksTpl(APP.userTasks);
         },
         error: function (error) {
             alert("There was an error updating the workflow");
@@ -172,52 +172,52 @@ function updateApprovals(group) {
     });
 }
 
-function updateApprovalsTpl() {
-    $('#approvals-panel').html(APP.approvalsTpl({
-        approvals: APP.approvals,
+function updateUserTasksTpl() {
+    $('#userTasks-panel').html(APP.userTasksTpl({
+        userTasks: APP.userTasks,
         groups: APP.groups,
         users: APP.users
     }));
-    $('.chosen-select', '#approvals-panel').chosen({}).change(function () {
+    $('.chosen-select', '#userTasks-panel').chosen({}).change(function () {
 //        console.dir($(this).val());
         var pos = parseInt($(this).attr('data-position'));
         var temp = $(this).val();
         var tempArray = _.isArray(temp) ? temp : [temp];
         if ($(this).hasClass('candidate-groups')) {
-            APP.approvals[pos - 1].candidateGroups = tempArray;
+            APP.userTasks[pos - 1].candidateGroups = tempArray;
         }
         else {
-            APP.approvals[pos - 1].candidateUsers = tempArray;
+            APP.userTasks[pos - 1].candidateUsers = tempArray;
         }
     });
-    $('input.approval-name', '#approvals-panel').on('blur', function(){
+    $('input.userTask-name', '#userTasks-panel').on('blur', function(){
         var pos = parseInt($(this).attr('data-position'));
-        APP.approvals[pos - 1].name = $(this).val();
+        APP.userTasks[pos - 1].name = $(this).val();
     });
-    $('button.add-button', '#approvals-panel').on('click', function () {
+    $('button.add-button', '#userTasks-panel').on('click', function () {
         var pos = $(this).attr('data-position');
-        addNewApprovalRow(parseInt(pos));
-        updateApprovalsTpl();
+        addNewuserTaskRow(parseInt(pos));
+        updateuserTasksTpl();
     });
-    $('button.delete-button', '#approvals-panel').on('click', function () {
+    $('button.delete-button', '#userTasks-panel').on('click', function () {
         var pos = $(this).attr('data-position');
-        removeApprovalRow(parseInt(pos));
-        updateApprovalsTpl();
+        removeuserTaskRow(parseInt(pos));
+        updateuserTasksTpl();
     });
 }
 
-function submitApprovals() {
-    $.ajax(SERVLET_CONTEXT + '/workflow/approvals/' + APP.currentGroup, {
+function submitUserTasks() {
+    $.ajax(SERVLET_CONTEXT + '/workflow/userTasks/' + APP.currentGroup, {
         type: 'PUT',
         dataType: 'json',
         contentType: "application/json; charset=utf-8",
-        data: JSON.stringify(APP.approvals),
+        data: JSON.stringify(APP.userTasks),
         headers: {
             Accept: "application/json"
         },
         success: function (data) {
             console.dir(data);
-            var newSrc = SERVLET_CONTEXT + '/workflow/diagrams/' + DOC_APPROVAL_ROOT_ID + '-' + APP.currentGroup;
+            var newSrc = SERVLET_CONTEXT + '/workflow/diagrams/' + DOC_userTask_ROOT_ID + '-' + APP.currentGroup;
             var rand = _.random(1, 100000000);
             newSrc = newSrc + '?rand=' + rand
             $('#proc-main-diagram').attr('src', newSrc);
@@ -225,7 +225,7 @@ function submitApprovals() {
                 alert("There was an error getting the app users");
             }
             else {
-                updateApprovals(APP.currentGroup);
+                updateUserTasks(APP.currentGroup);
             }
 
         },
@@ -241,39 +241,42 @@ $(function () {
     getGroups();
     getUsers();
     $('#update-button').on('click', function () {
-        submitApprovals();
+        submitUserTasks();
     });
     $('#docTypeSel').change(function(){
+        //$("#my-Select option[text=" + myText +"]").attr("selected","selected") ;
+        //$("#groupSel option[text=" + "Choose a Document Type" + "]").attr("selected", "selected");
+        $("#groupSel").val("");
         var val = $(this).val();
-       if (_.isEmpty(val)){
-           $('#groupSel').hide().find('option').remove().end();//.append('<option value="whatever">text</option>').val('whatever');
-       }
-       //else {
-       //
-       //}
-
-
-
-    });
-    $('#groupSel').change(function () {
-        APP.currentGroup = $(this).val();
-        console.log(APP.currentGroup);
-        if (!_.isEmpty(APP.currentGroup)){
-            $('#approvals').removeClass('hidden');
-            var newSrc = SERVLET_CONTEXT + '/workflow/diagrams/' + DOC_APPROVAL_ROOT_ID + '-' + APP.currentGroup;
-            //need to add random param to avoid caching of the image
-            var rand = _.random(1, 100000000);
-            newSrc = newSrc + '?rand=' + rand
-            $('#proc-main-diagram').attr('src', newSrc);
-            updateApprovals(APP.currentGroup);
-            $('#groupTitle').text(APP.currentGroup);
+        if (_.isEmpty(val)){
+            $('#groupSelForm').addClass('hidden');//.find('option').remove().end();//.append('<option value="whatever">text</option>').val('whatever');
         }
         else {
-            $('#approvals').addClass('hidden');
-            var newSrc = SERVLET_CONTEXT + '/workflow/diagrams/' + DOC_APPROVAL_ROOT_ID;
-            $('#proc-main-diagram').attr('src', newSrc);
-            $('#groupTitle').text('Default');
+            $('#groupSelForm').removeClass('hidden');
         }
+    });
+
+    $('#groupSel').change(function () {
+        APP.currentGroup = $(this).val();
+        var docType = $('#docTypeSel').val();
+        console.log(APP.currentGroup);
+        alert("DocType =" + docType + ", group =" + APP.currentGroup);
+        //if (!_.isEmpty(APP.currentGroup)){
+        //    $('#userTasks').removeClass('hidden');
+        //    var newSrc = SERVLET_CONTEXT + '/workflow/diagrams/' + DOC_userTask_ROOT_ID + '-' + APP.currentGroup;
+        //    //need to add random param to avoid caching of the image
+        //    var rand = _.random(1, 100000000);
+        //    newSrc = newSrc + '?rand=' + rand
+        //    $('#proc-main-diagram').attr('src', newSrc);
+        //    updateUserTasks(APP.currentGroup);
+        //    $('#groupTitle').text(APP.currentGroup);
+        //}
+        //else {
+        //    $('#userTasks').addClass('hidden');
+        //    var newSrc = SERVLET_CONTEXT + '/workflow/diagrams/' + DOC_userTask_ROOT_ID;
+        //    $('#proc-main-diagram').attr('src', newSrc);
+        //    $('#groupTitle').text('Default');
+        //}
 
     });
     //set up JQuery choosen plugin
