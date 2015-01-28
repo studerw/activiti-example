@@ -244,7 +244,8 @@ $(function () {
         submitApprovals();
     });
     $('#docTypeSel').change(function(){
-       if (_.isEmpty($(this.val()))){
+        var val = $(this).val();
+       if (_.isEmpty(val)){
            $('#groupSel').hide().find('option').remove().end();//.append('<option value="whatever">text</option>').val('whatever');
        }
        //else {

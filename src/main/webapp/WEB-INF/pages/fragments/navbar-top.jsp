@@ -30,7 +30,13 @@
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown" id="nav-alerts">
                     <a class="dropdown-toggle" data-toggle="dropdown"
-                       href="${pageContext.request.contextPath}/alerts.htm">Alerts
+                       href="${pageContext.request.contextPath}/alerts.htm">
+                        <c:choose>
+                            <c:when test="${not empty alerts}">
+                                <span style="color: red">Alerts </span>
+                            </c:when>
+                            <c:otherwise>Alerts </c:otherwise>
+                        </c:choose>
                         <span id="alertCount" class="badge">${fn:length(alerts)}</span><b class="caret"></b></a>
                     <ul id="alertMenuGroup" class="dropdown-menu list-group alert-dropdown">
                         <c:choose>

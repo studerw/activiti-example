@@ -30,8 +30,8 @@ import java.util.List;
 public class WorkflowController extends BaseController {
     private static final Logger LOG = LoggerFactory.getLogger(WorkflowController.class);
 
-    @Autowired WorkflowService workflowSrvc;
-    @Autowired WorkflowBuilder workflowBldr;
+    @Autowired protected WorkflowService workflowSrvc;
+    @Autowired protected WorkflowBuilder workflowBldr;
 
     @InitBinder
     protected void initBinder(WebDataBinder binder) {

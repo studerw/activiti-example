@@ -1,5 +1,6 @@
 package com.studerw.activiti.workflow;
 
+import com.google.common.collect.Lists;
 import com.studerw.activiti.model.document.DocType;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.engine.RepositoryService;
@@ -15,7 +16,9 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,7 +38,7 @@ public class WorkflowService {
 
     @Autowired protected RuntimeService runtimeService;
     @Autowired protected RepositoryService repoSrvc;
-
+    @Autowired ApplicationContext appContext;
 
     /**
      * @param processId the process <strong>Definition</strong> Id - NOT the process Instance Id.
@@ -45,8 +48,10 @@ public class WorkflowService {
         ProcessDefinition pd =
                 this.repoSrvc.createProcessDefinitionQuery().processDefinitionKey(processId).latestVersion().singleResult();
         LOG.debug("Getting process diagram for processId: {}", pd.getId());
-        BpmnModel model = repoSrvc.getBpmnModel(pd.getId());
-        InputStream in = new DefaultProcessDiagramGenerator().generatePngDiagram(model);
+        //BpmnModel model = repoSrvc.getBpmnModel(pd.getId());
+        InputStream in = this.appContext.getResource("classpath:800x200.png").getInputStream();
+
+        //InputStream in = new DefaultProcessDiagramGenerator().generatePngDiagram(model);
         byte[] bytes = IOUtils.toByteArray(in);
         IOUtils.closeQuietly(in);
         LOG.debug("Got bytes of size: {}", bytes.length);
@@ -63,10 +68,11 @@ public class WorkflowService {
         ProcessInstance pi =
                 runtimeService.createProcessInstanceQuery().processInstanceBusinessKey(docId).singleResult();
 
-        RepositoryServiceImpl impl = (RepositoryServiceImpl) repoSrvc;
-        ProcessDefinitionEntity pde = (ProcessDefinitionEntity) impl.getDeployedProcessDefinition(pi.getProcessDefinitionId());
-        BpmnModel bpmnModel = repoSrvc.getBpmnModel(pde.getId());
-        InputStream in = new DefaultProcessDiagramGenerator().generateDiagram(bpmnModel, "png", runtimeService.getActiveActivityIds(pi.getProcessInstanceId()));
+//        RepositoryServiceImpl impl = (RepositoryServiceImpl) repoSrvc;
+//        ProcessDefinitionEntity pde = (ProcessDefinitionEntity) impl.getDeployedProcessDefinition(pi.getProcessDefinitionId());
+//        BpmnModel bpmnModel = repoSrvc.getBpmnModel(pde.getId());
+//        InputStream in = new DefaultProcessDiagramGenerator().generateDiagram(bpmnModel, "png", runtimeService.getActiveActivityIds(pi.getProcessInstanceId()));
+        InputStream in = this.appContext.getResource("classpath:800x200.png").getInputStream();
         byte[] bytes = IOUtils.toByteArray(in);
         IOUtils.closeQuietly(in);
         LOG.debug("Got bytes of size: " + bytes.length);
@@ -84,6 +90,21 @@ public class WorkflowService {
         String processIdStr = String.format("%s_%s", docType.name(), group);
         return (this.repoSrvc.createProcessDefinitionQuery().processDefinitionCategory(WFConstants.NAMESPACE_CATEGORY).
                 processDefinitionKey(processIdStr).latestVersion().singleResult()) != null;
+    }
+
+    public List<DocType> getBaseDocTypes() {
+        List<DocType> docTypes = Lists.newArrayList();
+        List<ProcessDefinition> processDefinitions = this.repoSrvc.createProcessDefinitionQuery().processDefinitionCategory(WFConstants.NAMESPACE_CATEGORY).
+                processDefinitionKeyLike("%_" + WFConstants.WORKFLOW_GROUP_NONE).list();
+        for (ProcessDefinition procDef : processDefinitions) {
+            String procId = procDef.getKey();
+            String[] temp = parseProcessId(procId);
+            if (WFConstants.WORKFLOW_GROUP_NONE.equals(temp[1])) {
+                docTypes.add(DocType.valueOf(temp[0]));
+            }
+        }
+        LOG.debug(String.valueOf(docTypes));
+        return docTypes;
     }
 
     /**
@@ -204,6 +225,19 @@ public class WorkflowService {
         return runtimeService.createProcessInstanceQuery().processInstanceBusinessKey(businessKey).singleResult();
     }
 
+    protected String[] parseProcessId(String processId) {
+        if (!processId.contains("_")) {
+            throw new IllegalArgumentException("Invalid processId (must be in form: <DocType>_<group|NONE> ");
+        }
+        int index = processId.lastIndexOf("_");
+
+        String docType = processId.substring(0, index);
+        String group = processId.substring(index + 1, processId.length());
+        LOG.debug("{} - {}", docType, group);
+        Assert.hasText(docType);
+        Assert.hasText(group);
+        return new String[]{docType, group};
+    }
     /**
      * @param docType
      * @return returns the matching {@code ProcessDefinition} based on the namespace (i.e. category) which must

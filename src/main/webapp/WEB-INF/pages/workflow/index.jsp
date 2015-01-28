@@ -9,7 +9,7 @@
     <jsp:include page="../fragments/head.jsp"/>
     <link href="${pageContext.request.contextPath}/resources/css/bootstrap-choosen.css" rel="stylesheet" >
 
-    <title>Workflow</title>
+    <title>Workflow Edit</title>
 
     <style type="text/css">
         .panel-task {

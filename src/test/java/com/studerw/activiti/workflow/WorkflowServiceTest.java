@@ -65,10 +65,10 @@ public class WorkflowServiceTest {
     @Test
     public void testGetAllProcDefs() {
         List<ProcessDefinition> definitions = this.workflowService.getAllProcDefs(false);
-        assertTrue(definitions.size() == 3);
+        assertTrue(definitions.size() == 5);
 
         definitions = this.workflowService.getAllProcDefs(true);
-        assertTrue(definitions.size() == 3);
+        assertTrue(definitions.size() == 5);
     }
 
     @Test
@@ -140,6 +140,14 @@ public class WorkflowServiceTest {
 
         pd = this.workflowService.findBaseProcDef(DocType.UNIT_TEST_NO_EXIST);
         assertNull(pd);
+    }
+
+    @Test
+    public void testGetBaseDocTypes(){
+        List<DocType> docTypes = this.workflowService.getBaseDocTypes();
+        assertTrue(docTypes.size() == 2);
+        assertTrue(docTypes.contains(DocType.BOOK_REPORT));
+        assertTrue(docTypes.contains(DocType.INVOICE));
     }
 
     @Test
