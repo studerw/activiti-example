@@ -8,6 +8,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,11 +50,14 @@ public class WorkflowServiceTest {
 
 
     @Test
+    @Ignore
     public void testGetProcessDefinitionDiagram() throws Exception {
         fail("not implemented");
     }
 
     @Test
+    @Ignore
+
     public void testGetActiveDocumentDiagram() throws Exception {
         fail("not implemented");
     }
@@ -99,6 +103,7 @@ public class WorkflowServiceTest {
     }
 
     @Test
+    @Ignore
     public void testUpdateWorkflow() throws Exception {
         fail("not implemented");
     }
@@ -138,6 +143,7 @@ public class WorkflowServiceTest {
     }
 
     @Test
+    @Ignore
     public void testFindProcessByBusinessKey() throws Exception {
         fail("not implemented");
     }

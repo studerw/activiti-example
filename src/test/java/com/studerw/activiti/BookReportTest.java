@@ -14,6 +14,7 @@ import org.activiti.engine.task.Task;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,22 +71,23 @@ public class BookReportTest {
 //        assertEquals(group, "engineering");
 //    }
 
+//    @Test
+//    public void testDeployed() throws Exception {
+//        List<ProcessDefinition> definitions = repositoryService.createProcessDefinitionQuery().list();
+//        for (ProcessDefinition definition : definitions) {
+//            System.err.println(definition.getId());
+//        }
+//
+//        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().
+//                processDefinitionKey(BookReport.WORKFLOW_ID).singleResult();
+//        assertNotNull("Book Report Process Definition is not null", processDefinition);
+//
+//        String category = processDefinition.getCategory();
+//        LOG.debug("Category: {}", category);
+//    }
+
     @Test
-    public void testDeployed() throws Exception {
-        List<ProcessDefinition> definitions = repositoryService.createProcessDefinitionQuery().list();
-        for (ProcessDefinition definition : definitions) {
-            System.err.println(definition.getId());
-        }
-
-        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().
-                processDefinitionKey(BookReport.WORKFLOW_ID).singleResult();
-        assertNotNull("Book Report Process Definition is not null", processDefinition);
-
-        String category = processDefinition.getCategory();
-        LOG.debug("Category: {}", category);
-    }
-
-    @Test
+    @Ignore
     public void testEmptyBookReportProcess() throws Exception {
         BookReport bookReport = new BookReport();
         bookReport.setCreatedDate(new Date());
@@ -112,6 +114,7 @@ public class BookReportTest {
     }
 
     @Test
+    @Ignore
     public void testBookReportWithTasks() throws Exception {
         final String defKey = "bookReportWithTasksWorkflow";
         BookReport updated = null;

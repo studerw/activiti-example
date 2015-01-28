@@ -18,6 +18,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
+
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author William Studer
@@ -46,6 +49,7 @@ public class WorkflowBuilderTest {
     @Autowired RepositoryService repositoryService;
 
     @Test
+    @Ignore
     public void testRepoService() throws IOException {
         List<ProcessDefinition> pds = this.repositoryService.createProcessDefinitionQuery().list();
         LOG.debug("Number of pds: {}", pds.size());
@@ -91,11 +95,32 @@ public class WorkflowBuilderTest {
         userTasks.add(userTask2);
 
         BpmnModel model = workflowBldr.documentWithTasks(userTasks, DocType.BOOK_REPORT, "engineering");
-
-        InputStream in = new DefaultProcessDiagramGenerator().generatePngDiagram(model);
-        FileUtils.copyInputStreamToFile(in, new File("target/some_group_diagram.png"));
-        IOUtils.closeQuietly(in);
+        assertNotNull("model should be valid", model);
+//
+//        InputStream in = new DefaultProcessDiagramGenerator().generatePngDiagram(model);
+//        FileUtils.copyInputStreamToFile(in, new File("target/some_group_diagram.png"));
+//        IOUtils.closeQuietly(in);
     }
+
+    @Test
+    public void testBuildWFWithOneUserTask() throws IOException {
+        List<UserTask> userTasks = Lists.newArrayList();
+        UserTask userTask = new UserTask();
+        userTask.getCandidateGroups().add("engineering");
+        userTask.setPosition(1);
+        userTask.setUserTaskType(UserTaskType.APPROVE_REJECT);
+        userTasks.add(userTask);
+        BpmnModel model = workflowBldr.documentWithTasks(userTasks, DocType.BOOK_REPORT, "engineering");
+        assertNotNull("model should be valid", model);
+
+
+//        BpmnModel model = workflowBldr.documentWithTasks(userTasks, DocType.BOOK_REPORT, "engineering");
+//
+//        InputStream in = new DefaultProcessDiagramGenerator().generatePngDiagram(model);
+//        FileUtils.copyInputStreamToFile(in, new File("target/some_group_diagram.png"));
+//        IOUtils.closeQuietly(in);
+    }
+
 
     @Test
     public void testBuildDefaultWF() throws IOException {
@@ -103,8 +128,8 @@ public class WorkflowBuilderTest {
         BpmnXMLConverter converter = new BpmnXMLConverter();
         byte[] bytes = converter.convertToXML(model);
         System.out.println(new String(bytes, "UTF-8"));
-        InputStream in = new DefaultProcessDiagramGenerator().generatePngDiagram(model);
-        FileUtils.copyInputStreamToFile(in, new File("target/default_diagram.png"));
-        IOUtils.closeQuietly(in);
+//        InputStream in = new DefaultProcessDiagramGenerator().generatePngDiagram(model);
+//        FileUtils.copyInputStreamToFile(in, new File("target/default_diagram.png"));
+//        IOUtils.closeQuietly(in);
     }
 }

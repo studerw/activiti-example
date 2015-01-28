@@ -86,7 +86,7 @@ public class WorkflowBuilder {
 //        process.addFlowElement(createSequenceFlow(pub.getId(), endEvent.getId()));
 
         //Generate graphical information
-        new BpmnAutoLayout(model).execute();
+        //TODOnew BpmnAutoLayout(model).execute();
         return model;
     }
 
@@ -151,7 +151,7 @@ public class WorkflowBuilder {
         process.addFlowElement(createSequenceFlow(sub.getId(), endEvent.getId()));
 
         //Generate graphical information
-        new BpmnAutoLayout(model).execute();
+        //new BpmnAutoLayout(model).execute();TODO
         return model;
     }
 
@@ -241,7 +241,8 @@ public class WorkflowBuilder {
         }
 
         sub.addFlowElement(createSequenceFlow(start.getId(), created.get(0).getId()));
-        sub.addFlowElement(createSequenceFlow(created.get(created.size()).getId(), end.getId()));
+        int lastIndex = created.size() - 1;
+        sub.addFlowElement(createSequenceFlow(created.get(lastIndex).getId(), end.getId()));
         return sub;
     }
 
