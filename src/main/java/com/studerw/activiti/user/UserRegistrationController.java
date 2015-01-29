@@ -36,7 +36,7 @@ public class UserRegistrationController {
         binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
     }
 
-    @RequestMapping(value = "/userRegistration.htm", method = RequestMethod.GET)
+//    @RequestMapping(value = "/userRegistration.htm", method = RequestMethod.GET)
     public String get(ModelMap model, HttpServletRequest request) {
         LOG.debug("userRegistration");
         if (request.getRemoteUser() != null) {
@@ -47,7 +47,7 @@ public class UserRegistrationController {
         return "userRegistration";
     }
 
-    @RequestMapping(value = "/userRegistration", method = RequestMethod.POST)
+//    @RequestMapping(value = "/userRegistration", method = RequestMethod.POST)
     public String post(@Valid @ModelAttribute UserForm userForm,
                        BindingResult result,
                        final RedirectAttributes redirectAttributes,

@@ -51,10 +51,10 @@
                         <tr>
                             <c:choose>
                                 <c:when test="${doc.docType eq 'BOOK_REPORT'}">
-                                    <td><a href="${pageContext.request.contextPath}/document/bookReport/${doc.id}">${doc.title}</a></td>
+                                    <td><a href="${pageContext.request.contextPath}/document/bookReport/view.htm?id=${doc.id}">${doc.title}</a></td>
                                 </c:when>
                                 <c:when test="${doc.docType eq 'INVOICE'}">
-                                    <td><a href="${pageContext.request.contextPath}/document/invoice/${doc.id}">${doc.title}</a></td>
+                                    <td><a href="${pageContext.request.contextPath}/document/invoice/view.htm?id=${doc.id}">${doc.title}</a></td>
                                 </c:when>
                                 <c:otherwise>
                                     <td>UNKNOWN</td>

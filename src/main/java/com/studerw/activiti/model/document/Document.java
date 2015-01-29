@@ -1,6 +1,7 @@
 package com.studerw.activiti.model.document;
 
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
@@ -104,9 +105,10 @@ public abstract class Document implements Serializable, Comparable<Document> {
         return ObjectUtils.compare(this.createdDate, o.createdDate);
     }
 
-    public boolean isEditable() {
-        return DocState.DRAFT.equals(this.docState) || DocState.REJECTED.equals(this.docState)
-                /*|| DocState.WAITING_FOR_COLLABORATION.equals(this.docState)*/;
+    public boolean isEditable(String author, String currentUser) {
+        if (StringUtils.equals(author, currentUser)) {
+            return DocState.DRAFT.equals(this.docState) || DocState.REJECTED.equals(this.docState);
+        } else return DocState.WAITING_FOR_COLLABORATION.equals(this.docState);
     }
 
     @Override public String toString() {

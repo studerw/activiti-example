@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.util.Assert;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
@@ -61,23 +62,19 @@ public class BookReportController extends DocumentController {
     }
 
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/view.htm", method = RequestMethod.GET)
     public String view(ModelMap model,
-                       @PathVariable(value = "id") String id,
-                       final RedirectAttributes redirectAttributes,
-                       HttpServletRequest request) {
+                       @RequestParam(value = "id", required = true) String id){
         LOG.debug("viewing doc {} ", id);
+        Assert.hasText(id);
         Document doc = docService.getDocument(id);
         model.addAttribute("document", doc);
         List<HistoricTask> hts = this.localTaskSrvc.getTaskHistory(id);
         model.addAttribute("historicTasks", hts);
-        if (doc.getAuthor().equals(currentUserName()) && doc.isEditable()) {
+        if (doc.isEditable(doc.getAuthor(), currentUserName())) {
             return "document/bookReport/edit";
-        } else if (doc.getAuthor().equals(currentUserName())) {
-            model.addAttribute("msg", "The book report cannot be edited in its current state.");
-        } else {
-            model.addAttribute("msg", "Only the original author may edit the bookReport.");
         }
+        model.addAttribute("msg", "The book report cannot be edited in its current state.");
         return "document/bookReport/view";
     }
 
@@ -88,7 +85,7 @@ public class BookReportController extends DocumentController {
                          final RedirectAttributes redirectAttributes) {
         LOG.debug("updating bookReport: {}", bookReport);
 
-        if (!bookReport.isEditable()) {
+        if (!bookReport.isEditable(bookReport.getAuthor(), currentUserName())) {
             redirectAttributes.addFlashAttribute("msg", "This book report cannot currently be edited by you.</p>");
             return "redirect:/document/list.htm";
         }
