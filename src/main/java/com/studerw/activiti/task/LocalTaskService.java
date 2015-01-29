@@ -148,7 +148,7 @@ public class LocalTaskService {
             return Collections.emptyList();
         }
         LOG.debug("Duration time in millis: {}", historicPI.getDurationInMillis());
-        ;
+        //historyService.createProcessInstanceHistoryLogQuery(hTasks.get(0).getProcessInstanceId()).includeActivities().includeComments().includeTasks().singleResult()
         List<HistoricTaskInstance> hTasks = historyService.createHistoricTaskInstanceQuery().includeTaskLocalVariables().
                 processInstanceBusinessKey(businessKey).list();
         List<HistoricTask> historicTasks = Lists.newArrayList();
