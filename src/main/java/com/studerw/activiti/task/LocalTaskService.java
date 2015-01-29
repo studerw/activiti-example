@@ -94,10 +94,10 @@ public class LocalTaskService {
                 throw new RuntimeException("Unable to find task - it's possible another user has already completed it");
             }
             Map<String, Object> vars = task.getProcessVariables();
-            runtimeService.setVariable(task.getExecutionId(), WFConstants.PROCESS_VAR_APPROVED_OR_REJECTED, approved);
             if (StringUtils.equalsIgnoreCase((String) vars.get("initiator"), userDetails.getUsername())) {
                 throw new RuntimeException("The author of a document cannot perform approvals of the same document");
             }
+            runtimeService.setVariable(task.getExecutionId(), WFConstants.PROCESS_VAR_APPROVED_OR_REJECTED, approved);
             taskService.setAssignee(task.getId(), userDetails.getUsername());
             taskService.addComment(task.getId(), task.getProcessInstanceId(), comment);
             taskService.setVariableLocal(task.getId(), WFConstants.TASK_VAR_APPROVED_OR_REJECTED, Boolean.valueOf(approved));
@@ -111,10 +111,10 @@ public class LocalTaskService {
     /**
      * Complete a collaboration task
      *
-     * @param comment
      * @param taskId
+     * @param comment
      */
-    public void collaborateTask(String comment, String taskId) {
+    public void collaborateTask(String taskId, String comment) {
         LOG.debug("Collaboration Task completion");
         UserDetails userDetails = userService.currentUser();
         try {
@@ -142,7 +142,7 @@ public class LocalTaskService {
         LOG.debug("getting historic tasks for doc: {}", businessKey);
 
         HistoricProcessInstance historicPI = historyService.createHistoricProcessInstanceQuery().
-                includeProcessVariables().processInstanceBusinessKey(businessKey).singleResult();
+                /*includeProcessVariables()*/processInstanceBusinessKey(businessKey).singleResult();
 
         if (historicPI == null) {
             return Collections.emptyList();
@@ -150,7 +150,7 @@ public class LocalTaskService {
         LOG.debug("Duration time in millis: {}", historicPI.getDurationInMillis());
         ;
         List<HistoricTaskInstance> hTasks = historyService.createHistoricTaskInstanceQuery().includeTaskLocalVariables().
-                processInstanceId(historicPI.getSuperProcessInstanceId()).list();
+                processInstanceBusinessKey(businessKey).list();
         List<HistoricTask> historicTasks = Lists.newArrayList();
         for (HistoricTaskInstance hti : hTasks) {
             historicTasks.add(fromActiviti(hti));

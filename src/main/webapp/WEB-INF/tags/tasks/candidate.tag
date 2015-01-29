@@ -1,168 +1,70 @@
+<%@ tag import="com.studerw.activiti.model.document.DocType" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%--<%@ taglib prefix="tf" tagdir="/WEB-INF/tags/tasks/form" %>--%>
 
 <%@ tag body-content="scriptless" trimDirectiveWhitespaces="true" %>
+<%@ attribute name="candidateTasks" required="true" type="java.util.Collection"%>
 
-<%--<%@ attribute name="historicTags" required="true" type="org.springframework.validation.BindingResult" %>--%>
-<%@ attribute name="tasks" required="true" type="java.util.Collection"%>
+<spring:eval expression="T(com.studerw.activiti.workflow.WFConstants).TASK_ID_DOC_APPROVAL" var="docApprovalTask" />
+<spring:eval expression="T(com.studerw.activiti.workflow.WFConstants).TASK_ID_DOC_COLLABORATE" var="docCollaborateTask" />
+<spring:eval expression="T(com.studerw.activiti.workflow.WFConstants).TASK_ID_USER_APPROVAL" var="userApprovalTask" />
+<spring:eval expression="T(com.studerw.activiti.model.document.DocType).BOOK_REPORT" var="bookReportTypeStr" />
+<spring:eval expression="T(com.studerw.activiti.model.document.DocType).INVOICE" var="invoiceTypeStr" />
 
-<h3>Count: ${fn:length(tasks)}</h3>
+<h3>Count: ${fn:length(candidateTasks)}</h3>
 <c:choose>
-    <c:when test="${not empty tasks}">
+    <c:when test="${empty candidateTasks}">
+        <p>You do not currently have any tasks to complete.</p>
+    </c:when>
+    <c:otherwise>
         <div class="panel-group" id="accordion">
-            <c:forEach var="task" items="${tasks}">
-                <c:set var="currId" value="${task.id}"/>
+            <c:forEach var="task" items="${candidateTasks}">
                 <div class="panel panel-default panel-task">
                     <div class="panel-heading">
                         <c:choose>
-                            <c:when test="${task.name eq 'Approve New User Account'}">
+                            <c:when test="${fn:startsWith(task.taskDefinitionKey, userApprovalTask )}">
                                 <span class="glyphicon glyphicon-user pull-right"></span>
                             </c:when>
-                            <c:when test="${fn:startsWith(task.taskDefinitionKey, 'approveDocUserTask')}">
-                                <span class="glyphicon glyphicon-paperclip pull-right"></span>
+                            <c:when test="${fn:startsWith(task.taskDefinitionKey, docApprovalTask)}">
+                                <span class="glyphicon glyphicon-thumbs-up pull-right"></span>
+                            </c:when>
+                            <c:when test="${fn:startsWith(task.taskDefinitionKey, docCollaborateTask)}">
+                                <span class="glyphicon glyphicon-info-sign pull-right"></span>
                             </c:when>
                             <c:otherwise>
-                                <span class="glyphicon glyphicon-tasks pull-right"></span>
+                                <span class="glyphicon glyphicon-question-sign pull-right"></span>
                             </c:otherwise>
                         </c:choose>
 
                         <h4 class="panel-title">
                             <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne-${task.id}">
-                                    ${task.name} - <fmt:formatDate type="date"
-                                                                   dateStyle="medium"
-                                                                   timeStyle="medium"
-                                                                   value="${task.createTime}"/>
+                                    ${task.name} - <fmt:formatDate type="date" dateStyle="medium" timeStyle="medium" value="${task.createTime}"/>
                             </a>
                         </h4>
                     </div>
-                    <div id="collapseOne-${currId}" class="panel-collapse collapse">
-                        <div class="panel-body">
-                            <form class="form-horizontal" role="form" method="post"
-                                  action="${pageContext.request.contextPath}/tasks/approve.htm">
-                                <div class="form-group">
-                                    <label class="col-sm-2 control-label">Description</label>
+                    <c:choose>
+                        <c:when test="${fn:startsWith(task.taskDefinitionKey, userApprovalTask )}">
+                            <tf:userApproval candidateTask="task"/>
+                        </c:when>
+                        <c:when test="${fn:startsWith(task.taskDefinitionKey, docApprovalTask)}">
+                            <tf:docApproval candidateTask="task"/>
+                        </c:when>
+                        <c:when test="${fn:startsWith(task.taskDefinitionKey, docCollaborateTask)}">
+                            <tf:docCollaborate candidateTask="task"/>
+                        </c:when>
+                        <c:otherwise>
+                            <tf:unknown candidateTask="task"/>
+                        </c:otherwise>
+                    </c:choose>
 
-                                    <div class="col-sm-10">
-                                        <p class="form-control-static">${task.name}</p>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="col-sm-2 control-label">Created</label>
-
-                                    <div class="col-sm-10">
-                                        <p class="form-control-static">${task.createTime}</p>
-                                    </div>
-                                </div>
-                                <hr/>
-                                <c:if test="${task.name eq 'Approve New User Account'}">
-                                    <c:set var="userReg" value="${task.processVariables['userForm']}"/>
-                                    <div class="form-group">
-                                        <label class="col-sm-2 control-label">New User ID</label>
-
-                                        <div class="col-sm-10">
-                                            <p class="form-control-static"> ${userReg.userName}</p>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="col-sm-2 control-label">Group</label>
-
-                                        <div class="col-sm-10">
-                                            <p class="form-control-static"> ${userReg.group}</p>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="col-sm-2 control-label">New User Name</label>
-
-                                        <div class="col-sm-10">
-                                            <p class="form-control-static">${userReg.firstName} ${userReg.lastName}</p>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="col-sm-2 control-label">New User Email</label>
-
-                                        <div class="col-sm-10">
-                                            <p class="form-control-static"> ${userReg.email}</p>
-                                        </div>
-                                    </div>
-                                </c:if>
-                                <c:if test="${fn:startsWith(task.taskDefinitionKey, 'approveDocUserTask')}">
-                                    <div class="form-group">
-                                        <label class="col-sm-2 control-label">Document</label>
-
-                                        <div class="col-sm-10">
-                                            <p class="form-control-static"><a
-                                                    href="${pageContext.request.contextPath}/document/view.htm?id=${task.processVariables['docId']}"
-                                                    onclick="window.open(this.href, 'View Document','left=20,top=20,width=800,height=600,scrollbars=1,toolbar=0,resizable=1'); return false;">View
-                                                document</a>
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label class="col-sm-2 control-label">Author</label>
-
-                                        <div class="col-sm-10">
-                                            <p class="form-control-static"> ${task.processVariables['docAuthor']}</p>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="col-sm-2 control-label">Title</label>
-
-                                        <div class="col-sm-10">
-                                            <p class="form-control-static"> ${task.processVariables['docTitle']}</p>
-                                        </div>
-                                    </div>
-                                </c:if>
-                                <hr/>
-                                <div class="form-group">
-                                    <label for="comment-${task.id}"
-                                           class="col-sm-2 control-label">Comment</label>
-
-                                    <div class="col-sm-10">
-                                            <textarea class="form-control" rows="3" id="comment-${task.id}"
-                                                      name="comment" required></textarea>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="col-sm-offset-2 col-sm-10">
-                                        <div class="radio">
-                                            <label>
-                                                <input type="radio" name="approved"
-                                                       id="optionsRadios1-${task.id}"
-                                                       value="true" checked>Approve
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="col-sm-offset-2 col-sm-10">
-                                        <div class="radio">
-                                            <label>
-                                                <input type="radio" name="approved"
-                                                       id="optionsRadios2-${task.id}"
-                                                       value="false">Reject
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="col-sm-offset-2 col-sm-10">
-                                        <button type="submit" class="btn btn-primary">Complete</button>
-                                    </div>
-                                </div>
-                                <input type="hidden" name="taskId" value="${task.id}"/>
-                            </form>
-                        </div>
-                    </div>
                 </div>
             </c:forEach>
         </div>
-    </c:when>
-    <c:otherwise>
-        <p>You do not currently have any tasks to complete.</p>
     </c:otherwise>
+
 </c:choose>

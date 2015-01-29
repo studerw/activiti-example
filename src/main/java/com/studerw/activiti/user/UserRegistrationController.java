@@ -47,7 +47,7 @@ public class UserRegistrationController {
         return "userRegistration";
     }
 
-    @RequestMapping(value = "/userRegistration.htm", method = RequestMethod.POST)
+    @RequestMapping(value = "/userRegistration", method = RequestMethod.POST)
     public String post(@Valid @ModelAttribute UserForm userForm,
                        BindingResult result,
                        final RedirectAttributes redirectAttributes,
@@ -57,9 +57,7 @@ public class UserRegistrationController {
             return "redirect:j_spring_security_logout";
         }
         if (result.hasFieldErrors()) {
-            redirectAttributes.addFlashAttribute("error", true);
-            redirectAttributes.addFlashAttribute("errors", result.getFieldErrors());
-            return "redirect:userRegistration.htm";
+            return "userRegistration";
         }
         try {
             userService.submitForApproval(userForm);

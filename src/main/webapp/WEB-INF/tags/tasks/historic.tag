@@ -7,12 +7,11 @@
 
 <%@ tag body-content="scriptless" trimDirectiveWhitespaces="true" %>
 
-<%--<%@ attribute name="historicTags" required="true" type="org.springframework.validation.BindingResult" %>--%>
-<%@ attribute name="tagList" required="true" type="java.util.Collection"%>
+<%@ attribute name="tagList" required="true" type="java.util.Collection" %>
 <%@ attribute name="document" required="true" type="com.studerw.activiti.model.document.Document" %>
 
 <c:if test="${not empty historicTasks}">
-    <c:if test="${document.docState  ne 'DRAFT' && document.docState ne 'PUBLISHED'}">
+    <c:if test="${document.docState  ne 'DRAFT' && document.docState ne 'PUBLISHED' && document.docState ne 'EMAILED'}">
         <div id="diagram" class="center-block">
             <h4>Workflow</h4>
 
@@ -58,8 +57,4 @@
             </table>
         </div>
     </div>
-
-
 </c:if>
-
-

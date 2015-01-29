@@ -1,8 +1,12 @@
 package com.studerw.activiti.model;
 
 import com.studerw.activiti.model.document.BookReport;
+import com.studerw.activiti.model.document.Invoice;
+import com.studerw.activiti.model.task.TaskApprovalForm;
+import com.studerw.activiti.model.task.TaskCollaborationForm;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.Before;
 import org.junit.Test;
 
 import javax.validation.ConstraintViolation;
@@ -12,25 +16,77 @@ import javax.validation.ValidatorFactory;
 
 import java.util.Set;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author William Studer
  */
 public class ValidatorTest {
     private static final Logger LOG = LogManager.getLogger(ValidatorTest.class);
+    ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+    Validator validator = null;
+    @Before
+    public void before(){
+        this.validator = factory.getValidator();
+        assertNotNull(validator);
+    }
 
     @Test
     public void testValidateBookReport(){
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        Validator validator = factory.getValidator();
-        assertNotNull(validator);
-
         BookReport bookReport = new BookReport();
         Set<ConstraintViolation<BookReport>> violations = validator.validate(bookReport);
-//          Document doc = new Document();
-//        Set<ConstraintViolation<BookReport>> violations = validator.validate(bookReport);
-        LOG.debug(violations.size());
-        //assertEquals(violations.size(), 5);
+        LOG.debug("Empty book report violations: {}", violations.size());
+        assertFalse(violations.isEmpty());
     }
+
+    @Test
+    public void testValidateInvoice(){
+        Invoice invloice = new Invoice();
+        Set<ConstraintViolation<Invoice>> violations = validator.validate(invloice);
+        LOG.debug("Empty invoice violations: {}", violations.size());
+        assertFalse(violations.isEmpty());
+    }
+
+    @Test
+    public void testValidateCollabTask(){
+        TaskCollaborationForm form = new TaskCollaborationForm();
+        Set<ConstraintViolation<TaskCollaborationForm>> violations = validator.validate(form);
+        LOG.debug("violations: {}", violations.size());
+        assertTrue(violations.size() == 2);
+
+        form.setComment("foo");
+        violations = validator.validate(form);
+        LOG.debug("violations: {}", violations.size());
+        assertTrue(violations.size() == 1);
+
+        form.setTaskId("abc");
+        violations = validator.validate(form);
+        LOG.debug("violations: {}", violations.size());
+        assertTrue(violations.size() == 0);
+
+    }
+
+    @Test
+    public void testValidateApprovalTask(){
+        TaskApprovalForm form = new TaskApprovalForm();
+        Set<ConstraintViolation<TaskApprovalForm>> violations = validator.validate(form);
+        LOG.debug("violations: {}", violations.size());
+        assertTrue(violations.size() == 3);
+
+        form.setComment("foo");
+        form.setTaskId("abc");
+        violations = validator.validate(form);
+        LOG.debug("violations: {}", violations.size());
+        assertTrue(violations.size() == 1);
+
+        form.setApproved(Boolean.FALSE);
+        violations = validator.validate(form);
+        LOG.debug("violations: {}", violations.size());
+        assertTrue(violations.size() == 0);
+
+
+    }
+
 }

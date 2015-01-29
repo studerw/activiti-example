@@ -56,16 +56,16 @@
         </c:if>
     </div>
 
-    <t:candidate tasks="${tasks}" />
+    <t:candidate candidateTasks="${candidateTasks}" />
 
 </div>
 
 
 <jsp:include page="fragments/footer.jsp"/>
 
-<script src="${pageContext.request.contextPath}/resources/js/json2.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/underscore.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/backbone.js"></script>
+<%--<script src="${pageContext.request.contextPath}/resources/js/json2.js"></script>--%>
+<%--<script src="${pageContext.request.contextPath}/resources/js/underscore.js"></script>--%>
+<%--<script src="${pageContext.request.contextPath}/resources/js/backbone.js"></script>--%>
 <%--<script src="${pageContext.request.contextPath}/resources/js/app/tasks/main.js"></script>--%>
 <script>
     (function ($) {

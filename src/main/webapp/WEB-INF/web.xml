@@ -78,9 +78,9 @@
         <tracking-mode>COOKIE</tracking-mode>
    </session-config>
     
-    <error-page>
-        <location>/globalError.jsp</location>
-    </error-page>
+    <!--<error-page>-->
+        <!--<location>/globalError.jsp</location>-->
+    <!--</error-page>-->
 
     <jsp-config>
         <jsp-property-group>

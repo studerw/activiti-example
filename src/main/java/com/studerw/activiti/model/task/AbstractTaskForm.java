@@ -11,7 +11,8 @@ import javax.validation.constraints.Size;
  * Date: 5/19/14
  */
 public abstract class AbstractTaskForm {
-    @Size(max = 4000)
+    @NotNull
+    @Size(max = 10000, min = 2)
     private String comment;
     @NotNull
     private String taskId;

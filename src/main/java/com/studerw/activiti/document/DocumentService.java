@@ -125,6 +125,7 @@ public class DocumentService {
             processVariables.put("initiator", doc.getAuthor());
             processVariables.put("businessKey", doc.getId());
             processVariables.put("docAuthor", doc.getAuthor());
+            processVariables.put("docType", doc.getDocType());
             taskService.setVariables(task.getId(), processVariables);
             taskService.complete(task.getId());
         }

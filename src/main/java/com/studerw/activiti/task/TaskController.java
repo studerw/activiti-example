@@ -3,6 +3,7 @@ package com.studerw.activiti.task;
 import com.studerw.activiti.model.Response;
 import com.studerw.activiti.model.task.TaskApprovalForm;
 import com.studerw.activiti.model.task.CandidateTask;
+import com.studerw.activiti.model.task.TaskCollaborationForm;
 import com.studerw.activiti.web.BaseController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,14 +43,13 @@ public class TaskController extends BaseController {
 
     @RequestMapping(value = "/tasks.htm", method = RequestMethod.GET)
     public String index(ModelMap model, HttpServletRequest request) {
-        List<CandidateTask> tasks = this.taskService.findCandidateTasks(currentUserName());
-        model.addAttribute("tasks", tasks);
+        List<CandidateTask> candidateTasks = this.taskService.findCandidateTasks(currentUserName());
+        model.addAttribute("candidateTasks", candidateTasks);
         return "tasks";
     }
 
     @RequestMapping(value = "/tasks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Response<List<CandidateTask>>> getTasks(
-            HttpServletRequest request) {
+    public ResponseEntity<Response<List<CandidateTask>>> getTasks(HttpServletRequest request) {
         String userName = currentUserName();
         LOG.debug("TaskController: tasks for user: " + userName);
         List<CandidateTask> tasks = taskService.findCandidateTasks(userName);
@@ -58,23 +58,37 @@ public class TaskController extends BaseController {
         return new ResponseEntity<Response<List<CandidateTask>>>(res, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/tasks/approve.htm", method = RequestMethod.POST)
-    public String approve(@Valid @ModelAttribute TaskApprovalForm taskApprovalForm,
+    @RequestMapping(value = "/tasks/approve", method = RequestMethod.POST)
+    public String approve(@Valid @ModelAttribute TaskApprovalForm approvalForm,
                           BindingResult result,
                           final RedirectAttributes redirectAttributes){
-        LOG.debug("task approval: {}", taskApprovalForm.toString());
+        LOG.debug("task approval: {}", approvalForm.toString());
 
         if (result.hasFieldErrors()) {
-            redirectAttributes.addFlashAttribute("error", true);
-            redirectAttributes.addFlashAttribute("errors", result.getFieldErrors());
-            return "redirect:/tasks.htm";
+            return "tasks";
         }
 
-        this.taskService.approveOrRejectDoc(taskApprovalForm);
+        this.taskService.approveOrRejectDoc(approvalForm);
 
         redirectAttributes.addFlashAttribute("msg", "The task has been completed.");
         return "redirect:/tasks.htm";
     }
+
+    @RequestMapping(value = "/tasks/collaborate", method = RequestMethod.POST)
+    public String approve(@Valid @ModelAttribute TaskCollaborationForm collaborationForm,
+                          BindingResult result,
+                          final RedirectAttributes redirectAttributes){
+        LOG.debug("task collaboration: {}", collaborationForm.toString());
+
+        if (result.hasFieldErrors()) {
+            return "tasks";
+        }
+
+        this.taskService.collaborateTask(collaborationForm.getTaskId(), collaborationForm.getComment());
+        redirectAttributes.addFlashAttribute("msg", "The task has been completed.");
+        return "redirect:/tasks.htm";
+    }
+
 
 
 }

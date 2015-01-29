@@ -143,7 +143,7 @@ public class BookReportTest {
 
         task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertEquals(task.getTaskDefinitionKey(), "COLLABORATE_DOC_USER_TASK_1");
-        localTaskService.collaborateTask("some colloboration comment 1", task.getId());
+        localTaskService.collaborateTask(task.getId(), "some colloboration comment 1");
         updated = (BookReport) this.documentService.getDocument(id);
         LOG.debug(updated);
         assertTrue("Should have state=WAITING_FOR_COLLABORATION", updated.getDocState() == DocState.WAITING_FOR_COLLABORATION);
@@ -151,7 +151,7 @@ public class BookReportTest {
 
         task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertEquals(task.getTaskDefinitionKey(), "COLLABORATE_DOC_USER_TASK_2");
-        localTaskService.collaborateTask("some colloboration comment 2", task.getId());
+        localTaskService.collaborateTask(task.getId(), "some colloboration comment 2");
         updated = (BookReport) this.documentService.getDocument(id);
         LOG.debug(updated);
         assertTrue("Should have state=WAITING_FOR_APPROVAL", updated.getDocState() == DocState.WAITING_FOR_APPROVAL);
