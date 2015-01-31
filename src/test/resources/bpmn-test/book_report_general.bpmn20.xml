@@ -5,7 +5,7 @@
              xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
              typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath"
              targetNamespace="studerw.com">
-    <process id="BOOK_REPORT_NONE" name="Book Report Workflow" isExecutable="true">
+    <process id="BOOK_REPORT___NONE" name="Book Report Workflow" isExecutable="true">
         <documentation>{"name":"foo", "age":"29", "group": "some weired group_blah"}</documentation>
         <startEvent id="startevent" name="Start" activiti:initiator="initiator"></startEvent>
         <serviceTask id="publishBookReport" name="Publish Book Report"

@@ -87,15 +87,17 @@ public class WorkflowService {
      */
     public boolean groupWorkflowExists(DocType docType, String group) {
         LOG.debug("Checking for workflow exists of doctype={} and group={}", docType.name(), group);
-        String processIdStr = String.format("%s_%s", docType.name(), group);
+        String processIdStr = WFConstants.createProcId(docType, group);
         return (this.repoSrvc.createProcessDefinitionQuery().processDefinitionCategory(WFConstants.NAMESPACE_CATEGORY).
                 processDefinitionKey(processIdStr).latestVersion().singleResult()) != null;
     }
 
     public List<DocType> getBaseDocTypes() {
         List<DocType> docTypes = Lists.newArrayList();
-        List<ProcessDefinition> processDefinitions = this.repoSrvc.createProcessDefinitionQuery().processDefinitionCategory(WFConstants.NAMESPACE_CATEGORY).
-                processDefinitionKeyLike("%_" + WFConstants.WORKFLOW_GROUP_NONE).list();
+        String likeQuery = String.format("%s%s%s", "%", WFConstants.PROCESS_GROUP_DIVIDER, WFConstants.WORKFLOW_GROUP_NONE);
+                List < ProcessDefinition > processDefinitions = this.repoSrvc.createProcessDefinitionQuery().
+                        processDefinitionCategory(WFConstants.NAMESPACE_CATEGORY).
+                        processDefinitionKeyLike(likeQuery).list();
         for (ProcessDefinition procDef : processDefinitions) {
             String procId = procDef.getKey();
             String[] temp = parseProcessId(procId);

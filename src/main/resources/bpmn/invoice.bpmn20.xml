@@ -5,7 +5,7 @@
              xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
              typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath"
              targetNamespace="studerw.com">
-    <process id="INVOICE_NONE" name="Invoice Workflow" isExecutable="true">
+    <process id="INVOICE___NONE" name="Invoice Workflow" isExecutable="true">
         <documentation>This Base Invoice Workflow.</documentation>
         <startEvent id="startevent" name="Start" activiti:initiator="initiator"></startEvent>
         <serviceTask id="emailInvoice" name="Email Invoice"

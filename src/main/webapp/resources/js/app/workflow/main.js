@@ -1,9 +1,9 @@
-var APP = APP ||  {};
+var APP = APP || {};
 APP.users = [];
 APP.groups = [];
-APP.userTasks = [];
+APP.dynamicTasks = [];
 
-APP.userTasksTpl = _.template(
+APP.dynamicTasksTpl = _.template(
     '<table class="table table-striped"> \
         <thead> \
             <tr> \
@@ -16,14 +16,14 @@ APP.userTasksTpl = _.template(
             </tr> \
         </thead> \
         <tbody>  \
-            <% _.each(userTasks, function(userTask){ %> \
-                <tr data-id="<%= userTask.id %>" class="userTask-row">  \
-                    <td><%= userTask.position %></td> \
+            <% _.each(dynamicTasks, function(dynamicTask){ %> \
+                <tr data-id="<%= dynamicTask.id %>" class="dynamicTask-row">  \
+                    <td><%= dynamicTask.position %></td> \
                     <td>\
-                        <select data-placeholder="Candidate Groups" class="chosen-select candidate-groups" data-position="<%= userTask.position %>" multiple>\
+                        <select data-placeholder="Candidate Groups" class="chosen-select candidate-groups" data-position="<%= dynamicTask.position %>" multiple>\
                         <% _.each(groups, function(group){ %> \
                             <option value="<%= group.id %>" \
-                            <% var selected = _.contains(userTask.candidateGroups, group.id); %>\
+                            <% var selected = _.contains(dynamicTask.candidateGroups, group.id); %>\
                             <% if(selected){ %>\
                                 selected \
                                 <% } %>\
@@ -32,10 +32,10 @@ APP.userTasksTpl = _.template(
                         </select>\
                     </td> \
                     <td>\
-                        <select data-placeholder="Candidate Users" class="chosen-select candidate-users" data-position="<%= userTask.position %>" multiple>\
+                        <select data-placeholder="Candidate Users" class="chosen-select candidate-users" data-position="<%= dynamicTask.position %>" multiple>\
                         <% _.each(users, function(user){ %> \
                             <option value="<%= user.userName %>" \
-                            <% var selected = _.contains(userTask.candidateUsers, user.userName); %>\
+                            <% var selected = _.contains(dynamicTask.candidateUsers, user.userName); %>\
                             <% if(selected){ %>\
                                 selected \
                                 <% } %>\
@@ -45,16 +45,16 @@ APP.userTasksTpl = _.template(
                     </td> \
                     <td> \
                        <div class="form-group"> \
-                            <input type="text" class="form-control userTask-name" id="userTask-name-<%= userTask.name %>" data-position="<%= userTask.position %>" placeholder="Description" value="<%= userTask.name %>"/>\
+                            <input type="text" class="form-control dynamicTask-name" id="dynamicTask-name-<%= dynamicTask.name %>" data-position="<%= dynamicTask.position %>" placeholder="Description" value="<%= dynamicTask.name %>"/>\
                         </div>\
                     </td>\
                     <td> \
-                        <button type="button" class="btn btn-default add-button" data-position="<%= userTask.position %>" data-id="<%= userTask.id %>"> \
+                        <button type="button" class="btn btn-default add-button" data-position="<%= dynamicTask.position %>" data-id="<%= dynamicTask.id %>"> \
                             <span class="glyphicon glyphicon-plus"></span> \
                         </button>  \
                     </td> \
                     <td> \
-                        <button type="button" class="btn btn-default delete-button" data-position="<%= userTask.position %>" data-id="<%= userTask.id %>"> \
+                        <button type="button" class="btn btn-default delete-button" data-position="<%= dynamicTask.position %>" data-id="<%= dynamicTask.id %>"> \
                             <span class="glyphicon glyphicon-trash"></span> \
                        </button> \
                     </td> \
@@ -64,39 +64,39 @@ APP.userTasksTpl = _.template(
     </table>'
 );
 
-function addNewUserTaskRow(pos) {
+function addNewDynamicTaskRow(pos) {
     var newList = [];
-    _.each(APP.userTasks, function (userTask, index, list) {
-        if (userTask.position <= pos) {
-            newList.push(userTask);
+    _.each(APP.dynamicTasks, function (dynamicTask, index, list) {
+        if (dynamicTask.position <= pos) {
+            newList.push(dynamicTask);
         }
-        if (userTask.position === pos) {
+        if (dynamicTask.position === pos) {
             var newPos = pos + 1;
             newList.push({
                 position: newPos,
                 candidateGroups: [],
                 candidateUsers: [],
-                id: 'approveDocUserTask_' + newPos,
+                id: 'approveDocDynamicTask_' + newPos,
                 name: 'Approve Document'
             });
         }
-        if (userTask.position > pos) {
-            userTask.position += 1;
-            newList.push(userTask);
+        if (dynamicTask.position > pos) {
+            dynamicTask.position += 1;
+            newList.push(dynamicTask);
         }
     });
     console.dir(newList);
-    APP.userTasks = newList;
+    APP.dynamicTasks = newList;
 }
 
-function removeUserTaskRow(pos) {
-    if (APP.userTasks.length < 2) {
-        bootbox.alert("At least one userTask is required.", function() {});
+function removeDynamicTaskRow(pos) {
+    if (APP.dynamicTasks.length < 2) {
+        bootbox.alert("At least one dynamicTask is required.", function() {});
         return;
     }
-    APP.userTasks.splice(pos -1, 1);
-    _.each(APP.userTasks, function (userTask, index, list) {
-        userTask.position = index + 1;
+    APP.dynamicTasks.splice(pos -1, 1);
+    _.each(APP.dynamicTasks, function (dynamicTask, index, list) {
+        dynamicTask.position = index + 1;
     });
 }
 
@@ -150,11 +150,12 @@ function getUsers() {
     });
 }
 
-function updateUserTasks(group, docType) {
+function getDynamicTasks(group, docType) {
+
     $.ajax({
         type: 'GET',
         dataType: 'json',
-        url: SERVLET_CONTEXT + '/workflow/' + docType + '/' + group+ '/userTasks/',
+        url: SERVLET_CONTEXT+'/workflow/'+docType +'/'+group+'/dynamicTasks/',
         headers: {
             Accept: "application/json"
         },
@@ -162,8 +163,8 @@ function updateUserTasks(group, docType) {
             if (!data.success) {
                 alert("There was an error updating the workflow");
             }
-            APP.userTasks = data.data;
-            updateuserTasksTpl(APP.userTasks);
+            APP.dynamicTasks = data.data;
+            updateDynamicTasksTpl(APP.dynamicTasks);
         },
         error: function (error) {
             alert("There was an error updating the workflow");
@@ -171,63 +172,63 @@ function updateUserTasks(group, docType) {
     });
 }
 
-function updateUserTasksTpl() {
-    $('#userTasks-panel').html(APP.userTasksTpl({
-        userTasks: APP.userTasks,
+function updateDynamicTasksTpl() {
+    $('#dynamicTasks-panel').html(APP.dynamicTasksTpl({
+        dynamicTasks: APP.dynamicTasks,
         groups: APP.groups,
         users: APP.users
     }));
-    $('.chosen-select', '#userTasks-panel').chosen({}).change(function () {
+    $('.chosen-select', '#dynamicTasks-panel').chosen({}).change(function () {
 //        console.dir($(this).val());
         var pos = parseInt($(this).attr('data-position'));
         var temp = $(this).val();
         var tempArray = _.isArray(temp) ? temp : [temp];
         if ($(this).hasClass('candidate-groups')) {
-            APP.userTasks[pos - 1].candidateGroups = tempArray;
+            APP.dynamicTasks[pos - 1].candidateGroups = tempArray;
         }
         else {
-            APP.userTasks[pos - 1].candidateUsers = tempArray;
+            APP.dynamicTasks[pos - 1].candidateUsers = tempArray;
         }
     });
-    $('input.userTask-name', '#userTasks-panel').on('blur', function(){
+    $('input.dynamicTask-name', '#dynamicTasks-panel').on('blur', function(){
         var pos = parseInt($(this).attr('data-position'));
-        APP.userTasks[pos - 1].name = $(this).val();
+        APP.dynamicTasks[pos - 1].name = $(this).val();
     });
-    $('button.add-button', '#userTasks-panel').on('click', function () {
+    $('button.add-button', '#dynamicTasks-panel').on('click', function () {
         var pos = $(this).attr('data-position');
-        addNewuserTaskRow(parseInt(pos));
-        updateuserTasksTpl();
+        addNewDynamicTaskRow(parseInt(pos));
+        updateDynamicTasksTpl();
     });
-    $('button.delete-button', '#userTasks-panel').on('click', function () {
+    $('button.delete-button', '#dynamicTasks-panel').on('click', function () {
         var pos = $(this).attr('data-position');
-        removeuserTaskRow(parseInt(pos));
-        updateuserTasksTpl();
+        removeDynamicTaskRow(parseInt(pos));
+        updateDynamicTasksTpl();
     });
 }
 
-function submitUserTasks(group, docType) {
+function updateDynamicTasks(group, docType) {
     var _group = group;
     var _docType = docType;
-    $.ajax(SERVLET_CONTEXT + '/workflow/' + _docType + '/' + _group + '/userTasks/', {
+    $.ajax(SERVLET_CONTEXT + '/workflow/' + _docType + '/' + _group + '/dynamicTasks/', {
         type: 'PUT',
         dataType: 'json',
         contentType: "application/json; charset=utf-8",
-        data: JSON.stringify(APP.userTasks),
+        data: JSON.stringify(APP.dynamicTasks),
         headers: {
             Accept: "application/json"
         },
         success: function (data) {
             console.dir(data);
-            //var newSrc = SERVLET_CONTEXT + '/workflow/' + _group + '/diagrams/' + DOC_userTask_ROOT_ID + '-' + ;
+            //var newSrc = SERVLET_CONTEXT + '/workflow/' + _group + '/diagrams/' + DOC_dynamicTask_ROOT_ID + '-' + ;
             var newSrc ="http://placehold.it/800x200.png";
             var rand = _.random(1, 100000000);
             //newSrc = newSrc + '?rand=' + rand
             $('#proc-main-diagram').attr('src', newSrc);
             if (!data.success) {
-                alert("There was an error getting the app users");
+                alert("There was an error updating the workflow.");
             }
             else {
-                updateUserTasks(_group, _docType);
+                updateDynamicTasks(_group, _docType);
             }
 
         },
@@ -244,10 +245,12 @@ $(function () {
     getUsers();
     $('#update-button').on('click', function () {
         var group = $("#groupSel").val();
-        if (!_.isEmpty(group)) {
-            submitUserTasks(group);
+        var docType = $('#docType').val();
+        if (!_.isEmpty(group) && !_.isEmpty(docType)) {
+            updateDynamicTasks(group);
         }
     });
+    //hide and show the group select based on docType
     $('#docTypeSel').change(function(){
         //$("#my-Select option[text=" + myText +"]").attr("selected","selected") ;
         //$("#groupSel option[text=" + "Choose a Document Type" + "]").attr("selected", "selected");
@@ -267,18 +270,18 @@ $(function () {
         if (!_.isEmpty(group) && !_.isEmpty(docType)){
             alert("DocType =" + docType + ", group =" + group);
         }
-        //    $('#userTasks').removeClass('hidden');
-        //    var newSrc = SERVLET_CONTEXT + '/workflow/diagrams/' + DOC_userTask_ROOT_ID + '-' + group;
+        //    $('#dynamicTasks').removeClass('hidden');
+        //    var newSrc = SERVLET_CONTEXT + '/workflow/diagrams/' + DOC_dynamicTask_ROOT_ID + '-' + group;
         //    //need to add random param to avoid caching of the image
         //    var rand = _.random(1, 100000000);
         //    newSrc = newSrc + '?rand=' + rand
         //    $('#proc-main-diagram').attr('src', newSrc);
-        updateUserTasks(group);
+        getDynamicTasks(group, docType);
         //    $('#groupTitle').text(group);
         //}
         //else {
-        //    $('#userTasks').addClass('hidden');
-        //    var newSrc = SERVLET_CONTEXT + '/workflow/diagrams/' + DOC_userTask_ROOT_ID;
+        //    $('#dynamicTasks').addClass('hidden');
+        //    var newSrc = SERVLET_CONTEXT + '/workflow/diagrams/' + DOC_dynamicTask_ROOT_ID;
         //    $('#proc-main-diagram').attr('src', newSrc);
         //    $('#groupTitle').text('Default');
         //}

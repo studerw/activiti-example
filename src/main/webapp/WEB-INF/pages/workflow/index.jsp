@@ -7,7 +7,7 @@
 <html lang="en">
 <head>
     <jsp:include page="../fragments/head.jsp"/>
-    <link href="${pageContext.request.contextPath}/resources/css/bootstrap-choosen.css" rel="stylesheet" >
+    <link href="${pageContext.request.contextPath}/resources/css/bootstrap-choosen.css" rel="stylesheet">
 
     <title>Workflow Edit</title>
 
@@ -15,13 +15,11 @@
         .panel-task {
             margin: 15px 0;
         }
-        div#diagram{
+
+        div#diagram {
             margin: 20px auto;
         }
     </style>
-    <script type="text/javascript">
-        var DOC_APPROVAL_ROOT_ID = '${defaultDocProcId}';
-    </script>
 </head>
 <body>
 <jsp:include page="../fragments/navbar-top.jsp"/>
@@ -31,6 +29,7 @@
     <div class="start-template">
         <div class="page-header">
             <span class="glyphicon glyphicon-cog pull-right"></span>
+
             <h2>Workflows</h2>
         </div>
 
@@ -57,6 +56,7 @@
             </div>
         </c:if>
         <h4>${param.group}</h4>
+
         <div id="docTypeSelForm">
             <div class="form-group">
                 <label for="docTypeSel" class="">Document Type</label>
@@ -80,39 +80,40 @@
                 </select>
             </div>
         </div>
-
-
-
         <hr/>
 
-        <div class="page-header">
-            <span class="glyphicon glyphicon-paperclip pull-right"></span>
-            <h3>Document Approval Workflow
-            <small id="groupTitle">Default</small></h3>
-        </div>
+        <div id="dynamic-tasks" class="collapse">
+            <div class="page-header">
+                <span class="glyphicon glyphicon-paperclip pull-right"></span>
 
-
-        <div id="diagram" class="center-block">
-            <p>
-                <%--<img id="proc-main-diagram" class="img-responsive img-rounded proc-diagram" src="${pageContext.request.contextPath}/workflow/diagrams/${defaultDocProcId}"--%>
-                     <%--alt="Workflow Process Diagram">--%>
-            </p>
-        </div>
-
-        <div id="approvals" class="panel panel-info hidden">
-            <div class="panel-heading">
-                <span class="glyphicon glyphicon-thumbs-up pull-right"></span>
-
-                <h3 class="panel-title">Approvals</h3>
+                <h3>Dynamic Workflow Tasks</h3>
+                    <%--<small id="groupTitle">Default</small></h3>--%>
             </div>
-            <div class="panel-body" id="approvals-panel">
 
+
+            <div id="diagram" class="center-block">
+                <p>
+                    <%--<img id="proc-main-diagram" class="img-responsive img-rounded proc-diagram" src="${pageContext.request.contextPath}/workflow/diagrams/${defaultDocProcId}"--%>
+                    <%--alt="Workflow Process Diagram">--%>
+                </p>
             </div>
-            <p class="pull-right">
-                <button id="update-button" type="button" style="margin-top: 20px" class="btn btn-primary">Update Workflow</button>
-            </p>
-        </div>
 
+            <div id="approvals" class="panel panel-info hidden">
+                <div class="panel-heading">
+                    <span class="glyphicon glyphicon-thumbs-up pull-right"></span>
+
+                    <h3 class="panel-title">Approvals</h3>
+                </div>
+                <div class="panel-body" id="approvals-panel">
+
+                </div>
+                <p class="pull-right">
+                    <button id="update-button" type="button" style="margin-top: 20px" class="btn btn-primary">Update
+                        Workflow
+                    </button>
+                </p>
+            </div>
+        </div>
     </div>
 
 </div>
@@ -123,6 +124,10 @@
 <script src="${pageContext.request.contextPath}/resources/js/underscore.js"></script>
 <%--<script src="${pageContext.request.contextPath}/resources/js/backbone.js"></script>--%>
 <script src="${pageContext.request.contextPath}/resources/js/chosen_v1.3.0/chosen.jquery.js"></script>
+<script type="application/javascript">
+    APP = {} || APP;
+    APP.dynamicTaskTypes = "${dynamicTaskTypesJson}";
+</script>
 <script src="${pageContext.request.contextPath}/resources/js/app/workflow/main.js"></script>
 <script>
     (function ($) {

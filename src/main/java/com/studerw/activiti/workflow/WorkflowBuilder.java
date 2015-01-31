@@ -2,9 +2,8 @@ package com.studerw.activiti.workflow;
 
 import com.google.common.collect.Lists;
 import com.studerw.activiti.model.document.DocType;
-import com.studerw.activiti.model.workflow.UserTask;
-import com.studerw.activiti.model.workflow.UserTaskType;
-import org.activiti.bpmn.BpmnAutoLayout;
+import com.studerw.activiti.model.workflow.DynamicUserTask;
+import com.studerw.activiti.model.workflow.DynamicUserTaskType;
 import org.activiti.bpmn.model.*;
 import org.activiti.bpmn.model.Process;
 import org.apache.commons.lang3.StringUtils;
@@ -91,12 +90,12 @@ public class WorkflowBuilder {
     }
 
     /**
-     * @param userTasks
+     * @param dynamicUserTasks
      * @param docType
      * @param group
      * @return fully populated BpmnModel with appropriate ids, namespace, sub process tasks, etc.
      */
-    public BpmnModel documentWithTasks(List<UserTask> userTasks, DocType docType, String group) {
+    public BpmnModel documentWithTasks(List<DynamicUserTask> dynamicUserTasks, DocType docType, String group) {
         Assert.notNull(docType);
         Assert.hasText(group);
         BpmnModel model = new BpmnModel();
@@ -120,7 +119,7 @@ public class WorkflowBuilder {
         ErrorEventDefinition errorDef = new ErrorEventDefinition();
         errorDef.setErrorCode("errorDocRejected");
 
-        SubProcess sub = createDynamicSubProcess(userTasks, errorDef);
+        SubProcess sub = createDynamicSubProcess(dynamicUserTasks, errorDef);
         process.addFlowElement(sub);
 
         process.addFlowElement(createSequenceFlow(submitTask.getId(), sub.getId()));
@@ -183,7 +182,7 @@ public class WorkflowBuilder {
 
     }
 
-    protected SubProcess createDynamicSubProcess(List<UserTask> userTasks, ErrorEventDefinition errorDef) {
+    protected SubProcess createDynamicSubProcess(List<DynamicUserTask> dynamicUserTasks, ErrorEventDefinition errorDef) {
         SubProcess sub = new SubProcess();
         sub.setId(WFConstants.SUBPROCESS_ID_DYNAMIC);
         sub.setName(WFConstants.SUBPROCESS_NAME_DYNAMIC);
@@ -204,20 +203,20 @@ public class WorkflowBuilder {
         errorEnd.addEventDefinition(errorDef);
         sub.addFlowElement(errorEnd);
 
-        if (userTasks.isEmpty()) {
+        if (dynamicUserTasks.isEmpty()) {
             sub.addFlowElement(createSequenceFlow(start.getId(), end.getId()));
             return sub;
         }
 
-        List<UserTask> collaborations = Lists.newArrayList();
-        List<UserTask> approvals = Lists.newArrayList();
-        for (UserTask ut : userTasks) {
-            if (UserTaskType.APPROVE_REJECT.equals(ut.getUserTaskType())) {
+        List<DynamicUserTask> collaborations = Lists.newArrayList();
+        List<DynamicUserTask> approvals = Lists.newArrayList();
+        for (DynamicUserTask ut : dynamicUserTasks) {
+            if (DynamicUserTaskType.APPROVE_REJECT.equals(ut.getDynamicUserTaskType())) {
                 approvals.add(ut);
-            } else if (UserTaskType.COLLABORATION.equals(ut.getUserTaskType())) {
+            } else if (DynamicUserTaskType.COLLABORATION.equals(ut.getDynamicUserTaskType())) {
                 collaborations.add(ut);
             } else {
-                throw new IllegalArgumentException("Invalid user task type: " + ut.getUserTaskType());
+                throw new IllegalArgumentException("Invalid user task type: " + ut.getDynamicUserTaskType());
             }
         }
 
@@ -225,17 +224,17 @@ public class WorkflowBuilder {
         int approvalCount = 1;
         int collabCount = 1;
         boolean first = true;
-        for (UserTask from : userTasks) {
-            if (UserTaskType.APPROVE_REJECT.equals(from.getUserTaskType())) {
+        for (DynamicUserTask from : dynamicUserTasks) {
+            if (DynamicUserTaskType.APPROVE_REJECT.equals(from.getDynamicUserTaskType())) {
                 org.activiti.bpmn.model.UserTask approvalTask = approvalTask(sub, errorEnd, from, approvalCount, approvals.size());
                 created.add(approvalTask);
                 approvalCount++;
-            } else if (UserTaskType.COLLABORATION.equals(from.getUserTaskType())) {
+            } else if (DynamicUserTaskType.COLLABORATION.equals(from.getDynamicUserTaskType())) {
                 org.activiti.bpmn.model.UserTask collabTask = collaborationTask(sub, from, collabCount, collaborations.size());
                 created.add(collabTask);
                 collabCount++;
             } else {
-                throw new IllegalArgumentException("Invalid user task type: " + from.getUserTaskType());
+                throw new IllegalArgumentException("Invalid user task type: " + from.getDynamicUserTaskType());
             }
 
         }
@@ -247,7 +246,7 @@ public class WorkflowBuilder {
     }
 
 
-    protected org.activiti.bpmn.model.UserTask approvalTask(SubProcess sub, EndEvent errorEnd, UserTask from, int current, int total) {
+    protected org.activiti.bpmn.model.UserTask approvalTask(SubProcess sub, EndEvent errorEnd, DynamicUserTask from, int current, int total) {
         org.activiti.bpmn.model.UserTask to = new org.activiti.bpmn.model.UserTask();
         to.setId(String.format("%s_%d", WFConstants.TASK_ID_DOC_APPROVAL, current));
         if (StringUtils.isBlank(from.getName())) {
@@ -316,7 +315,7 @@ public class WorkflowBuilder {
         return to;
     }
 
-    protected org.activiti.bpmn.model.UserTask collaborationTask(SubProcess sub, UserTask from, int current, int total) {
+    protected org.activiti.bpmn.model.UserTask collaborationTask(SubProcess sub, DynamicUserTask from, int current, int total) {
         org.activiti.bpmn.model.UserTask to = new org.activiti.bpmn.model.UserTask();
         to.setId(String.format("%s_%d", WFConstants.TASK_ID_DOC_COLLABORATE, current));
         if (StringUtils.isBlank(from.getName())) {
@@ -356,7 +355,7 @@ public class WorkflowBuilder {
 
     /*protected UserTask fromUserTask(org.activiti.bpmn.model.UserTask userTask, int position) {
         UserTask uTask = new UserTask();
-        uTask.setPosition(position);
+        uTask.setIndex(position);
         uTask.setCandidateGroups(Lists.newArrayList(userTask.getCandidateGroups()));
         uTask.setCandidateUsers(Lists.newArrayList(userTask.getCandidateUsers()));
         uTask.setName(userTask.getName());

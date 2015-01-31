@@ -11,21 +11,21 @@ import java.util.List;
  * @author William Studer
  * Date: 5/29/14
  */
-public class UserTask implements Comparable<UserTask> {
+public class DynamicUserTask implements Comparable<DynamicUserTask> {
 
     private String id;
     private String name;
-    private Integer position;
+    private Integer index;
     private List<String> candidateUsers = Lists.newArrayList();
     private List<String> candidateGroups = Lists.newArrayList();
-    private UserTaskType userTaskType;
+    private DynamicUserTaskType dynamicUserTaskType;
 
-    public UserTaskType getUserTaskType() {
-        return userTaskType;
+    public DynamicUserTaskType getDynamicUserTaskType() {
+        return dynamicUserTaskType;
     }
 
-    public void setUserTaskType(UserTaskType userTaskType) {
-        this.userTaskType = userTaskType;
+    public void setDynamicUserTaskType(DynamicUserTaskType dynamicUserTaskType) {
+        this.dynamicUserTaskType = dynamicUserTaskType;
     }
 
     public String getName() {
@@ -44,10 +44,10 @@ public class UserTask implements Comparable<UserTask> {
         this.id = id;
     }
 
-    public Integer getPosition() {return position;}
+    public Integer getIndex() {return index;}
 
-    public void setPosition(Integer position) {
-        this.position = position;
+    public void setIndex(Integer index) {
+        this.index = index;
     }
 
     public List<String> getCandidateUsers() {
@@ -67,8 +67,8 @@ public class UserTask implements Comparable<UserTask> {
     }
 
     @Override
-    public int compareTo(UserTask o) {
-        return ObjectUtils.compare(this.position, o.position);
+    public int compareTo(DynamicUserTask o) {
+        return ObjectUtils.compare(this.index, o.index);
     }
 
 
@@ -76,10 +76,10 @@ public class UserTask implements Comparable<UserTask> {
         final StringBuilder sb = new StringBuilder("UserTask{");
         sb.append("id='").append(id).append('\'');
         sb.append(", name='").append(name).append('\'');
-        sb.append(", position=").append(position);
+        sb.append(", index=").append(index);
         sb.append(", candidateUsers=").append(candidateUsers);
         sb.append(", candidateGroups=").append(candidateGroups);
-        sb.append(", userTaskType=").append(userTaskType);
+        sb.append(", userTaskType=").append(dynamicUserTaskType);
         sb.append('}');
         return sb.toString();
     }

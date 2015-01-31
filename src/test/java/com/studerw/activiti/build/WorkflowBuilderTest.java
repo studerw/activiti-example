@@ -2,8 +2,8 @@ package com.studerw.activiti.build;
 
 import com.google.common.collect.Lists;
 import com.studerw.activiti.model.document.DocType;
-import com.studerw.activiti.model.workflow.UserTask;
-import com.studerw.activiti.model.workflow.UserTaskType;
+import com.studerw.activiti.model.workflow.DynamicUserTask;
+import com.studerw.activiti.model.workflow.DynamicUserTaskType;
 import com.studerw.activiti.workflow.WFConstants;
 import com.studerw.activiti.workflow.WorkflowBuilder;
 import org.activiti.bpmn.converter.BpmnXMLConverter;
@@ -81,20 +81,20 @@ public class WorkflowBuilderTest {
 
     @Test
     public void testBuildWFWithUserTasks() throws IOException {
-        List<UserTask> userTasks = Lists.newArrayList();
-        UserTask userTask = new UserTask();
-        userTask.getCandidateGroups().add("engineering");
-        userTask.setPosition(1);
-        userTask.setUserTaskType(UserTaskType.APPROVE_REJECT);
-        userTasks.add(userTask);
+        List<DynamicUserTask> dynamicUserTasks = Lists.newArrayList();
+        DynamicUserTask dynamicUserTask = new DynamicUserTask();
+        dynamicUserTask.getCandidateGroups().add("engineering");
+        dynamicUserTask.setIndex(1);
+        dynamicUserTask.setDynamicUserTaskType(DynamicUserTaskType.APPROVE_REJECT);
+        dynamicUserTasks.add(dynamicUserTask);
 
-        UserTask userTask2 = new UserTask();
-        userTask2.getCandidateUsers().add("kermit");
-        userTask2.setUserTaskType(UserTaskType.COLLABORATION);
-        userTask.setPosition(2);
-        userTasks.add(userTask2);
+        DynamicUserTask dynamicUserTask2 = new DynamicUserTask();
+        dynamicUserTask2.getCandidateUsers().add("kermit");
+        dynamicUserTask2.setDynamicUserTaskType(DynamicUserTaskType.COLLABORATION);
+        dynamicUserTask.setIndex(2);
+        dynamicUserTasks.add(dynamicUserTask2);
 
-        BpmnModel model = workflowBldr.documentWithTasks(userTasks, DocType.BOOK_REPORT, "engineering");
+        BpmnModel model = workflowBldr.documentWithTasks(dynamicUserTasks, DocType.BOOK_REPORT, "engineering");
         assertNotNull("model should be valid", model);
 //
 //        InputStream in = new DefaultProcessDiagramGenerator().generatePngDiagram(model);
@@ -104,13 +104,13 @@ public class WorkflowBuilderTest {
 
     @Test
     public void testBuildWFWithOneUserTask() throws IOException {
-        List<UserTask> userTasks = Lists.newArrayList();
-        UserTask userTask = new UserTask();
-        userTask.getCandidateGroups().add("engineering");
-        userTask.setPosition(1);
-        userTask.setUserTaskType(UserTaskType.APPROVE_REJECT);
-        userTasks.add(userTask);
-        BpmnModel model = workflowBldr.documentWithTasks(userTasks, DocType.BOOK_REPORT, "engineering");
+        List<DynamicUserTask> dynamicUserTasks = Lists.newArrayList();
+        DynamicUserTask dynamicUserTask = new DynamicUserTask();
+        dynamicUserTask.getCandidateGroups().add("engineering");
+        dynamicUserTask.setIndex(1);
+        dynamicUserTask.setDynamicUserTaskType(DynamicUserTaskType.APPROVE_REJECT);
+        dynamicUserTasks.add(dynamicUserTask);
+        BpmnModel model = workflowBldr.documentWithTasks(dynamicUserTasks, DocType.BOOK_REPORT, "engineering");
         assertNotNull("model should be valid", model);
 
 

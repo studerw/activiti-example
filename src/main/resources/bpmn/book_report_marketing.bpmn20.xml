@@ -5,7 +5,7 @@
              typeLanguage="http://www.w3.org/2001/XMLSchema"
              expressionLanguage="http://www.w3.org/1999/XPath"
              targetNamespace="studerw.com">
-    <process id="BOOK_REPORT_marketing" name="Book Report for marketing Group" isExecutable="true">
+    <process id="BOOK_REPORT___marketing" name="Book Report for marketing Group" isExecutable="true">
         <documentation>This process is initiated when a book report is created.</documentation>
         <startEvent id="startevent1" name="Start" activiti:initiator="initiator"/>
         <userTask id="submitToWorkflow" name="Submit Book Report to Workflow"/>

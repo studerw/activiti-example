@@ -4,7 +4,7 @@
         typeLanguage="http://www.w3.org/2001/XMLSchema"
         expressionLanguage="http://www.w3.org/1999/XPath"
         targetNamespace="studerw.com">
-    <process id="BOOK_REPORT_engineering" name="Book Report Engineering Workflow" isExecutable="true">
+    <process id="BOOK_REPORT___engineering" name="Book Report Engineering Workflow" isExecutable="true">
         <documentation>This process is explicit for Book Report and Group Engineering</documentation>
         <startEvent id="startevent" name="Start" activiti:initiator="initiator"></startEvent>
         <serviceTask id="publishBookReport" name="Publish Book Report"

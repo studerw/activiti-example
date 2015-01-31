@@ -6,11 +6,11 @@ import java.util.List;
 /**
  * @author William Studer
  */
-public enum UserTaskType {
+public enum DynamicUserTaskType {
     COLLABORATION,
     APPROVE_REJECT;
 
-    public static List<UserTaskType> asList(){
-        return Arrays.asList(UserTaskType.values());
+    public static List<DynamicUserTaskType> asList(){
+        return Arrays.asList(DynamicUserTaskType.values());
     }
 }
