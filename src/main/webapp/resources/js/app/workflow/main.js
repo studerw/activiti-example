@@ -1,5 +1,4 @@
 var APP = APP ||  {};
-APP.currentGroup = null;
 APP.users = [];
 APP.groups = [];
 APP.userTasks = [];
@@ -151,11 +150,11 @@ function getUsers() {
     });
 }
 
-function updateUserTasks(group) {
+function updateUserTasks(group, docType) {
     $.ajax({
         type: 'GET',
         dataType: 'json',
-        url: SERVLET_CONTEXT + '/workflow/userTasks/' + group,
+        url: SERVLET_CONTEXT + '/workflow/' + docType + '/' + group+ '/userTasks/',
         headers: {
             Accept: "application/json"
         },
@@ -206,8 +205,10 @@ function updateUserTasksTpl() {
     });
 }
 
-function submitUserTasks() {
-    $.ajax(SERVLET_CONTEXT + '/workflow/userTasks/' + APP.currentGroup, {
+function submitUserTasks(group, docType) {
+    var _group = group;
+    var _docType = docType;
+    $.ajax(SERVLET_CONTEXT + '/workflow/' + _docType + '/' + _group + '/userTasks/', {
         type: 'PUT',
         dataType: 'json',
         contentType: "application/json; charset=utf-8",
@@ -217,15 +218,16 @@ function submitUserTasks() {
         },
         success: function (data) {
             console.dir(data);
-            var newSrc = SERVLET_CONTEXT + '/workflow/diagrams/' + DOC_userTask_ROOT_ID + '-' + APP.currentGroup;
+            //var newSrc = SERVLET_CONTEXT + '/workflow/' + _group + '/diagrams/' + DOC_userTask_ROOT_ID + '-' + ;
+            var newSrc ="http://placehold.it/800x200.png";
             var rand = _.random(1, 100000000);
-            newSrc = newSrc + '?rand=' + rand
+            //newSrc = newSrc + '?rand=' + rand
             $('#proc-main-diagram').attr('src', newSrc);
             if (!data.success) {
                 alert("There was an error getting the app users");
             }
             else {
-                updateUserTasks(APP.currentGroup);
+                updateUserTasks(_group, _docType);
             }
 
         },
@@ -241,7 +243,10 @@ $(function () {
     getGroups();
     getUsers();
     $('#update-button').on('click', function () {
-        submitUserTasks();
+        var group = $("#groupSel").val();
+        if (!_.isEmpty(group)) {
+            submitUserTasks(group);
+        }
     });
     $('#docTypeSel').change(function(){
         //$("#my-Select option[text=" + myText +"]").attr("selected","selected") ;
@@ -257,19 +262,19 @@ $(function () {
     });
 
     $('#groupSel').change(function () {
-        APP.currentGroup = $(this).val();
+        var group =  $(this).val();
         var docType = $('#docTypeSel').val();
-        console.log(APP.currentGroup);
-        alert("DocType =" + docType + ", group =" + APP.currentGroup);
-        //if (!_.isEmpty(APP.currentGroup)){
+        if (!_.isEmpty(group) && !_.isEmpty(docType)){
+            alert("DocType =" + docType + ", group =" + group);
+        }
         //    $('#userTasks').removeClass('hidden');
-        //    var newSrc = SERVLET_CONTEXT + '/workflow/diagrams/' + DOC_userTask_ROOT_ID + '-' + APP.currentGroup;
+        //    var newSrc = SERVLET_CONTEXT + '/workflow/diagrams/' + DOC_userTask_ROOT_ID + '-' + group;
         //    //need to add random param to avoid caching of the image
         //    var rand = _.random(1, 100000000);
         //    newSrc = newSrc + '?rand=' + rand
         //    $('#proc-main-diagram').attr('src', newSrc);
-        //    updateUserTasks(APP.currentGroup);
-        //    $('#groupTitle').text(APP.currentGroup);
+        updateUserTasks(group);
+        //    $('#groupTitle').text(group);
         //}
         //else {
         //    $('#userTasks').addClass('hidden');
