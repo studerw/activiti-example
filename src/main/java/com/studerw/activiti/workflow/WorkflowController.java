@@ -2,7 +2,6 @@ package com.studerw.activiti.workflow;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Lists;
 import com.studerw.activiti.model.Response;
 import com.studerw.activiti.model.document.DocType;
 import com.studerw.activiti.model.workflow.DynamicUserTask;
@@ -10,6 +9,7 @@ import com.studerw.activiti.model.workflow.DynamicUserTaskType;
 import com.studerw.activiti.web.BaseController;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.engine.identity.Group;
+import org.activiti.engine.repository.ProcessDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +47,7 @@ public class WorkflowController extends BaseController {
         List<Group> groups = userService.getAllAssignmentGroups();
         model.addAttribute("groups", groups);
         //model.addAttribute("defaultDocProcId", "FOO");//TODOWorkflow.PROCESS_ID_DOC_APPROVAL);
-        model.addAttribute("docTypes", this.workflowSrvc.getBaseDocTypes());
+        model.addAttribute("docTypes", this.workflowSrvc.findExistingBaseDocTypes());
 
         List<DynamicUserTaskType> taskTypes = DynamicUserTaskType.asList();
         model.addAttribute("dynamicTaskTypes", taskTypes);
@@ -84,15 +84,19 @@ public class WorkflowController extends BaseController {
     @RequestMapping(value = "/tasks/{docType}/{group}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Response<List<DynamicUserTask>>> dynamicTasksByDocAndGroup
             (@PathVariable(value = "group") String group,
-             @PathVariable(value = "docType") DocType docType){
-        String groupId = null;
-        if (!workflowSrvc.groupWorkflowExists(docType, group)) {
-            groupId = null;
-        }
+             @PathVariable(value = "docType") DocType docType) {
 
-        List<DynamicUserTask> dynamicUserTasks = Lists.newArrayList();//TODO workflowBldr.getDocApprovalsByGroup(groupId);
+        LOG.debug("finding dynamic tasks for docType = {} and group = {}", docType, group);
+        List<DynamicUserTask> dynamicUserTasks = null;
+
+        ProcessDefinition procDef = this.workflowSrvc.findProcDef(docType, group);
+        if (procDef == null) {
+            String errMsg = String.format("There is no defined workgroup for docType: %s", docType.name());
+            Response res = new Response(false, errMsg);
+            return new ResponseEntity<Response<List<DynamicUserTask>>>(res, HttpStatus.OK);
+        }
         LOG.debug("returning json response of {} approvals", dynamicUserTasks.size());
-        Response res = new Response(true, groupId, dynamicUserTasks);
+        Response res = new Response(true, group, dynamicUserTasks);
         return new ResponseEntity<Response<List<DynamicUserTask>>>(res, HttpStatus.OK);
     }
 

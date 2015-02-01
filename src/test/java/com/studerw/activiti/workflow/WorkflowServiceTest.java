@@ -3,7 +3,6 @@ package com.studerw.activiti.workflow;
 import com.studerw.activiti.document.DocumentService;
 import com.studerw.activiti.model.document.DocType;
 import org.activiti.engine.*;
-import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -89,24 +88,6 @@ public class WorkflowServiceTest {
 
     }
 
-    @Test
-    public void testDocTypeWorkflowsExist() throws Exception {
-        boolean exists = this.workflowService.docTypeWorkflowsExist(DocType.BOOK_REPORT);
-        assertTrue("BOOK_REPORT workflows should exist.", exists);
-
-        exists = this.workflowService.docTypeWorkflowsExist(DocType.UNIT_TEST_NO_EXIST);
-        assertFalse("NO_EXIST docType workflow(s) should NOT exist.", exists);
-    }
-
-    @Test
-    public void testFindProcDefinitionsByDocType() throws Exception {
-        List<ProcessDefinition> processDefs = this.workflowService.findProcDefinitionsByDocType(DocType.BOOK_REPORT);
-        assertTrue("should have 3 process defs", processDefs.size() == 3);
-
-        processDefs = this.workflowService.findProcDefinitionsByDocType(DocType.UNIT_TEST_NO_EXIST);
-        assertTrue("should have no process defs", processDefs.isEmpty());
-
-    }
 
     @Test
     @Ignore
@@ -150,7 +131,7 @@ public class WorkflowServiceTest {
 
     @Test
     public void testGetBaseDocTypes(){
-        List<DocType> docTypes = this.workflowService.getBaseDocTypes();
+        List<DocType> docTypes = this.workflowService.findExistingBaseDocTypes();
         assertTrue(docTypes.size() == 2);
         assertTrue(docTypes.contains(DocType.BOOK_REPORT));
         assertTrue(docTypes.contains(DocType.INVOICE));
@@ -161,7 +142,6 @@ public class WorkflowServiceTest {
     public void testFindProcessByBusinessKey() throws Exception {
         fail("not implemented");
     }
-
 
     /*public String getProcessDefXml(String key){
         ProcessDefinition defintion = this.repoSrvc.createProcessDefinitionQuery().processDefinitionKey(key).singleResult();

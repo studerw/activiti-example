@@ -20,6 +20,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import javax.print.Doc;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -92,50 +93,38 @@ public class WorkflowService {
                 processDefinitionKey(processIdStr).latestVersion().singleResult()) != null;
     }
 
-    public List<DocType> getBaseDocTypes() {
+    /**
+     *
+     * @return the list (possibly empty) of DocTypes that have at least a base type (i.e. group = NONE) defined.
+     */
+    public List<DocType> findExistingBaseDocTypes() {
         List<DocType> docTypes = Lists.newArrayList();
         String likeQuery = String.format("%s%s%s", "%", WFConstants.PROCESS_GROUP_DIVIDER, WFConstants.WORKFLOW_GROUP_NONE);
+        LOG.debug("using likeQuery for baseTypes = {}", likeQuery);
                 List < ProcessDefinition > processDefinitions = this.repoSrvc.createProcessDefinitionQuery().
                         processDefinitionCategory(WFConstants.NAMESPACE_CATEGORY).
                         processDefinitionKeyLike(likeQuery).list();
-        for (ProcessDefinition procDef : processDefinitions) {
-            String procId = procDef.getKey();
-            String[] temp = parseProcessId(procId);
-            if (WFConstants.WORKFLOW_GROUP_NONE.equals(temp[1])) {
-                docTypes.add(DocType.valueOf(temp[0]));
+        LOG.debug("Base type = {}", String.valueOf(docTypes));
+        for (ProcessDefinition processDefinition : processDefinitions) {
+            String[] parsed = this.parseProcessId(processDefinition.getKey());
+            DocType docType = null;
+            try {
+                docType = DocType.valueOf(parsed[0]);
+
+            }
+            catch(Exception e) {
+                LOG.error("Invalid docType detected in workflow (ignoring): {}", parsed[0]);
+            }
+            if (docType != null){
+                docTypes.add(docType);
+
             }
         }
-        LOG.debug(String.valueOf(docTypes));
+        LOG.debug("Found baseDocTypes: {}", docTypes);
         return docTypes;
     }
 
-    /**
-     * @param docType
-     * @return true if one or more workflows of the specific {@code DocType} exists, false if not.
-     * e.g. process Id of deployed definition(s) would be like {@code BOOK_REPORT_engineering} or just {@code BOOK_REPORT}
-     */
-    public boolean docTypeWorkflowsExist(DocType docType) {
-        LOG.debug("Checking for workflow exists of doctype={}.", docType.name());
-        String processIdStr = String.format("%s_%s", docType.name(), "%");
-        LOG.info("using key LIKE={}", processIdStr);
-        return !(this.repoSrvc.createProcessDefinitionQuery().processDefinitionCategory(WFConstants.NAMESPACE_CATEGORY).
-                processDefinitionKeyLike(processIdStr).latestVersion().list().isEmpty());
-    }
 
-    /**
-     * @param docType
-     * @return List (may be empty) of process definitions for the given doc type.
-     */
-    public List<ProcessDefinition> findProcDefinitionsByDocType(DocType docType) {
-        LOG.debug("Checking for workflow exists of doctype={}.", docType.name());
-        String processIdStr = String.format("%s_%s", docType.name(), "%");
-        LOG.debug("Finding workflows of id: {}", processIdStr);
-        List<ProcessDefinition> pds = this.repoSrvc.createProcessDefinitionQuery().processDefinitionCategory(WFConstants.NAMESPACE_CATEGORY).
-                processDefinitionKeyLike(processIdStr).
-                latestVersion().list();
-        LOG.debug("Found {} of id={}", pds.size(), processIdStr);
-        return pds;
-    }
 
     /**
      * @param docType
@@ -145,7 +134,7 @@ public class WorkflowService {
      */
     public boolean baseDocTypeWorkflowExists(DocType docType) {
         LOG.debug("Checking for base workflow exists of doctype={}.", docType.name());
-        String processIdStr = String.format("%s_%s", docType.name(), WFConstants.WORKFLOW_GROUP_NONE);
+        String processIdStr = WFConstants.createProcId(docType, WFConstants.WORKFLOW_GROUP_NONE);
         LOG.info("search for base doc workflow using processId={}", processIdStr);
         return this.repoSrvc.createProcessDefinitionQuery().processDefinitionCategory(WFConstants.NAMESPACE_CATEGORY).
                 processDefinitionKey(processIdStr).latestVersion().singleResult() != null;
@@ -157,7 +146,7 @@ public class WorkflowService {
      */
     public ProcessDefinition findProcDefByDocTypeAndGroup(DocType docType, String group) {
         LOG.debug("Checking for workflow exists of doctype={} and group={}", docType.name(), group);
-        String processIdStr = String.format("%s_%s", docType.name(), group);
+        String processIdStr = WFConstants.createProcId(docType, group);
         ProcessDefinition pd = this.repoSrvc.createProcessDefinitionQuery().processDefinitionCategory(WFConstants.NAMESPACE_CATEGORY).
                 processDefinitionKey(processIdStr).latestVersion().singleResult();
         return pd;
@@ -170,7 +159,7 @@ public class WorkflowService {
      */
     public ProcessDefinition findBaseProcDef(DocType docType) {
         LOG.debug("Checking for base workflow exists of doctype={}", docType.name());
-        String processIdStr = String.format("%s_%s", docType.name(), WFConstants.WORKFLOW_GROUP_NONE);
+        String processIdStr = WFConstants.createProcId(docType, WFConstants.WORKFLOW_GROUP_NONE);
         ProcessDefinition pd = this.repoSrvc.createProcessDefinitionQuery().processDefinitionCategory(WFConstants.NAMESPACE_CATEGORY).
                 processDefinitionKey(processIdStr).latestVersion().singleResult();
         return pd;
@@ -229,10 +218,10 @@ public class WorkflowService {
 
 
     protected String[] parseProcessId(String processId) {
-        if (!processId.contains("_")) {
+        if (!processId.contains(WFConstants.PROCESS_GROUP_DIVIDER)) {
             throw new IllegalArgumentException("Invalid processId (must be in form: <DocType>_<group|NONE> ");
         }
-        int index = processId.lastIndexOf("_");
+        int index = processId.lastIndexOf(WFConstants.PROCESS_GROUP_DIVIDER);
 
         String docType = processId.substring(0, index);
         String group = processId.substring(index + 1, processId.length());
