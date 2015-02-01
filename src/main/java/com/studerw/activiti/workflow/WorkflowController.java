@@ -2,6 +2,7 @@ package com.studerw.activiti.workflow;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import com.studerw.activiti.model.Response;
 import com.studerw.activiti.model.document.DocType;
 import com.studerw.activiti.model.workflow.DynamicUserTask;
@@ -42,7 +43,7 @@ public class WorkflowController extends BaseController {
 
     @Override
     @ModelAttribute
-    public void addModelInfo(ModelMap model, HttpServletRequest request)  {
+    public void addModelInfo(ModelMap model, HttpServletRequest request) {
         super.addModelInfo(model, request);
         List<Group> groups = userService.getAllAssignmentGroups();
         model.addAttribute("groups", groups);
@@ -54,8 +55,7 @@ public class WorkflowController extends BaseController {
         try {
             String json = objectMapper.writeValueAsString(taskTypes);
             model.addAttribute("dynamicTaskTypesJson", taskTypes);
-        }
-        catch(JsonProcessingException ex) {
+        } catch (JsonProcessingException ex) {
             throw new RuntimeException(ex);
         }
 
@@ -87,19 +87,33 @@ public class WorkflowController extends BaseController {
              @PathVariable(value = "docType") DocType docType) {
 
         LOG.debug("finding dynamic tasks for docType = {} and group = {}", docType, group);
-        List<DynamicUserTask> dynamicUserTasks = null;
 
-        ProcessDefinition procDef = this.workflowSrvc.findProcDef(docType, group);
-        if (procDef == null) {
-            String errMsg = String.format("There is no defined workgroup for docType: %s", docType.name());
+
+        // Do we have a Doctype at least?
+        if (!workflowSrvc.baseDocTypeWorkflowExists(docType)) {
+            String errMsg = String.format("There is no defined work group for docType: %s", docType.name());
             Response res = new Response(false, errMsg);
             return new ResponseEntity<Response<List<DynamicUserTask>>>(res, HttpStatus.OK);
         }
-        LOG.debug("returning json response of {} approvals", dynamicUserTasks.size());
-        Response res = new Response(true, group, dynamicUserTasks);
-        return new ResponseEntity<Response<List<DynamicUserTask>>>(res, HttpStatus.OK);
-    }
 
+        //Try to find the specific DocType/Group workflow
+        ProcessDefinition procDef = this.workflowSrvc.findProcDefByDocTypeAndGroup(docType, group);
+/*
+        if (procDef == null) {
+            //we need to build a new group workflow based on the specified docType
+            ;
+
+        }
+        else {
+            //just get the tasks for the docType and Group definition that already exists
+        }
+*/
+
+        LOG.debug("returning json response of {} dynamicProcDefs", 0);
+        //Response res = new Response(true, group, Lists.new
+        //        return new ResponseEntity<Response<List<DynamicUserTask>>>(res, HttpStatus.OK);
+        return null;
+    }
 
 
 }

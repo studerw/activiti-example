@@ -7,6 +7,7 @@ import com.studerw.activiti.model.workflow.DynamicUserTaskType;
 import org.activiti.bpmn.model.*;
 import org.activiti.bpmn.model.Process;
 import org.activiti.engine.RepositoryService;
+import org.activiti.engine.repository.ProcessDefinition;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,14 +32,15 @@ public class WorkflowParser {
 
     /**
      *
-     * @param processId the definition of the process Id
+     * @param procDef the definition of the process
      * @return a list of {@code DynamicUserTask tasks} contained in the dynamic subprocess
      * of the given process definition. If a definition cannot be found, an unchecked IllegalArgumentException
      * is thrown.
      */
-    public List<DynamicUserTask> getTasksFromProcDef(String processId) {
-        Assert.hasText(processId);
+    public List<DynamicUserTask> getTasksFromProcDef(ProcessDefinition procDef) {
+        Assert.notNull(procDef);
         //ProcessDefinition procDef = this.repoSrvc.createProcessDefinitionQuery().
         return null;
     }
+
 }

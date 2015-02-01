@@ -16,6 +16,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.InputStream;
+import java.util.Collection;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -23,6 +25,7 @@ import static org.junit.Assert.*;
 @ContextConfiguration({"classpath:spring/testAppContext.xml"})
 public class WorkflowParserTest {
     private static final Logger LOG = LogManager.getLogger(WorkflowParserTest.class);
+
     @Autowired WorkflowParser parser;
     @Autowired RepositoryService repoSrvc;
 
@@ -57,6 +60,10 @@ public class WorkflowParserTest {
         SubProcess subProcess = (SubProcess)proc.getFlowElement(WFConstants.SUBPROCESS_ID_DYNAMIC);
 
         assertNotNull(subProcess);
+        Collection<FlowElement> flowElements = subProcess.getFlowElements();
+        for (FlowElement flowElement : flowElements) {
+            LOG.debug("FlowElement: {}", flowElement.getId());
+        }
 
 //        proc.findFlowElementsInSubProcessOfType(, FlowNode.class);
 
