@@ -69,11 +69,11 @@ public class DocApproveTest {
         process.addFlowElement(createSequenceFlow(submitTask.getId(), sub.getId()));
 
         BoundaryEvent boundaryEvent = new BoundaryEvent();
-        boundaryEvent.setId("rejectedErrorBoundaryEvent");
+        boundaryEvent.setId(WFConstants.REJECTED_BOUNDARY_EVENT_ID);
         boundaryEvent.setName("Rejected Error Event");
         boundaryEvent.setAttachedToRef(sub);
         ErrorEventDefinition errorDef = new ErrorEventDefinition();
-        errorDef.setErrorCode("errorDocRejected");
+        errorDef.setErrorCode(WFConstants.ERROR_DOC_REJECTED);
         boundaryEvent.addEventDefinition(errorDef);
         process.addFlowElement(boundaryEvent);
 
@@ -176,7 +176,7 @@ public class DocApproveTest {
         errorEnd.setId("rejectedErrorEndEvent");
         errorEnd.setName("ErrorEnd");
         ErrorEventDefinition errorDef = new ErrorEventDefinition();
-        errorDef.setErrorCode("errorDocRejected");
+        errorDef.setErrorCode(WFConstants.ERROR_DOC_REJECTED);
         errorEnd.addEventDefinition(errorDef);
         sub.addFlowElement(errorEnd);
 

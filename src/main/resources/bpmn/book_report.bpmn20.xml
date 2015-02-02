@@ -16,11 +16,11 @@
             <startEvent id="dynamic_sub_process_start_event" name="Start Dynamic SubProcess"></startEvent>
             <endEvent id="dynamic_sub_process_end_event" name="End Dynamic SubProcess"></endEvent>
             <endEvent id="rejectedErrorEndEvent" name="ErrorEnd">
-                <errorEventDefinition errorRef="errorDocRejected"></errorEventDefinition>
+                <errorEventDefinition errorRef="ERROR_DOC_REJECTED"></errorEventDefinition>
             </endEvent>
         </subProcess>
-        <boundaryEvent id="rejectedErrorBoundaryEvent" name="Rejected Error Event" attachedToRef="DYNAMIC_SUB_PROCESS">
-            <errorEventDefinition errorRef="errorDocRejected"></errorEventDefinition>
+        <boundaryEvent id="REJECTED_ERROR_BOUNDARY_EVENT" name="Rejected Error Event" attachedToRef="DYNAMIC_SUB_PROCESS">
+            <errorEventDefinition errorRef="ERROR_DOC_REJECTED"></errorEventDefinition>
         </boundaryEvent>
         <sequenceFlow id="flow1" sourceRef="startevent" targetRef="submitToWorkflow"></sequenceFlow>
         <sequenceFlow id="flow2" sourceRef="submitToWorkflow" targetRef="DYNAMIC_SUB_PROCESS"></sequenceFlow>
@@ -55,7 +55,7 @@
             <bpmndi:BPMNShape bpmnElement="rejectedErrorEndEvent" id="BPMNShape_rejectedErrorEndEvent">
                 <omgdc:Bounds height="35.0" width="35.0" x="250.0" y="200.0"></omgdc:Bounds>
             </bpmndi:BPMNShape>
-            <bpmndi:BPMNShape bpmnElement="rejectedErrorBoundaryEvent" id="BPMNShape_rejectedErrorBoundaryEvent">
+            <bpmndi:BPMNShape bpmnElement="REJECTED_ERROR_BOUNDARY_EVENT" id="BPMNShape_REJECTED_ERROR_BOUNDARY_EVENT">
                 <omgdc:Bounds height="30.0" width="30.0" x="271.0" y="235.0"></omgdc:Bounds>
             </bpmndi:BPMNShape>
             <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">

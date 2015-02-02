@@ -42,7 +42,7 @@
                 </extensionElements>
             </userTask>
             <endEvent id="rejectedErrorEndEvent" name="ErrorEnd">
-                <errorEventDefinition errorRef="errorDocRejected"></errorEventDefinition>
+                <errorEventDefinition errorRef="ERROR_DOC_REJECTED"></errorEventDefinition>
             </endEvent>
             <sequenceFlow id="dynamic_subflow_1" sourceRef="dynamic_sub_process_start_event"
                           targetRef="COLLABORATE_DOC_USER_TASK_1"/>
@@ -87,8 +87,8 @@
 
             <endEvent id="dynamic_sub_process_end_event" name="End Dynamic SubProcess"/>
         </subProcess>
-        <boundaryEvent id="rejectedErrorBoundaryEvent" name="Rejected Error Event" attachedToRef="DYNAMIC_SUB_PROCESS">
-            <errorEventDefinition errorRef="errorDocRejected"/>
+        <boundaryEvent id="REJECTED_ERROR_BOUNDARY_EVENT" name="Rejected Error Event" attachedToRef="DYNAMIC_SUB_PROCESS">
+            <errorEventDefinition errorRef="ERROR_DOC_REJECTED"/>
         </boundaryEvent>
         <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="submitToWorkflow"/>
         <sequenceFlow id="flow2" sourceRef="submitToWorkflow" targetRef="DYNAMIC_SUB_PROCESS"/>

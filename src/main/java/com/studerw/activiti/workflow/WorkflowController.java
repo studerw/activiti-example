@@ -67,14 +67,13 @@ public class WorkflowController extends BaseController {
         return "workflow/index";
     }
 
-    @RequestMapping(value = "/tasks/{docType}/{group}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/dynamicTasks/{docType}/{group}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Response<String>> userTasksByGroup(
             @RequestBody List<DynamicUserTask> dynamicUserTasks,
             @PathVariable(value = "group") String group,
-            @PathVariable(value = "docType") DocType docType) throws InterruptedException {
-        LOG.debug(dynamicUserTasks.toString());
-        BpmnModel model = this.workflowBldr.documentWithTasks(dynamicUserTasks, docType, group);
-        this.workflowSrvc.updateWorkflow(model, group);
+            @PathVariable(value = "docType") DocType docType)  {
+        LOG.debug("updating tasks for docType: {} and group: {} --> {}", docType, group, dynamicUserTasks.toString());
+        ProcessDefinition procDefinition = this.workflowBldr.updateDynamicTasks(docType, group, dynamicUserTasks);
 
         //wait for the model diagram to catch up (maybe)
         Response res = new Response(true, group);

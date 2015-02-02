@@ -8,12 +8,7 @@ import org.activiti.bpmn.BpmnAutoLayout;
 import org.activiti.bpmn.model.*;
 import org.activiti.bpmn.model.Process;
 import org.activiti.engine.RepositoryService;
-import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
-import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,8 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.io.File;
-import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -63,7 +56,6 @@ public class WorkflowBuilder {
         }
 
         ProcessDefinition baseProcDef = this.workflowService.findBaseProcDef(docType);
-
 
         BpmnModel base = this.repoSrvc.getBpmnModel(baseProcDef.getId());
         org.activiti.bpmn.model.Process proc = base.getMainProcess();
@@ -106,7 +98,7 @@ public class WorkflowBuilder {
         int i = 1;
         for (FlowElement el : flowElements) {
             String id = el.getId();
-            if (isSubTask(id)) {
+            if (isDynamicUserTask(id)) {
                 UserTask userTask = (UserTask)el;
                 DynamicUserTask dut = fromUserTask(userTask, i);
                 LOG.debug("Adding {}", id);
@@ -148,7 +140,7 @@ public class WorkflowBuilder {
         process.addFlowElement(createSequenceFlow(startEvent.getId(), submitTask.getId()));
 
         ErrorEventDefinition errorDef = new ErrorEventDefinition();
-        errorDef.setErrorCode("errorDocRejected");
+        errorDef.setErrorCode(WFConstants.ERROR_DOC_REJECTED);
 
         SubProcess sub = createEmptyDynamicSubProcess(errorDef);
         process.addFlowElement(sub);
@@ -156,7 +148,7 @@ public class WorkflowBuilder {
         process.addFlowElement(createSequenceFlow(submitTask.getId(), sub.getId()));
 
         BoundaryEvent boundaryEvent = new BoundaryEvent();
-        boundaryEvent.setId("rejectedErrorBoundaryEvent");
+        boundaryEvent.setId(WFConstants.REJECTED_BOUNDARY_EVENT_ID);
         boundaryEvent.setName("Rejected Error Event");
         boundaryEvent.setAttachedToRef(sub);
         boundaryEvent.addEventDefinition(errorDef);
@@ -183,6 +175,47 @@ public class WorkflowBuilder {
         //Generate graphical information
         //TODOnew BpmnAutoLayout(model).execute();
         return model;
+    }
+
+    /**
+     *
+     * @param docType
+     * @param group
+     * @param tasks
+     * @return the newly created ProcessDefinition of the replaced workflow for the given {@code DocType} and group.
+     */
+    public ProcessDefinition updateDynamicTasks(DocType docType, String group, List<DynamicUserTask> tasks) {
+        LOG.info("updating tasks for docType {} and group: {}", docType, group);
+        String key = WFConstants.createProcId(docType, group);
+
+        //make sure one doesn't already exist.
+        if (!workflowService.groupWorkflowExists(docType, group)) {
+            throw new IllegalStateException("The workflow for doctype: " + docType.name() + " and group: " + group + " does not exist");
+        }
+
+        ProcessDefinition procDef = workflowService.findProcDefByDocTypeAndGroup(docType, group);
+
+        BpmnModel model = this.repoSrvc.getBpmnModel(procDef.getId());
+        org.activiti.bpmn.model.Process proc = model.getMainProcess();
+        SubProcess subProcessOrig = this.getDynamicSubProcess(proc);
+        if (subProcessOrig == null) {
+            throw new IllegalStateException("Could not find the required Dynamic SubProcess for docType: " + docType + " and group: " + group);
+        }
+        ErrorEventDefinition error = this.getErrorEventDefinition(proc);
+        if (error == null) {
+            throw new IllegalStateException("Could not find the ErrorEventDefinition for docType: " + docType + " and group: " + group);
+        }
+        SubProcess subProcessUpDt = createDynamicSubProcess(tasks, error);
+        proc.removeFlowElement(WFConstants.SUBPROCESS_ID_DYNAMIC);
+        proc.addFlowElement(subProcessOrig);
+
+        //create the diagramming
+        new BpmnAutoLayout(model).execute();
+        String deployId = this.repoSrvc.createDeployment()
+                .addBpmnModel(key + ".bpmn", model).name("Dynamic Process Deployment - " + key).deploy().getId();
+        ProcessDefinition updatedProcDef = workflowService.findProcDefByDocTypeAndGroup(docType, group);
+        Assert.notNull(updatedProcDef, "something went wrong creating the new processDefinition: " + key);
+        return updatedProcDef;
     }
 
     /**
@@ -213,7 +246,7 @@ public class WorkflowBuilder {
         process.addFlowElement(createSequenceFlow(startEvent.getId(), submitTask.getId()));
 
         ErrorEventDefinition errorDef = new ErrorEventDefinition();
-        errorDef.setErrorCode("errorDocRejected");
+        errorDef.setErrorCode(WFConstants.ERROR_DOC_REJECTED);
 
         SubProcess sub = createDynamicSubProcess(dynamicUserTasks, errorDef);
         process.addFlowElement(sub);
@@ -221,7 +254,7 @@ public class WorkflowBuilder {
         process.addFlowElement(createSequenceFlow(submitTask.getId(), sub.getId()));
 
         BoundaryEvent boundaryEvent = new BoundaryEvent();
-        boundaryEvent.setId("rejectedErrorBoundaryEvent");
+        boundaryEvent.setId(WFConstants.REJECTED_BOUNDARY_EVENT_ID);
         boundaryEvent.setName("Rejected Error Event");
         boundaryEvent.setAttachedToRef(sub);
         boundaryEvent.addEventDefinition(errorDef);
@@ -470,10 +503,36 @@ public class WorkflowBuilder {
         else return null;
     }
 
-    protected boolean isSubTask(String id) {
+    protected boolean isDynamicUserTask(String id) {
         return StringUtils.startsWith(id, WFConstants.TASK_ID_DOC_APPROVAL) ||
                 StringUtils.startsWith(id, WFConstants.TASK_ID_DOC_COLLABORATE);
 
+    }
+
+    protected SubProcess getDynamicSubProcess(Process process) {
+        FlowElement sub = process.getFlowElement(WFConstants.SUBPROCESS_ID_DYNAMIC);
+        if (sub != null){
+            return (SubProcess)sub;
+        }
+        return null;
+    }
+
+    protected ErrorEventDefinition getErrorEventDefinition(Process process){
+        FlowElement boundary = process.getFlowElement(WFConstants.REJECTED_BOUNDARY_EVENT_ID);
+        if (boundary == null) {
+            return null;
+        }
+        BoundaryEvent boundaryEvent = (BoundaryEvent) boundary;
+        List<EventDefinition> eventDefs = boundaryEvent.getEventDefinitions();
+        for (EventDefinition eventDef : eventDefs) {
+            if (eventDef instanceof ErrorEventDefinition){
+                ErrorEventDefinition temp = (ErrorEventDefinition)eventDef;
+                if (WFConstants.ERROR_DOC_REJECTED.equals(temp.getErrorCode())){
+                    return temp;
+                }
+            }
+        }
+        return  null;
     }
 
 }

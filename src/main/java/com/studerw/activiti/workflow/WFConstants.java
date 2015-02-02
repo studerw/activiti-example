@@ -15,6 +15,8 @@ public class WFConstants {
     public static final String SUBPROCESS_NAME_DYNAMIC = "Dynamic Document Subprocess";
     public static final String TASK_ID_DOC_APPROVAL = "APPROVE_REJECT_DOC_USER_TASK";
     public static final String TASK_ID_DOC_COLLABORATE = "COLLABORATE_DOC_USER_TASK";
+    public static final String REJECTED_BOUNDARY_EVENT_ID = "REJECTED_ERROR_BOUNDARY_EVENT";
+    public static final String ERROR_DOC_REJECTED = "ERROR_DOC_REJECTED";
 
     public static final String TASK_VAR_APPROVED_OR_REJECTED = "taskOutcome";
     public static final String PROCESS_VAR_APPROVED_OR_REJECTED = "approved";
