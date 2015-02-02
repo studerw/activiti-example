@@ -10,9 +10,12 @@ import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.image.impl.DefaultProcessDiagramGenerator;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,6 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
@@ -73,7 +78,7 @@ public class WorkflowParserTest {
     }
 
     @Test
-    public void copyDocType(){
+    public void copyDocType() throws IOException {
         String key = WFConstants.createProcId(DocType.BOOK_REPORT, "engineering");
         LOG.debug("Using key: {}", key);
         ProcessDefinition def = this.repoSrvc.createProcessDefinitionQuery().
@@ -88,28 +93,41 @@ public class WorkflowParserTest {
         BpmnModel clone = new BpmnModel();
         clone.setTargetNamespace(WFConstants.NAMESPACE_CATEGORY);
         proc.setId(WFConstants.createProcId(DocType.BOOK_REPORT, "blah"));
+        proc.setName(DocType.BOOK_REPORT.name() + " for group: blah");
         clone.addProcess(proc);
 
         new BpmnAutoLayout(clone).execute();
-        String deploymentName = WFConstants.createProcId(DocType.BOOK_REPORT, "blah");
+        String procId = WFConstants.createProcId(DocType.BOOK_REPORT, "blah");
 
 
         String deployId = this.repoSrvc.createDeployment()
-                .addBpmnModel(deploymentName, clone).name(deploymentName).deploy().getId();
+                .addBpmnModel("dynamic-model.bpmn", clone).name("Dynamic Process Deployment").deploy().getId();
 
         List<Deployment> deployments = repoSrvc.createDeploymentQuery().list();
 
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(deploymentName);
+        ProcessDefinition processDefinition = this.repoSrvc.createProcessDefinitionQuery().
+                processDefinitionKey(procId).latestVersion().singleResult();
+
+        Assert.assertNotNull(processDefinition);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(procId);
         assertNotNull(processInstance);
 
 
         List<ProcessDefinition> procDefs = this.repoSrvc.createProcessDefinitionQuery().latestVersion().list();
+        for (ProcessDefinition procDef : procDefs) {
+            LOG.debug(procDef.getKey());
+        }
 
-        ProcessDefinition procDef = this.repoSrvc.createProcessDefinitionQuery().processDefinitionCategory(WFConstants.NAMESPACE_CATEGORY).
-                processDefinitionKey(deploymentName).latestVersion().singleResult();
-        assertEquals(procDef.getKey(), deploymentName);
-        InputStream in = this.repoSrvc.getProcessDiagram(procDef.getId());
+
+        InputStream in = this.repoSrvc.getProcessDiagram(processDefinition.getId());
         assertNotNull(in);
+        FileUtils.copyInputStreamToFile(in, new File("target/diagram.png"));
+
+        InputStream processBpmn = this.repoSrvc
+                .getResourceAsStream(deployId, "dynamic-model.bpmn");
+        FileUtils.copyInputStreamToFile(processBpmn,
+                new File("target/" + procId + ".bpmn20.xml"));
+        IOUtils.closeQuietly(in);
         //InputStream in = new DefaultProcessDiagramGenerator().generatePngDiagram(clone);
         //this.repoSrvc.createDeployment().category(WFConstants.NAMESPACE_CATEGORY).addBpmnModel(
     }

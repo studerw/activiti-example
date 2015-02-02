@@ -5,11 +5,13 @@ import org.activiti.bpmn.model.*;
 import org.activiti.bpmn.model.Process;
 import org.activiti.engine.*;
 import org.activiti.engine.repository.Deployment;
+import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,6 +73,10 @@ public class SimpleWorkflowTest {
                 .addBpmnModel("dynamic-model.bpmn", model).name("Dynamic process deployment")
                 .deploy();
 
+        ProcessDefinition processDefinition = this.repositoryService.createProcessDefinitionQuery().
+                processDefinitionKey("my-process").latestVersion().singleResult();
+
+        Assert.assertNotNull(processDefinition);
         // 4. Start a process instance
         ProcessInstance processInstance = runtimeService
                 .startProcessInstanceByKey("my-process");
