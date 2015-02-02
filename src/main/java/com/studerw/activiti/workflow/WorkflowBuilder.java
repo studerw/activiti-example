@@ -88,7 +88,7 @@ public class WorkflowBuilder {
         LOG.debug("returning dynamic tasks for procDef: {}", procDef.getKey());
 
         BpmnModel model = repoSrvc.getBpmnModel(procDef.getId());
-        Process process = model.getProcesses().get(0);
+        Process process = model.getMainProcess();
 
         SubProcess sub = (SubProcess) process.getFlowElement(WFConstants.SUBPROCESS_ID_DYNAMIC);
         LOG.trace(sub.getName());
@@ -206,13 +206,18 @@ public class WorkflowBuilder {
             throw new IllegalStateException("Could not find the ErrorEventDefinition for docType: " + docType + " and group: " + group);
         }
         SubProcess subProcessUpDt = createDynamicSubProcess(tasks, error);
-        proc.removeFlowElement(WFConstants.SUBPROCESS_ID_DYNAMIC);
-        proc.addFlowElement(subProcessOrig);
+
+//        proc.removeFlowElement(WFConstants.SUBPROCESS_ID_DYNAMIC);
+//        proc.addFlowElement(subProcessOrig);
+
+        BpmnModel updatedModel = new BpmnModel();
+        updatedModel.setTargetNamespace(WFConstants.NAMESPACE_CATEGORY);
+        updatedModel.addProcess(proc);
 
         //create the diagramming
-        new BpmnAutoLayout(model).execute();
+        new BpmnAutoLayout(updatedModel).execute();
         String deployId = this.repoSrvc.createDeployment()
-                .addBpmnModel(key + ".bpmn", model).name("Dynamic Process Deployment - " + key).deploy().getId();
+                .addBpmnModel(key + ".bpmn", updatedModel).name("Dynamic Process Deployment - " + key).deploy().getId();
         ProcessDefinition updatedProcDef = workflowService.findProcDefByDocTypeAndGroup(docType, group);
         Assert.notNull(updatedProcDef, "something went wrong creating the new processDefinition: " + key);
         return updatedProcDef;
