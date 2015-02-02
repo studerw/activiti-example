@@ -99,18 +99,12 @@ public class WorkflowController extends BaseController {
         ProcessDefinition procDef = this.workflowSrvc.findProcDefByDocTypeAndGroup(docType, group);
         if (procDef == null) {
             //we need to build a new group workflow based on the specified docType
-            ProcessDefinition procDefinition = this.workflowBldr.createGroupFromDocType(docType, group)
-            ;
-
+            procDef = this.workflowBldr.createGroupWorkflow(docType, group);
         }
-        else {
-            //just get the tasks for the docType and Group definition that already exists
-        }
-
-        LOG.debug("returning json response of {} dynamicProcDefs", 0);
-        //Response res = new Response(true, group, Lists.new
-        //        return new ResponseEntity<Response<List<DynamicUserTask>>>(res, HttpStatus.OK);
-        return null;
+        List<DynamicUserTask> tasks = this.workflowBldr.getDynamicTasks(procDef);
+        LOG.debug("returning json response of {} dynamicProcDefs", tasks.size());
+        Response res = new Response<List<DynamicUserTask>>(true, group, tasks);
+        return new ResponseEntity<Response<List<DynamicUserTask>>>(res, HttpStatus.OK);
     }
 
 

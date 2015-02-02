@@ -32,6 +32,8 @@ import java.util.Collection;
 import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author William Studer
@@ -131,5 +133,44 @@ public class WorkflowBuilderTest {
 //        InputStream in = new DefaultProcessDiagramGenerator().generatePngDiagram(model);
 //        FileUtils.copyInputStreamToFile(in, new File("target/default_diagram.png"));
 //        IOUtils.closeQuietly(in);
+    }
+
+    @Test
+    public void testCreateGroupWorkflow() throws IOException {
+        ProcessDefinition procDef = this.workflowBldr.createGroupWorkflow(DocType.BOOK_REPORT, "foo");
+        LOG.debug(procDef.getKey());
+        assertNotNull(procDef);
+        BpmnModel model = repositoryService.getBpmnModel(procDef.getId());
+        assertNotNull(model);
+        InputStream in = new DefaultProcessDiagramGenerator().generatePngDiagram(model);
+        FileUtils.copyInputStreamToFile(in, new File("target/default_diagram.png"));
+        IOUtils.closeQuietly(in);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testInvalidDocType() {
+        this.workflowBldr.createGroupWorkflow(DocType.UNIT_TEST_NO_EXIST, "sales");
+        fail("Should not get here");
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testExistingGroup() {
+        this.workflowBldr.createGroupWorkflow(DocType.BOOK_REPORT, "engineering");
+        fail("Should not get here");
+    }
+
+    @Test
+    public void testGetDynamicTasks(){
+        ProcessDefinition processDefinition = this.repositoryService.createProcessDefinitionQuery().processDefinitionCategory(WFConstants.NAMESPACE_CATEGORY).
+                processDefinitionKey(WFConstants.createProcId(DocType.BOOK_REPORT, "engineering")).latestVersion().singleResult();
+        assertNotNull(processDefinition);
+        List<DynamicUserTask> dynamicTasks = this.workflowBldr.getDynamicTasks(processDefinition);
+        LOG.debug(dynamicTasks.size());
+        assertTrue(dynamicTasks.size() == 4);
+        assertTrue(dynamicTasks.get(0).getId().startsWith(WFConstants.TASK_ID_DOC_COLLABORATE));
+        assertTrue(dynamicTasks.get(1).getId().startsWith(WFConstants.TASK_ID_DOC_COLLABORATE));
+        assertTrue(dynamicTasks.get(2).getId().startsWith(WFConstants.TASK_ID_DOC_APPROVAL));
+        assertTrue(dynamicTasks.get(3).getId().startsWith(WFConstants.TASK_ID_DOC_APPROVAL));
+
     }
 }

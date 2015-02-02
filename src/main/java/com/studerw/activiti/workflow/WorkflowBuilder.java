@@ -4,15 +4,27 @@ import com.google.common.collect.Lists;
 import com.studerw.activiti.model.document.DocType;
 import com.studerw.activiti.model.workflow.DynamicUserTask;
 import com.studerw.activiti.model.workflow.DynamicUserTaskType;
+import org.activiti.bpmn.BpmnAutoLayout;
 import org.activiti.bpmn.model.*;
 import org.activiti.bpmn.model.Process;
+import org.activiti.engine.RepositoryService;
+import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
+import org.activiti.engine.runtime.ProcessInstance;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import java.io.File;
+import java.io.InputStream;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -25,9 +37,88 @@ import java.util.List;
 public class WorkflowBuilder {
     private static final Logger LOG = LoggerFactory.getLogger(WorkflowBuilder.class);
 
-//    public ProcessDefinition cloneDocType(DocType docType, String group) {
-//
-//    }
+    @Autowired RepositoryService repoSrvc;
+    @Autowired WorkflowService workflowService;
+
+    /**
+     *
+     * @param docType
+     * @param group
+     * @return a newly created process definition cloned from the base {@link com.studerw.activiti.model.document.DocType}.
+     * The process definition should be deployed to the repo with diagramming also created.
+     * An {@code IllegalStateException} is thrown if the group workflow already exits.
+     */
+    public ProcessDefinition createGroupWorkflow(DocType docType, String group) {
+        LOG.info("Creating new workflow for docType {} and group: {}", docType, group);
+        String key = WFConstants.createProcId(docType, group);
+
+        //make sure the docType is valid
+        if (!this.workflowService.baseDocTypeWorkflowExists(docType)) {
+            throw new IllegalStateException("The doctype: " + docType.name() + " has no base workflow definition.");
+        }
+
+        //make sure one doesn't already exist.
+        if (workflowService.groupWorkflowExists(docType, group)) {
+            throw new IllegalStateException("The workflow for doctype: " + docType.name() + " and group: " + group + " already exists");
+        }
+
+        ProcessDefinition baseProcDef = this.workflowService.findBaseProcDef(docType);
+
+
+        BpmnModel base = this.repoSrvc.getBpmnModel(baseProcDef.getId());
+        org.activiti.bpmn.model.Process proc = base.getMainProcess();
+
+        BpmnModel clone = new BpmnModel();
+        clone.setTargetNamespace(WFConstants.NAMESPACE_CATEGORY);
+        proc.setId(key);
+        proc.setName(String.format("%s for group %s", docType.name(), group));
+        clone.addProcess(proc);
+
+        //create the diagramming
+        new BpmnAutoLayout(clone).execute();
+
+        String deployId = this.repoSrvc.createDeployment()
+                .addBpmnModel(key + ".bpmn", clone).name("Dynamic Process Deployment - " + key).deploy().getId();
+
+
+        ProcessDefinition procDef = workflowService.findProcDefByDocTypeAndGroup(docType, group);
+        Assert.notNull(procDef, "something went wrong creating the new processDefinition: " + key);
+        return procDef;
+    }
+
+    /**
+     *
+     * @param procDef
+     * @return a list of ordered {@code DynamicUserTask} found within the {@code Dynamic Subprocess}
+     */
+    public List<DynamicUserTask> getDynamicTasks(ProcessDefinition procDef) {
+        Assert.notNull(procDef, "ProcessDefinition cannot be null");
+        LOG.debug("returning dynamic tasks for procDef: {}", procDef.getKey());
+
+        BpmnModel model = repoSrvc.getBpmnModel(procDef.getId());
+        Process process = model.getProcesses().get(0);
+
+        SubProcess sub = (SubProcess) process.getFlowElement(WFConstants.SUBPROCESS_ID_DYNAMIC);
+        LOG.trace(sub.getName());
+        List<DynamicUserTask> tasks = Lists.newArrayList();
+
+        Collection<FlowElement> flowElements = sub.getFlowElements();
+        int i = 1;
+        for (FlowElement el : flowElements) {
+            String id = el.getId();
+            if (isSubTask(id)) {
+                UserTask userTask = (UserTask)el;
+                DynamicUserTask dut = fromUserTask(userTask, i);
+                LOG.debug("Adding {}", id);
+                tasks.add(dut);
+
+            }
+        }
+        //this may not be needed, though it's dependent up on Activiti's internal API
+        Collections.sort(tasks);
+        return tasks;
+    }
+
 
     /**
      * Build the minimal base document definition needed for dynamic tasks ({@code NONE} group is used).
@@ -358,17 +449,31 @@ public class WorkflowBuilder {
         return flow;
     }
 
-    public ProcessDefinition createGroupFromDocType(DocType docType, String group){
-        return null;
+    protected DynamicUserTask fromUserTask(org.activiti.bpmn.model.UserTask userTask, int position) {
+        DynamicUserTask dut = new DynamicUserTask();
+        dut.setIndex(position);
+        dut.setCandidateGroups(Lists.newArrayList(userTask.getCandidateGroups()));
+        dut.setCandidateUsers(Lists.newArrayList(userTask.getCandidateUsers()));
+        dut.setName(userTask.getName());
+        dut.setId(userTask.getId());
+        dut.setDynamicUserTaskType(fromString(dut.getId()));
+        return dut;
     }
 
-    /*protected UserTask fromUserTask(org.activiti.bpmn.model.UserTask userTask, int position) {
-        UserTask uTask = new UserTask();
-        uTask.setIndex(position);
-        uTask.setCandidateGroups(Lists.newArrayList(userTask.getCandidateGroups()));
-        uTask.setCandidateUsers(Lists.newArrayList(userTask.getCandidateUsers()));
-        uTask.setName(userTask.getName());
-        uTask.setId(userTask.getId());
-        return uTask;
-    }*/
+    protected DynamicUserTaskType fromString(String id){
+        if (StringUtils.startsWith(id, WFConstants.TASK_ID_DOC_APPROVAL)){
+            return DynamicUserTaskType.APPROVE_REJECT;
+        }
+        else if (StringUtils.startsWith(id, WFConstants.TASK_ID_DOC_COLLABORATE)){
+            return DynamicUserTaskType.COLLABORATION;
+        }
+        else return null;
+    }
+
+    protected boolean isSubTask(String id) {
+        return StringUtils.startsWith(id, WFConstants.TASK_ID_DOC_APPROVAL) ||
+                StringUtils.startsWith(id, WFConstants.TASK_ID_DOC_COLLABORATE);
+
+    }
+
 }
