@@ -196,32 +196,36 @@ public class WorkflowBuilder {
         ProcessDefinition procDef = workflowService.findProcDefByDocTypeAndGroup(docType, group);
 
         BpmnModel model = this.repoSrvc.getBpmnModel(procDef.getId());
-        org.activiti.bpmn.model.Process proc = model.getMainProcess();
-        SubProcess subProcessOrig = this.getDynamicSubProcess(proc);
+        Process proc = model.getMainProcess();
+        Process clone = proc.clone();
+        SubProcess subProcessOrig = this.getDynamicSubProcess(clone);
         if (subProcessOrig == null) {
             throw new IllegalStateException("Could not find the required Dynamic SubProcess for docType: " + docType + " and group: " + group);
         }
-        ErrorEventDefinition error = this.getErrorEventDefinition(proc);
+        ErrorEventDefinition error = this.getErrorEventDefinition(clone);
         if (error == null) {
             throw new IllegalStateException("Could not find the ErrorEventDefinition for docType: " + docType + " and group: " + group);
         }
         SubProcess subProcessUpDt = createDynamicSubProcess(tasks, error);
-
-//        proc.removeFlowElement(WFConstants.SUBPROCESS_ID_DYNAMIC);
-//        proc.addFlowElement(subProcessOrig);
+        List<SequenceFlow> sequenceFlows = getSubReferences(clone, subProcessOrig, subProcessUpDt);
+        //only need to modify ref from original subProcess to next flow element
+        clone.addFlowElement(subProcessUpDt);
 
         BpmnModel updatedModel = new BpmnModel();
         updatedModel.setTargetNamespace(WFConstants.NAMESPACE_CATEGORY);
-        updatedModel.addProcess(proc);
+        updatedModel.addProcess(clone);
 
         //create the diagramming
-        new BpmnAutoLayout(updatedModel).execute();
         String deployId = this.repoSrvc.createDeployment()
                 .addBpmnModel(key + ".bpmn", updatedModel).name("Dynamic Process Deployment - " + key).deploy().getId();
         ProcessDefinition updatedProcDef = workflowService.findProcDefByDocTypeAndGroup(docType, group);
+
+        new BpmnAutoLayout(this.repoSrvc.getBpmnModel(updatedProcDef.getId())).execute();
+
         Assert.notNull(updatedProcDef, "something went wrong creating the new processDefinition: " + key);
         return updatedProcDef;
     }
+
 
     /**
      * @param dynamicUserTasks
@@ -538,6 +542,35 @@ public class WorkflowBuilder {
             }
         }
         return  null;
+    }
+
+    /**
+     * @param process
+     * @param original
+     * @param updated
+     * @return
+     */
+    private List<SequenceFlow> getSubReferences(Process process, SubProcess original, SubProcess updated) {
+        List<SequenceFlow> refs = Lists.newArrayList();
+
+        Collection<FlowElement> flowElements = process.getFlowElements();
+        for (FlowElement el : flowElements) {
+            if (el instanceof SequenceFlow){
+                SequenceFlow seqFlow = (SequenceFlow)el;
+                if (WFConstants.SUBPROCESS_ID_DYNAMIC.equals(seqFlow.getTargetRef())){
+                    refs.add(0, seqFlow);
+                    continue;
+                }
+                if (WFConstants.SUBPROCESS_ID_DYNAMIC.equals(seqFlow.getSourceRef())) {
+                    refs.add(1, seqFlow);
+                    continue;
+                }
+            }
+        }
+        if (refs.size() != 2 || refs.get(0) == null || refs.get(1) == null) {
+            throw new IllegalStateException("Could not find source and ref sequenceflows");
+        }
+        return refs;
     }
 
 }

@@ -106,7 +106,7 @@ public class WorkflowBuilderTest {
         List<DynamicUserTask> tasks = this.workflowBldr.getDynamicTasks(pd);
         assertTrue(tasks.size() == 4);
 
-        ProcessDefinition updatedProcDef = this.workflowBldr.updateDynamicTasks(bookReport, group, tasks);
+        ProcessDefinition updatedProcDef = this.workflowBldr.updateDynamicTasks(bookReport, group, dynamicUserTasks);
         assertNotNull(updatedProcDef);
 
         tasks = this.workflowBldr.getDynamicTasks(updatedProcDef);
