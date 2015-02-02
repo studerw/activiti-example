@@ -81,15 +81,14 @@ public class WorkflowController extends BaseController {
         return new ResponseEntity<Response<String>>(res, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/tasks/{docType}/{group}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/dynamicTasks/{docType}/{group}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Response<List<DynamicUserTask>>> dynamicTasksByDocAndGroup
             (@PathVariable(value = "group") String group,
              @PathVariable(value = "docType") DocType docType) {
 
         LOG.debug("finding dynamic tasks for docType = {} and group = {}", docType, group);
 
-
-        // Do we have a Doctype at least?
+        // Do we have a DocType at least?
         if (!workflowSrvc.baseDocTypeWorkflowExists(docType)) {
             String errMsg = String.format("There is no defined work group for docType: %s", docType.name());
             Response res = new Response(false, errMsg);
@@ -98,16 +97,15 @@ public class WorkflowController extends BaseController {
 
         //Try to find the specific DocType/Group workflow
         ProcessDefinition procDef = this.workflowSrvc.findProcDefByDocTypeAndGroup(docType, group);
-/*
         if (procDef == null) {
             //we need to build a new group workflow based on the specified docType
+            ProcessDefinition procDefinition = this.workflowBldr.createGroupFromDocType(docType, group)
             ;
 
         }
         else {
             //just get the tasks for the docType and Group definition that already exists
         }
-*/
 
         LOG.debug("returning json response of {} dynamicProcDefs", 0);
         //Response res = new Response(true, group, Lists.new

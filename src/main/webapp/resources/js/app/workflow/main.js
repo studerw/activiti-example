@@ -2,6 +2,7 @@ var APP = APP || {};
 APP.users = [];
 APP.groups = [];
 APP.dynamicTasks = [];
+APP.BASE_URL = SERVLET_CONTEXT+'/workflow/dynamicTasks/';
 
 APP.dynamicTasksTpl = _.template(
     '<table class="table table-striped"> \
@@ -151,11 +152,10 @@ function getUsers() {
 }
 
 function getDynamicTasks(group, docType) {
-
     $.ajax({
         type: 'GET',
         dataType: 'json',
-        url: SERVLET_CONTEXT+'/workflow/'+docType +'/'+group+'/dynamicTasks/',
+        url: APP.BASE_URL+docType +'/'+group+'',
         headers: {
             Accept: "application/json"
         },
@@ -209,7 +209,7 @@ function updateDynamicTasksTpl() {
 function updateDynamicTasks(group, docType) {
     var _group = group;
     var _docType = docType;
-    $.ajax(SERVLET_CONTEXT + '/workflow/' + _docType + '/' + _group + '/dynamicTasks/', {
+    $.ajax(APP.BASE_URL+ _docType + '/' + _group, {
         type: 'PUT',
         dataType: 'json',
         contentType: "application/json; charset=utf-8",
@@ -267,16 +267,18 @@ $(function () {
     $('#groupSel').change(function () {
         var group =  $(this).val();
         var docType = $('#docTypeSel').val();
-        if (!_.isEmpty(group) && !_.isEmpty(docType)){
-            alert("DocType =" + docType + ", group =" + group);
+        if (_.isEmpty(group) || _.isEmpty(docType)){
+            return;
         }
+        //alert("DocType =" + docType + ", group =" + group);
+        getDynamicTasks(group, docType);
+
         //    $('#dynamicTasks').removeClass('hidden');
         //    var newSrc = SERVLET_CONTEXT + '/workflow/diagrams/' + DOC_dynamicTask_ROOT_ID + '-' + group;
         //    //need to add random param to avoid caching of the image
         //    var rand = _.random(1, 100000000);
         //    newSrc = newSrc + '?rand=' + rand
         //    $('#proc-main-diagram').attr('src', newSrc);
-        getDynamicTasks(group, docType);
         //    $('#groupTitle').text(group);
         //}
         //else {

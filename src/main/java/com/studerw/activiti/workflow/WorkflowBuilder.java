@@ -6,6 +6,7 @@ import com.studerw.activiti.model.workflow.DynamicUserTask;
 import com.studerw.activiti.model.workflow.DynamicUserTaskType;
 import org.activiti.bpmn.model.*;
 import org.activiti.bpmn.model.Process;
+import org.activiti.engine.repository.ProcessDefinition;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,10 @@ import java.util.List;
 @Service("workflowBuilder")
 public class WorkflowBuilder {
     private static final Logger LOG = LoggerFactory.getLogger(WorkflowBuilder.class);
+
+//    public ProcessDefinition cloneDocType(DocType docType, String group) {
+//
+//    }
 
     /**
      * Build the minimal base document definition needed for dynamic tasks ({@code NONE} group is used).
@@ -351,6 +356,10 @@ public class WorkflowBuilder {
         flow.setTargetRef(to);
         flow.setName(name);
         return flow;
+    }
+
+    public ProcessDefinition createGroupFromDocType(DocType docType, String group){
+        return null;
     }
 
     /*protected UserTask fromUserTask(org.activiti.bpmn.model.UserTask userTask, int position) {
