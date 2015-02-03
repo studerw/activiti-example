@@ -163,8 +163,6 @@ public class WorkflowBuilder {
     }
 
 
-
-
     protected SubProcess createDynamicSubProcess(List<DynamicUserTask> dynamicUserTasks, ErrorEventDefinition errorDef) {
         SubProcess sub = new SubProcess();
         sub.setId(WFConstants.SUBPROCESS_ID_DYNAMIC);
@@ -299,6 +297,8 @@ public class WorkflowBuilder {
         ref.setId(String.format("dynamic_collab_subflow_%d_%d", currentIdx, total));
         ref.setName(String.format("Collaboration SubFlow %d of %d", currentIdx, total));
         ref.setSourceRef(current.getId());
+
+        subProcess.addFlowElement(ref);
 
         return ref;
     }

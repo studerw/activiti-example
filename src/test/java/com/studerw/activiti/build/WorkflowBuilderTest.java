@@ -24,6 +24,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.Assert;
@@ -45,7 +46,7 @@ import static org.junit.Assert.fail;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"classpath:spring/testAppContext.xml"})
-public class WorkflowBuilderTest {
+    public class WorkflowBuilderTest {
     private static final Logger LOG = LogManager.getLogger(WorkflowBuilderTest.class);
     @Autowired public WorkflowBuilder workflowBldr;
     @Autowired RuntimeService runtimeService;
@@ -71,6 +72,7 @@ public class WorkflowBuilderTest {
 
 
     @Test
+    @DirtiesContext
     public void testUpdateDynamicTasks() throws IOException {
         List<DynamicUserTask> dynamicUserTasks = Lists.newArrayList();
         DynamicUserTask dynamicUserTask = new DynamicUserTask();
@@ -114,6 +116,7 @@ public class WorkflowBuilderTest {
 
 
     @Test
+    @DirtiesContext
     public void testCreateGroupWorkflow() throws IOException {
         ProcessDefinition procDef = this.workflowBldr.createGroupWorkflow(DocType.BOOK_REPORT, "foo");
         LOG.debug(procDef.getKey());
@@ -139,6 +142,7 @@ public class WorkflowBuilderTest {
     }
 
     @Test
+    @DirtiesContext
     public void testGetDynamicTasks() {
         String key = WFConstants.createProcId(DocType.BOOK_REPORT, "engineering");
         ProcessDefinition processDefinition = this.repositoryService.createProcessDefinitionQuery().
