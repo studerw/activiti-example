@@ -27,9 +27,9 @@
         <div class="page-header">
             <span class="glyphicon glyphicon-tasks pull-right"></span>
 
-            <h2>Tasks
+            <h3>Tasks
                 <small>${pageContext.request.remoteUser}</small>
-            </h2>
+            </h3>
         </div>
 
         <c:if test="${error == true}">

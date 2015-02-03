@@ -19,7 +19,7 @@ APP.dynamicTasksTpl = _.template(
         <tbody>  \
             <% _.each(dynamicTasks, function(dynamicTask){ %> \
                 <tr data-id="<%= dynamicTask.id %>" class="dynamicTask-row">  \
-                    <td><%= dynamicTask.position %></td> \
+                    <td><%= dynamicTask.index %></td> \
                     <td>\
                         <select data-placeholder="Candidate Groups" class="chosen-select candidate-groups" data-position="<%= dynamicTask.position %>" multiple>\
                         <% _.each(groups, function(group){ %> \
@@ -163,8 +163,27 @@ function getDynamicTasks(group, docType) {
             if (!data.success) {
                 alert("There was an error updating the workflow");
             }
+            $('#tasksGroupLabel').text(data.message);
             APP.dynamicTasks = data.data;
             updateDynamicTasksTpl(APP.dynamicTasks);
+            $('#dynamicTasks').removeClass('hidden').addClass('show');
+            //var newSrc = SERVLET_CONTEXT + '/workflow/diagrams/' + DOC_dynamicTask_ROOT_ID + '-' + group;
+            var newSrc ="http://placehold.it/800x200.png";
+            var rand = _.random(1, 100000000);
+            //newSrc = newSrc + '?rand=' + rand
+            $('#proc-main-diagram').attr('src', newSrc);
+            //    //need to add random param to avoid caching of the image
+            //    var rand = _.random(1, 100000000);
+            //    newSrc = newSrc + '?rand=' + rand
+            //    $('#proc-main-diagram').attr('src', newSrc);
+            //    $('#groupTitle').text(group);
+            //}
+            //else {
+            //    $('#dynamicTasks').addClass('hidden');
+            //    var newSrc = SERVLET_CONTEXT + '/workflow/diagrams/' + DOC_dynamicTask_ROOT_ID;
+            //    $('#proc-main-diagram').attr('src', newSrc);
+            //    $('#groupTitle').text('Default');
+            //}
         },
         error: function (error) {
             alert("There was an error updating the workflow");
@@ -173,7 +192,7 @@ function getDynamicTasks(group, docType) {
 }
 
 function updateDynamicTasksTpl() {
-    $('#dynamicTasks-panel').html(APP.dynamicTasksTpl({
+    $('#userTasks-panel').html(APP.dynamicTasksTpl({
         dynamicTasks: APP.dynamicTasks,
         groups: APP.groups,
         users: APP.users
@@ -247,7 +266,7 @@ $(function () {
         var group = $("#groupSel").val();
         var docType = $('#docType').val();
         if (!_.isEmpty(group) && !_.isEmpty(docType)) {
-            updateDynamicTasks(group);
+            updateDynamicTasks(group, docType);
         }
     });
     //hide and show the group select based on docType
@@ -272,22 +291,6 @@ $(function () {
         }
         //alert("DocType =" + docType + ", group =" + group);
         getDynamicTasks(group, docType);
-
-        //    $('#dynamicTasks').removeClass('hidden');
-        //    var newSrc = SERVLET_CONTEXT + '/workflow/diagrams/' + DOC_dynamicTask_ROOT_ID + '-' + group;
-        //    //need to add random param to avoid caching of the image
-        //    var rand = _.random(1, 100000000);
-        //    newSrc = newSrc + '?rand=' + rand
-        //    $('#proc-main-diagram').attr('src', newSrc);
-        //    $('#groupTitle').text(group);
-        //}
-        //else {
-        //    $('#dynamicTasks').addClass('hidden');
-        //    var newSrc = SERVLET_CONTEXT + '/workflow/diagrams/' + DOC_dynamicTask_ROOT_ID;
-        //    $('#proc-main-diagram').attr('src', newSrc);
-        //    $('#groupTitle').text('Default');
-        //}
-
     });
     //set up JQuery choosen plugin
     var config = {

@@ -69,9 +69,7 @@
             </div>
         </div>
 
-        <div id="userList">
-
-        </div>
+        <div id="userList"></div>
     </div>
 
 </div>

@@ -30,7 +30,7 @@
         <div class="page-header">
             <span class="glyphicon glyphicon-cog pull-right"></span>
 
-            <h2>Workflows</h2>
+            <h3>Workflows</h3>
         </div>
 
         <c:if test="${error == true}">
@@ -82,31 +82,44 @@
         </div>
         <hr/>
 
-        <div id="dynamic-tasks" class="collapse">
+        <div id="dynamicTasks" class="hidden">
             <div class="page-header">
-                <span class="glyphicon glyphicon-paperclip pull-right"></span>
+                <%--<span class="glyphicon glyphicon-paperclip pull-right"></span>--%>
 
-                <h3>Dynamic Workflow Tasks</h3>
-                    <%--<small id="groupTitle">Default</small></h3>--%>
+                <h4>Dynamic Workflow Tasks
+                    <small id="tasksGroupLabel">Default</small>
+                </h4>
             </div>
 
 
             <div id="diagram" class="center-block">
                 <p>
-                    <%--<img id="proc-main-diagram" class="img-responsive img-rounded proc-diagram" src="${pageContext.request.contextPath}/workflow/diagrams/${defaultDocProcId}"--%>
-                    <%--alt="Workflow Process Diagram">--%>
+                    <img id="proc-main-diagram" class="img-responsive img-rounded proc-diagram" src="http://placehold.it/800x200.png"
+                         alt="Workflow Process Diagram">
                 </p>
             </div>
 
-            <div id="approvals" class="panel panel-info hidden">
+            <div id="userTasks" class="panel panel-info">
                 <div class="panel-heading">
                     <span class="glyphicon glyphicon-thumbs-up pull-right"></span>
 
-                    <h3 class="panel-title">Approvals</h3>
+                    <h3 class="panel-title">User Tasks</h3>
                 </div>
-                <div class="panel-body" id="approvals-panel">
+                <div class="panel-body">
+                    <div class="btn-group pull-right">
+                        <button type="button" class="btn btn-default dropdown-toggle btn-primary" data-toggle="dropdown" aria-expanded="false">
+                            Add Task<span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="${pageContext.request.contextPath}/document/bookReport/create.htm">Book Report</a></li>
+                            <li><a href="${pageContext.request.contextPath}/document/invoice/create.htm">Invoice</a></li>
+                        </ul>
+                    </div>
+                    <div id="userTasks-panel" class="clearfix">
 
+                    </div>
                 </div>
+
                 <p class="pull-right">
                     <button id="update-button" type="button" style="margin-top: 20px" class="btn btn-primary">Update
                         Workflow
