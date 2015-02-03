@@ -37,7 +37,6 @@ import static org.junit.Assert.assertNotNull;
 public class WorkflowParserTest {
     private static final Logger LOG = LogManager.getLogger(WorkflowParserTest.class);
 
-    @Autowired WorkflowParser parser;
     @Autowired RepositoryService repoSrvc;
     @Autowired RuntimeService runtimeService;
 

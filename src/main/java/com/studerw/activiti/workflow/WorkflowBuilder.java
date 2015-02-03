@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Used to build and modify workflows for addition of dynamic tasks
+ * Used to build and modify workflows for modification of  of subprocess dynamic tasks
  *
  * @author William Studer
  *         Date: 5/29/14
@@ -106,76 +106,11 @@ public class WorkflowBuilder {
 
             }
         }
-        //this may not be needed, though it's dependent up on Activiti's internal API
+        //this may not be needed, though it's dependent upon Activiti's internal API
         Collections.sort(tasks);
         return tasks;
     }
 
-
-    /**
-     * Build the minimal base document definition needed for dynamic tasks ({@code NONE} group is used).
-     * The ID is set to {@code WFConstants.WORKFLOW_GROUP_NONE} and
-     * the category (i.e. Namespace) set to {@code DocType.GENERAL};
-     *
-     * @param name
-     * @return BpmnModel
-     */
-    public BpmnModel defaultDocument(String name) {
-        BpmnModel model = new BpmnModel();
-        model.setTargetNamespace(WFConstants.NAMESPACE_CATEGORY);
-        org.activiti.bpmn.model.Process process = new Process();
-        process.setId(WFConstants.createProcId(DocType.UNIT_TEST_NO_EXIST, WFConstants.WORKFLOW_GROUP_NONE));
-                process.setName(name);
-        model.addProcess(process);
-
-        StartEvent startEvent = new StartEvent();
-        startEvent.setId("start");
-
-        process.addFlowElement(startEvent);
-
-        org.activiti.bpmn.model.UserTask submitTask = new org.activiti.bpmn.model.UserTask();
-        submitTask.setId("submitDocUserTask");
-        submitTask.setName("Submit Document to Workflow");
-        process.addFlowElement(submitTask);
-        process.addFlowElement(createSequenceFlow(startEvent.getId(), submitTask.getId()));
-
-        ErrorEventDefinition errorDef = new ErrorEventDefinition();
-        errorDef.setErrorCode(WFConstants.ERROR_DOC_REJECTED);
-
-        SubProcess sub = createEmptyDynamicSubProcess(errorDef);
-        process.addFlowElement(sub);
-
-        process.addFlowElement(createSequenceFlow(submitTask.getId(), sub.getId()));
-
-        BoundaryEvent boundaryEvent = new BoundaryEvent();
-        boundaryEvent.setId(WFConstants.REJECTED_BOUNDARY_EVENT_ID);
-        boundaryEvent.setName("Rejected Error Event");
-        boundaryEvent.setAttachedToRef(sub);
-        boundaryEvent.addEventDefinition(errorDef);
-        process.addFlowElement(boundaryEvent);
-
-        process.addFlowElement(createSequenceFlow(boundaryEvent.getId(), submitTask.getId(), "Rejected"));
-/*
-        ServiceTask pub = new ServiceTask();
-        pub.setId("publishDocServiceTask");
-        pub.setName("Publish Approved Document");
-        pub.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
-        pub.setImplementation("${documentWorkflow.publish(execution)}");
-
-        process.addFlowElement(pub);
-*/
-
-        EndEvent endEvent = new EndEvent();
-        endEvent.setId("end");
-        process.addFlowElement(endEvent);
-        process.addFlowElement(createSequenceFlow(sub.getId(), endEvent.getId()));
-
-//        process.addFlowElement(createSequenceFlow(pub.getId(), endEvent.getId()));
-
-        //Generate graphical information
-        //TODOnew BpmnAutoLayout(model).execute();
-        return model;
-    }
 
     /**
      *
@@ -197,128 +132,38 @@ public class WorkflowBuilder {
 
         BpmnModel model = this.repoSrvc.getBpmnModel(procDef.getId());
         Process proc = model.getMainProcess();
-        Process clone = proc.clone();
-        SubProcess subProcessOrig = this.getDynamicSubProcess(clone);
+        SubProcess subProcessOrig = this.getDynamicSubProcess(proc);
         if (subProcessOrig == null) {
             throw new IllegalStateException("Could not find the required Dynamic SubProcess for docType: " + docType + " and group: " + group);
         }
-        ErrorEventDefinition error = this.getErrorEventDefinition(clone);
+        ErrorEventDefinition error = this.getErrorEventDefinition(proc);
         if (error == null) {
             throw new IllegalStateException("Could not find the ErrorEventDefinition for docType: " + docType + " and group: " + group);
         }
         SubProcess subProcessUpDt = createDynamicSubProcess(tasks, error);
-        List<SequenceFlow> sequenceFlows = getSubReferences(clone, subProcessOrig, subProcessUpDt);
+        List<SequenceFlow> sequenceFlows = getSubReferences(proc, subProcessOrig, subProcessUpDt);
         //only need to modify ref from original subProcess to next flow element
-        clone.addFlowElement(subProcessUpDt);
+        proc.removeFlowElement(subProcessOrig.getId());
+        proc.addFlowElement(subProcessUpDt);
 
         BpmnModel updatedModel = new BpmnModel();
         updatedModel.setTargetNamespace(WFConstants.NAMESPACE_CATEGORY);
-        updatedModel.addProcess(clone);
+        updatedModel.addProcess(proc);
+
+        //create the diagramming
+        new BpmnAutoLayout(updatedModel).execute();
 
         //create the diagramming
         String deployId = this.repoSrvc.createDeployment()
                 .addBpmnModel(key + ".bpmn", updatedModel).name("Dynamic Process Deployment - " + key).deploy().getId();
         ProcessDefinition updatedProcDef = workflowService.findProcDefByDocTypeAndGroup(docType, group);
 
-        new BpmnAutoLayout(this.repoSrvc.getBpmnModel(updatedProcDef.getId())).execute();
-
         Assert.notNull(updatedProcDef, "something went wrong creating the new processDefinition: " + key);
         return updatedProcDef;
     }
 
 
-    /**
-     * @param dynamicUserTasks
-     * @param docType
-     * @param group
-     * @return fully populated BpmnModel with appropriate ids, namespace, sub process tasks, etc.
-     */
-    public BpmnModel documentWithTasks(List<DynamicUserTask> dynamicUserTasks, DocType docType, String group) {
-        Assert.notNull(docType);
-        Assert.hasText(group);
-        BpmnModel model = new BpmnModel();
-        model.setTargetNamespace(WFConstants.NAMESPACE_CATEGORY);
-        org.activiti.bpmn.model.Process process = new Process();
-        process.setId(String.format("%s_%s", docType.name(), group));
-        process.setName(String.format("Generated workflow for docType=%s and Group=%s", docType.name(), group));
 
-        model.addProcess(process);
-
-        StartEvent startEvent = new StartEvent();
-        startEvent.setId("start");
-        process.addFlowElement(startEvent);
-
-        org.activiti.bpmn.model.UserTask submitTask = new org.activiti.bpmn.model.UserTask();
-        submitTask.setId("submitDocUserTask");
-        submitTask.setName("Submit doc to Workflow");
-        process.addFlowElement(submitTask);
-        process.addFlowElement(createSequenceFlow(startEvent.getId(), submitTask.getId()));
-
-        ErrorEventDefinition errorDef = new ErrorEventDefinition();
-        errorDef.setErrorCode(WFConstants.ERROR_DOC_REJECTED);
-
-        SubProcess sub = createDynamicSubProcess(dynamicUserTasks, errorDef);
-        process.addFlowElement(sub);
-
-        process.addFlowElement(createSequenceFlow(submitTask.getId(), sub.getId()));
-
-        BoundaryEvent boundaryEvent = new BoundaryEvent();
-        boundaryEvent.setId(WFConstants.REJECTED_BOUNDARY_EVENT_ID);
-        boundaryEvent.setName("Rejected Error Event");
-        boundaryEvent.setAttachedToRef(sub);
-        boundaryEvent.addEventDefinition(errorDef);
-        process.addFlowElement(boundaryEvent);
-
-        process.addFlowElement(createSequenceFlow(boundaryEvent.getId(), submitTask.getId(), "Rejected"));
-/*
-        ServiceTask pub = new ServiceTask();
-        pub.setId("publishDocServiceTask");
-        pub.setName("Publish Approved Document");
-        pub.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
-        pub.setImplementation("${documentWorkflow.publish(execution)}");
-
-        process.addFlowElement(pub);
-        process.addFlowElement(createSequenceFlow(sub.getId(), pub.getId()));
-*/
-
-        EndEvent endEvent = new EndEvent();
-        endEvent.setId("end");
-
-        process.addFlowElement(endEvent);
-        process.addFlowElement(createSequenceFlow(sub.getId(), endEvent.getId()));
-
-        //Generate graphical information
-        new BpmnAutoLayout(model).execute();
-        return model;
-    }
-
-
-    protected SubProcess createEmptyDynamicSubProcess(ErrorEventDefinition errorDef) {
-        SubProcess sub = new SubProcess();
-        sub.setId(WFConstants.SUBPROCESS_ID_DYNAMIC);
-        sub.setName(WFConstants.SUBPROCESS_NAME_DYNAMIC);
-
-        StartEvent start = new StartEvent();
-        start.setId("dynamic_sub_process_start_event");
-        start.setName("Start Dynamic SubProcess");
-        sub.addFlowElement(start);
-
-        EndEvent end = new EndEvent();
-        end.setId("dynamic_sub_process_end_event");
-        end.setName("End Dynamic SubProcess");
-        sub.addFlowElement(end);
-
-        EndEvent errorEnd = new EndEvent();
-        errorEnd.setId("rejectedErrorEndEvent");
-        errorEnd.setName("ErrorEnd");
-        errorEnd.addEventDefinition(errorDef);
-        sub.addFlowElement(errorEnd);
-
-        sub.addFlowElement(createSequenceFlow(start.getId(), end.getId()));
-
-        return sub;
-
-    }
 
     protected SubProcess createDynamicSubProcess(List<DynamicUserTask> dynamicUserTasks, ErrorEventDefinition errorDef) {
         SubProcess sub = new SubProcess();
@@ -349,9 +194,9 @@ public class WorkflowBuilder {
 
         SequenceFlow startFlow = new SequenceFlow(start.getId(), null);
         sub.addFlowElement(startFlow);
-        RecurseUserTasks recurseUserTasks = new RecurseUserTasks(dynamicUserTasks, sub, errorEnd);
+        RecursiveTaskConverter recursiveTaskConverter = new RecursiveTaskConverter(dynamicUserTasks, sub, errorEnd);
 
-        SequenceFlow lastRef = recurseUserTasks.recurseSequenceFlows(startFlow);
+        SequenceFlow lastRef = recursiveTaskConverter.recurseSequenceFlows(startFlow);
         lastRef.setTargetRef(end.getId());
         return sub;
     }
@@ -532,7 +377,7 @@ public class WorkflowBuilder {
      * @param updated
      * @return
      */
-    private List<SequenceFlow> getSubReferences(Process process, SubProcess original, SubProcess updated) {
+    protected List<SequenceFlow> getSubReferences(Process process, SubProcess original, SubProcess updated) {
         List<SequenceFlow> refs = Lists.newArrayList();
 
         Collection<FlowElement> flowElements = process.getFlowElements();
@@ -555,7 +400,7 @@ public class WorkflowBuilder {
         return refs;
     }
 
-    private static class RecurseUserTasks{
+    protected static class RecursiveTaskConverter {
         private List<DynamicUserTask> dynamicUserTasks;
         private int approvalCount = 1;
         private int approvalsTotal = 0;
@@ -564,7 +409,7 @@ public class WorkflowBuilder {
         private SubProcess subProcess;
         private EndEvent errorEnd;
 
-        public RecurseUserTasks(List<DynamicUserTask> dynamicUserTasks, SubProcess subProcess, EndEvent errorEnd) {
+        public RecursiveTaskConverter(List<DynamicUserTask> dynamicUserTasks, SubProcess subProcess, EndEvent errorEnd) {
             this.dynamicUserTasks = Lists.newArrayList(dynamicUserTasks);
             this.subProcess = subProcess;
             this.errorEnd = errorEnd;

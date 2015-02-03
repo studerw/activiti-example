@@ -94,5 +94,6 @@
         <sequenceFlow id="flow2" sourceRef="submitToWorkflow" targetRef="DYNAMIC_SUB_PROCESS"/>
         <sequenceFlow id="flow3" sourceRef="DYNAMIC_SUB_PROCESS" targetRef="publishBookReport"/>
         <sequenceFlow id="flow4" sourceRef="publishBookReport" targetRef="endevent1"/>
+        <sequenceFlow id="flow5" name="Doc Rejected" sourceRef="REJECTED_ERROR_BOUNDARY_EVENT" targetRef="submitToWorkflow"></sequenceFlow>
     </process>
 </definitions>
