@@ -124,8 +124,8 @@ public class WorkflowBuilder {
         BpmnModel model = new BpmnModel();
         model.setTargetNamespace(WFConstants.NAMESPACE_CATEGORY);
         org.activiti.bpmn.model.Process process = new Process();
-        process.setId(String.format("%s_%s", DocType.GENERAL.name(), WFConstants.WORKFLOW_GROUP_NONE));
-        process.setName(name);
+        process.setId(WFConstants.createProcId(DocType.UNIT_TEST_NO_EXIST, WFConstants.WORKFLOW_GROUP_NONE));
+                process.setName(name);
         model.addProcess(process);
 
         StartEvent startEvent = new StartEvent();
@@ -288,7 +288,7 @@ public class WorkflowBuilder {
         process.addFlowElement(createSequenceFlow(sub.getId(), endEvent.getId()));
 
         //Generate graphical information
-        //new BpmnAutoLayout(model).execute();TODO
+        new BpmnAutoLayout(model).execute();
         return model;
     }
 
@@ -346,58 +346,32 @@ public class WorkflowBuilder {
             return sub;
         }
 
-        List<DynamicUserTask> collaborations = Lists.newArrayList();
-        List<DynamicUserTask> approvals = Lists.newArrayList();
-        for (DynamicUserTask ut : dynamicUserTasks) {
-            if (DynamicUserTaskType.APPROVE_REJECT.equals(ut.getDynamicUserTaskType())) {
-                approvals.add(ut);
-            } else if (DynamicUserTaskType.COLLABORATION.equals(ut.getDynamicUserTaskType())) {
-                collaborations.add(ut);
-            } else {
-                throw new IllegalArgumentException("Invalid user task type: " + ut.getDynamicUserTaskType());
-            }
-        }
 
-        List<org.activiti.bpmn.model.UserTask> created = Lists.newArrayList();
-        int approvalCount = 1;
-        int collabCount = 1;
-        boolean first = true;
-        for (DynamicUserTask from : dynamicUserTasks) {
-            if (DynamicUserTaskType.APPROVE_REJECT.equals(from.getDynamicUserTaskType())) {
-                org.activiti.bpmn.model.UserTask approvalTask = approvalTask(sub, errorEnd, from, approvalCount, approvals.size());
-                created.add(approvalTask);
-                approvalCount++;
-            } else if (DynamicUserTaskType.COLLABORATION.equals(from.getDynamicUserTaskType())) {
-                org.activiti.bpmn.model.UserTask collabTask = collaborationTask(sub, from, collabCount, collaborations.size());
-                created.add(collabTask);
-                collabCount++;
-            } else {
-                throw new IllegalArgumentException("Invalid user task type: " + from.getDynamicUserTaskType());
-            }
+        SequenceFlow startFlow = new SequenceFlow(start.getId(), null);
+        sub.addFlowElement(startFlow);
+        RecurseUserTasks recurseUserTasks = new RecurseUserTasks(dynamicUserTasks, sub, errorEnd);
 
-        }
-
-        sub.addFlowElement(createSequenceFlow(start.getId(), created.get(0).getId()));
-        int lastIndex = created.size() - 1;
-        sub.addFlowElement(createSequenceFlow(created.get(lastIndex).getId(), end.getId()));
+        SequenceFlow lastRef = recurseUserTasks.recurseSequenceFlows(startFlow);
+        lastRef.setTargetRef(end.getId());
         return sub;
     }
 
 
-    protected org.activiti.bpmn.model.UserTask approvalTask(SubProcess sub, EndEvent errorEnd, DynamicUserTask from, int current, int total) {
-        org.activiti.bpmn.model.UserTask to = new org.activiti.bpmn.model.UserTask();
-        to.setId(String.format("%s_%d", WFConstants.TASK_ID_DOC_APPROVAL, current));
+
+    protected static SequenceFlow approvalTask(SubProcess sub, EndEvent errorEnd, DynamicUserTask from, int currentIdx, int total, SequenceFlow prev) {
+        org.activiti.bpmn.model.UserTask current = new org.activiti.bpmn.model.UserTask();
+        current.setId(String.format("%s_%d", WFConstants.TASK_ID_DOC_APPROVAL, currentIdx));
         if (StringUtils.isBlank(from.getName())) {
-            to.setName(String.format("Approve Document (%d / %d)", current, total));
+            current.setName(String.format("Approve Document (%d / %d)", currentIdx, total));
         } else {
-            to.setName(from.getName());
+            current.setName(from.getName());
         }
 
         ActivitiListener onCreateApproval = new ActivitiListener();
         onCreateApproval.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
         onCreateApproval.setImplementation("${docWorkflowListener.onCreateApproval(execution, task)}");
         onCreateApproval.setEvent("create");
-        to.setTaskListeners(Lists.newArrayList(onCreateApproval));
+        current.setTaskListeners(Lists.newArrayList(onCreateApproval));
 
 
         if (from.getCandidateGroups().isEmpty() && from.getCandidateUsers().isEmpty()) {
@@ -410,21 +384,19 @@ public class WorkflowBuilder {
                 userTask.setTaskListeners(Lists.newArrayList(taskListener));
 */
         }
-        to.setCandidateGroups(from.getCandidateGroups());
-        to.setCandidateUsers(from.getCandidateUsers());
-
-        sub.addFlowElement(to);
+        current.setCandidateGroups(from.getCandidateGroups());
+        current.setCandidateUsers(from.getCandidateUsers());
 
         ExclusiveGateway gw = new ExclusiveGateway();
-        gw.setId(String.format("exclusivegateway_approval_%d_of_%d", current, total));
-        gw.setName(String.format("Exclusive Approval Gateway %d of %d", current, total));
+        gw.setId(String.format("exclusivegateway_approval_%d_of_%d", currentIdx, total));
+        gw.setName(String.format("Exclusive Approval Gateway %d of %d", currentIdx, total));
         sub.addFlowElement(gw);
-        sub.addFlowElement(createSequenceFlow(to.getId(), gw.getId()));
+        sub.addFlowElement(createSequenceFlow(current.getId(), gw.getId()));
 
         //-------------------------------------------------------------
         SequenceFlow rejectedFlow = new SequenceFlow();
-        rejectedFlow.setId(String.format("docRejectedSubFlow_%d_of_%d", current, total));
-        rejectedFlow.setName(String.format("Doc Rejected %d of %d", current, total));
+        rejectedFlow.setId(String.format("docRejectedSubFlow_%d_of_%d", currentIdx, total));
+        rejectedFlow.setName(String.format("Doc Rejected %d of %d", currentIdx, total));
         rejectedFlow.setSourceRef(gw.getId());
         rejectedFlow.setTargetRef(errorEnd.getId());
 
@@ -438,8 +410,8 @@ public class WorkflowBuilder {
 
         //-----------------------------------------------
         SequenceFlow approvedFlow = new SequenceFlow();
-        approvedFlow.setId(String.format("docApprovedSubFlow_%d_of_%d", current, total));
-        approvedFlow.setName(String.format("Doc Approved %d of %d", current, total));
+        approvedFlow.setId(String.format("docApprovedSubFlow_%d_of_%d", currentIdx, total));
+        approvedFlow.setName(String.format("Doc Approved %d of %d", currentIdx, total));
         approvedFlow.setSourceRef(gw.getId());
 
         ActivitiListener approvedListener = new ActivitiListener();
@@ -450,16 +422,18 @@ public class WorkflowBuilder {
         approvedFlow.setConditionExpression("${approved == true}");
         sub.addFlowElement(approvedFlow);
 
-        return to;
+        sub.addFlowElement(current);
+        prev.setTargetRef(current.getId());
+        return approvedFlow;
     }
 
-    protected org.activiti.bpmn.model.UserTask collaborationTask(SubProcess sub, DynamicUserTask from, int current, int total) {
-        org.activiti.bpmn.model.UserTask to = new org.activiti.bpmn.model.UserTask();
-        to.setId(String.format("%s_%d", WFConstants.TASK_ID_DOC_COLLABORATE, current));
+    protected static SequenceFlow collaborationTask(SubProcess subProcess, DynamicUserTask from, int currentIdx, int total, SequenceFlow prev) {
+        org.activiti.bpmn.model.UserTask current = new org.activiti.bpmn.model.UserTask();
+        current.setId(String.format("%s_%d", WFConstants.TASK_ID_DOC_COLLABORATE, currentIdx));
         if (StringUtils.isBlank(from.getName())) {
-            to.setName(String.format("Document Collaboration (%d / %d)", current, total));
+            current.setName(String.format("Document Collaboration (%d / %d)", currentIdx, total));
         } else {
-            to.setName(from.getName());
+            current.setName(from.getName());
         }
 
         ActivitiListener onCreate = new ActivitiListener();
@@ -472,18 +446,26 @@ public class WorkflowBuilder {
         onComplete.setImplementation("${docWorkflowListener.onCompleteCollaborate(execution, task)}");
         onComplete.setEvent("complete");
 
-        to.setTaskListeners(Lists.newArrayList(onCreate, onComplete));
-        return to;
+        current.setTaskListeners(Lists.newArrayList(onCreate, onComplete));
+        subProcess.addFlowElement(current);
+        prev.setTargetRef(current.getId());
+
+        SequenceFlow ref = new SequenceFlow();
+        ref.setId(String.format("dynamic_collab_subflow_%d_%d", currentIdx, total));
+        ref.setName(String.format("Collaboration SubFlow %d of %d", currentIdx, total));
+        ref.setSourceRef(current.getId());
+
+        return ref;
     }
 
-    protected SequenceFlow createSequenceFlow(String from, String to) {
+    protected static SequenceFlow createSequenceFlow(String from, String to) {
         SequenceFlow flow = new SequenceFlow();
         flow.setSourceRef(from);
         flow.setTargetRef(to);
         return flow;
     }
 
-    protected SequenceFlow createSequenceFlow(String from, String to, String name) {
+    protected static SequenceFlow createSequenceFlow(String from, String to, String name) {
         SequenceFlow flow = new SequenceFlow();
         flow.setSourceRef(from);
         flow.setTargetRef(to);
@@ -573,4 +555,48 @@ public class WorkflowBuilder {
         return refs;
     }
 
+    private static class RecurseUserTasks{
+        private List<DynamicUserTask> dynamicUserTasks;
+        private int approvalCount = 1;
+        private int approvalsTotal = 0;
+        private int collabCount = 1;
+        private int collabTotal = 0;
+        private SubProcess subProcess;
+        private EndEvent errorEnd;
+
+        public RecurseUserTasks(List<DynamicUserTask> dynamicUserTasks, SubProcess subProcess, EndEvent errorEnd) {
+            this.dynamicUserTasks = Lists.newArrayList(dynamicUserTasks);
+            this.subProcess = subProcess;
+            this.errorEnd = errorEnd;
+            List<DynamicUserTask> collaborations = Lists.newArrayList();
+            List<DynamicUserTask> approvals = Lists.newArrayList();
+            for (DynamicUserTask ut : dynamicUserTasks) {
+                if (DynamicUserTaskType.APPROVE_REJECT.equals(ut.getDynamicUserTaskType())) {
+                    this.approvalsTotal++;
+                } else if (DynamicUserTaskType.COLLABORATION.equals(ut.getDynamicUserTaskType())) {
+                    this.collabTotal++;
+                } else {
+                    throw new IllegalArgumentException("Invalid user task type: " + ut.getDynamicUserTaskType());
+                }
+            }
+        }
+
+        public SequenceFlow recurseSequenceFlows(SequenceFlow prev){
+            if (dynamicUserTasks.isEmpty()){
+                return prev;
+            }
+            DynamicUserTask current = this.dynamicUserTasks.remove(0);
+            SequenceFlow target;
+            if (DynamicUserTaskType.APPROVE_REJECT.equals(current.getDynamicUserTaskType())) {
+                 target = approvalTask(subProcess, errorEnd, current, approvalCount, approvalsTotal, prev);
+                approvalCount++;
+            } else if (DynamicUserTaskType.COLLABORATION.equals(current.getDynamicUserTaskType())) {
+                target = collaborationTask(subProcess, current, collabCount, collabTotal, prev);
+                collabCount++;
+            } else {
+                throw new IllegalArgumentException("Invalid user task type: " + current.getDynamicUserTaskType());
+            }
+            return recurseSequenceFlows(target);
+        }
+    }
 }

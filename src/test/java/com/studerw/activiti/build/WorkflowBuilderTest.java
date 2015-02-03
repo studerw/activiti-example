@@ -7,6 +7,7 @@ import com.studerw.activiti.model.workflow.DynamicUserTaskType;
 import com.studerw.activiti.workflow.WFConstants;
 import com.studerw.activiti.workflow.WorkflowBuilder;
 import com.studerw.activiti.workflow.WorkflowService;
+import org.activiti.bpmn.BpmnAutoLayout;
 import org.activiti.bpmn.converter.BpmnXMLConverter;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.bpmn.model.FlowElement;
@@ -25,6 +26,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.util.Assert;
 
 import java.io.File;
 import java.io.IOException;
@@ -67,7 +69,7 @@ public class WorkflowBuilderTest {
     }
 
     @Test
-    public void testBuildDefault() {
+    public void testBuildDefault() throws IOException {
         BpmnModel model = workflowBldr.defaultDocument("foo");
         Process process = model.getProcesses().get(0);
         SubProcess sub = (SubProcess) process.getFlowElement(WFConstants.SUBPROCESS_ID_DYNAMIC);
@@ -80,6 +82,18 @@ public class WorkflowBuilderTest {
                 userTasks.add((org.activiti.bpmn.model.UserTask) (el));
             }
         }
+
+        String deployId = this.repositoryService.createDeployment()
+                .addBpmnModel(process.getId() + ".bpmn", model).name("Dynamic Process Deployment - " + process.getId()).deploy().getId();
+        ProcessDefinition updatedProcDef = workflowService.findProcDefByDocTypeAndGroup(DocType.UNIT_TEST_NO_EXIST, WFConstants.WORKFLOW_GROUP_NONE);
+
+        new BpmnAutoLayout(model).execute();
+
+        Assert.notNull(updatedProcDef, "something went wrong creating the new processDefinition: " + process.getId());
+
+        InputStream in = new DefaultProcessDiagramGenerator().generatePngDiagram(model);
+        FileUtils.copyInputStreamToFile(in, new File("target/testbuilddefault.png"));
+        IOUtils.closeQuietly(in);
     }
 
 
@@ -91,14 +105,14 @@ public class WorkflowBuilderTest {
         String group = "engineering";
 
         dynamicUserTask.getCandidateGroups().add(group);
-        dynamicUserTask.setIndex(1);
+        dynamicUserTask.setIndex(0);
         dynamicUserTask.setDynamicUserTaskType(DynamicUserTaskType.APPROVE_REJECT);
         dynamicUserTasks.add(dynamicUserTask);
 
         DynamicUserTask dynamicUserTask2 = new DynamicUserTask();
         dynamicUserTask2.getCandidateUsers().add("kermit");
         dynamicUserTask2.setDynamicUserTaskType(DynamicUserTaskType.COLLABORATION);
-        dynamicUserTask.setIndex(2);
+        dynamicUserTask.setIndex(1);
         dynamicUserTasks.add(dynamicUserTask2);
 
         ProcessDefinition pd = this.workflowService.findProcDef(bookReport, group);
@@ -125,22 +139,39 @@ public class WorkflowBuilderTest {
         List<DynamicUserTask> dynamicUserTasks = Lists.newArrayList();
         DynamicUserTask dynamicUserTask = new DynamicUserTask();
         dynamicUserTask.getCandidateGroups().add("engineering");
-        dynamicUserTask.setIndex(1);
+        dynamicUserTask.setIndex(0);
         dynamicUserTask.setDynamicUserTaskType(DynamicUserTaskType.APPROVE_REJECT);
         dynamicUserTasks.add(dynamicUserTask);
 
         DynamicUserTask dynamicUserTask2 = new DynamicUserTask();
         dynamicUserTask2.getCandidateUsers().add("kermit");
         dynamicUserTask2.setDynamicUserTaskType(DynamicUserTaskType.COLLABORATION);
-        dynamicUserTask.setIndex(2);
+        dynamicUserTask2.setIndex(1);
         dynamicUserTasks.add(dynamicUserTask2);
+
+        DynamicUserTask dynamicUserTask3 = new DynamicUserTask();
+        dynamicUserTask3.getCandidateUsers().add("kermit");
+        dynamicUserTask3.setDynamicUserTaskType(DynamicUserTaskType.APPROVE_REJECT);
+        dynamicUserTask3.setIndex(2);
+        dynamicUserTasks.add(dynamicUserTask3);
 
         BpmnModel model = workflowBldr.documentWithTasks(dynamicUserTasks, DocType.BOOK_REPORT, "engineering");
         assertNotNull("model should be valid", model);
+
+        Process proc = model.getMainProcess();
+        String deployId = this.repositoryService.createDeployment()
+                .addBpmnModel(proc.getId() + ".bpmn", model).name("Dynamic Process Deployment - " + proc.getId()).deploy().getId();
+        ProcessDefinition updatedProcDef = workflowService.findProcDefByDocTypeAndGroup(DocType.BOOK_REPORT, "engineering");
+
+
+        Assert.notNull(updatedProcDef, "something went wrong creating the new processDefinition: " + proc.getId());
+        BpmnModel bpmnModel = this.repositoryService.getBpmnModel(updatedProcDef.getId());
+        InputStream in = new DefaultProcessDiagramGenerator().generatePngDiagram(bpmnModel);
+        FileUtils.copyInputStreamToFile(in, new File("target/some_group_diagram.png"));
+        IOUtils.closeQuietly(in);
+        LOG.debug("image copied to target/testBuildWFWithUserTasks.png");
+
 //
-//        InputStream in = new DefaultProcessDiagramGenerator().generatePngDiagram(model);
-//        FileUtils.copyInputStreamToFile(in, new File("target/some_group_diagram.png"));
-//        IOUtils.closeQuietly(in);
     }
 
     @Test
@@ -148,12 +179,20 @@ public class WorkflowBuilderTest {
         List<DynamicUserTask> dynamicUserTasks = Lists.newArrayList();
         DynamicUserTask dynamicUserTask = new DynamicUserTask();
         dynamicUserTask.getCandidateGroups().add("engineering");
-        dynamicUserTask.setIndex(1);
+        dynamicUserTask.setIndex(0);
         dynamicUserTask.setDynamicUserTaskType(DynamicUserTaskType.APPROVE_REJECT);
         dynamicUserTasks.add(dynamicUserTask);
         BpmnModel model = workflowBldr.documentWithTasks(dynamicUserTasks, DocType.BOOK_REPORT, "engineering");
         assertNotNull("model should be valid", model);
 
+        Process proc = model.getMainProcess();
+        String deployId = this.repositoryService.createDeployment()
+                .addBpmnModel(proc.getId() + ".bpmn", model).name("Dynamic Process Deployment - " + proc.getId()).deploy().getId();
+        ProcessDefinition updatedProcDef = workflowService.findProcDefByDocTypeAndGroup(DocType.BOOK_REPORT, "engineering");
+
+        new BpmnAutoLayout(model).execute();
+
+        Assert.notNull(updatedProcDef, "something went wrong creating the new processDefinition: " + proc.getId());
 
 //        BpmnModel model = workflowBldr.documentWithTasks(userTasks, DocType.BOOK_REPORT, "engineering");
 //
@@ -182,8 +221,9 @@ public class WorkflowBuilderTest {
         BpmnModel model = repositoryService.getBpmnModel(procDef.getId());
         assertNotNull(model);
         InputStream in = new DefaultProcessDiagramGenerator().generatePngDiagram(model);
-        FileUtils.copyInputStreamToFile(in, new File("target/default_diagram.png"));
+        FileUtils.copyInputStreamToFile(in, new File("target/testCreateGroupWorkflow.png"));
         IOUtils.closeQuietly(in);
+        LOG.debug("Images generated to target/testCreateGroupWorkflow.png");
     }
 
     @Test(expected = IllegalStateException.class)
