@@ -7,7 +7,8 @@
 <html lang="en">
 <head>
     <jsp:include page="../fragments/head.jsp"/>
-    <link href="${pageContext.request.contextPath}/resources/css/bootstrap-choosen.css" rel="stylesheet">
+    <link href="${pageContext.request.contextPath}/resources/js/chosen_v1.3.0/chosen.css" rel="stylesheet">
+    <%--<link href="${pageContext.request.contextPath}/resources/css/bootstrap-choosen.css" rel="stylesheet">--%>
 
     <title>Workflow Edit</title>
 
@@ -83,6 +84,7 @@
         <hr/>
 
         <div id="dynamicTasks" class="hidden">
+
             <div class="page-header">
                 <%--<span class="glyphicon glyphicon-paperclip pull-right"></span>--%>
 
@@ -111,8 +113,8 @@
                             Add Task<span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu" role="menu">
-                            <li><a href="${pageContext.request.contextPath}/document/bookReport/create.htm">Book Report</a></li>
-                            <li><a href="${pageContext.request.contextPath}/document/invoice/create.htm">Invoice</a></li>
+                            <li><a href="${pageContext.request.contextPath}/document/bookReport/create.htm">Approval</a></li>
+                            <li><a href="${pageContext.request.contextPath}/document/invoice/create.htm">Collaboration</a></li>
                         </ul>
                     </div>
                     <div id="userTasks-panel" class="clearfix">
@@ -127,6 +129,27 @@
                 </p>
             </div>
         </div>
+        <%--<div>--%>
+            <%--<select data-placeholder="Choose a Country..." class="chosen-select" style="width:350px;" multiple tabindex="1">--%>
+                <%--<option value=""></option>--%>
+                <%--<option value="United States">United States</option>--%>
+                <%--<option value="United Kingdom">United Kingdom</option>--%>
+                <%--<option value="Afghanistan">Afghanistan</option>--%>
+                <%--<option value="Aland Islands">Aland Islands</option>--%>
+                <%--<option value="Suriname">Suriname</option>--%>
+                <%--<option value="Svalbard and Jan Mayen">Svalbard and Jan Mayen</option>--%>
+                <%--<option value="Swaziland">Swaziland</option>--%>
+                <%--<option value="Sweden">Sweden</option>--%>
+                <%--<option value="Switzerland">Switzerland</option>--%>
+                <%--<option value="Syrian Arab Republic">Syrian Arab Republic</option>--%>
+                <%--<option value="Taiwan, Province of China">Taiwan, Province of China</option>--%>
+                <%--<option value="Tajikistan">Tajikistan</option>--%>
+                <%--<option value="Tanzania, United Republic of">Tanzania, United Republic of</option>--%>
+                <%--<option value="Zimbabwe">Zimbabwe</option>--%>
+            <%--</select>--%>
+        <%--</div>--%>
+
+
     </div>
 
 </div>

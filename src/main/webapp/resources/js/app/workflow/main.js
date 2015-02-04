@@ -12,8 +12,7 @@ APP.dynamicTasksTpl = _.template(
                 <td>Candidate Groups</td> \
                 <td>Candidate Users</td> \
                 <td>Description</td> \
-                <td>Add</td> \
-                <td>Delete</td> \
+                <td>&nbsp;</td> \
             </tr> \
         </thead> \
         <tbody>  \
@@ -21,7 +20,7 @@ APP.dynamicTasksTpl = _.template(
                 <tr data-id="<%= dynamicTask.id %>" class="dynamicTask-row">  \
                     <td><%= dynamicTask.index %></td> \
                     <td>\
-                        <select data-placeholder="Candidate Groups" class="chosen-select candidate-groups" data-position="<%= dynamicTask.position %>" multiple>\
+                        <select data-placeholder="Candidate Groups" class="chosen-select candidate-groups" data-position="<%= dynamicTask.index %>" multiple>\
                         <% _.each(groups, function(group){ %> \
                             <option value="<%= group.id %>" \
                             <% var selected = _.contains(dynamicTask.candidateGroups, group.id); %>\
@@ -33,7 +32,7 @@ APP.dynamicTasksTpl = _.template(
                         </select>\
                     </td> \
                     <td>\
-                        <select data-placeholder="Candidate Users" class="chosen-select candidate-users" data-position="<%= dynamicTask.position %>" multiple>\
+                        <select data-placeholder="Candidate Users" class="chosen-select candidate-users" data-position="<%= dynamicTask.index %>" multiple>\
                         <% _.each(users, function(user){ %> \
                             <option value="<%= user.userName %>" \
                             <% var selected = _.contains(dynamicTask.candidateUsers, user.userName); %>\
@@ -50,12 +49,7 @@ APP.dynamicTasksTpl = _.template(
                         </div>\
                     </td>\
                     <td> \
-                        <button type="button" class="btn btn-default add-button" data-position="<%= dynamicTask.position %>" data-id="<%= dynamicTask.id %>"> \
-                            <span class="glyphicon glyphicon-plus"></span> \
-                        </button>  \
-                    </td> \
-                    <td> \
-                        <button type="button" class="btn btn-default delete-button" data-position="<%= dynamicTask.position %>" data-id="<%= dynamicTask.id %>"> \
+                        <button type="button" class="btn btn-danger delete-button" data-position="<%= dynamicTask.index %>" data-id="<%= dynamicTask.id %>"> \
                             <span class="glyphicon glyphicon-trash"></span> \
                        </button> \
                     </td> \
@@ -68,21 +62,21 @@ APP.dynamicTasksTpl = _.template(
 function addNewDynamicTaskRow(pos) {
     var newList = [];
     _.each(APP.dynamicTasks, function (dynamicTask, index, list) {
-        if (dynamicTask.position <= pos) {
+        if (dynamicTask.index <= pos) {
             newList.push(dynamicTask);
         }
-        if (dynamicTask.position === pos) {
+        if (dynamicTask.index === pos) {
             var newPos = pos + 1;
             newList.push({
-                position: newPos,
+                index: newPos,
                 candidateGroups: [],
                 candidateUsers: [],
                 id: 'approveDocDynamicTask_' + newPos,
                 name: 'Approve Document'
             });
         }
-        if (dynamicTask.position > pos) {
-            dynamicTask.position += 1;
+        if (dynamicTask.index > pos) {
+            dynamicTask.index += 1;
             newList.push(dynamicTask);
         }
     });
@@ -97,7 +91,7 @@ function removeDynamicTaskRow(pos) {
     }
     APP.dynamicTasks.splice(pos -1, 1);
     _.each(APP.dynamicTasks, function (dynamicTask, index, list) {
-        dynamicTask.position = index + 1;
+        dynamicTask.index = index + 1;
     });
 }
 
@@ -168,7 +162,7 @@ function getDynamicTasks(group, docType) {
             updateDynamicTasksTpl(APP.dynamicTasks);
             $('#dynamicTasks').removeClass('hidden').addClass('show');
             //var newSrc = SERVLET_CONTEXT + '/workflow/diagrams/' + DOC_dynamicTask_ROOT_ID + '-' + group;
-            var newSrc ="http://placehold.it/800x200.png";
+            var newSrc ="http://placehold.it/800x150.png";
             var rand = _.random(1, 100000000);
             //newSrc = newSrc + '?rand=' + rand
             $('#proc-main-diagram').attr('src', newSrc);
@@ -197,28 +191,27 @@ function updateDynamicTasksTpl() {
         groups: APP.groups,
         users: APP.users
     }));
-    $('.chosen-select', '#dynamicTasks-panel').chosen({}).change(function () {
-//        console.dir($(this).val());
+    $('.chosen-select', '#userTasks-panel').chosen({ width: '100%' }).change(function () {
         var pos = parseInt($(this).attr('data-position'));
         var temp = $(this).val();
         var tempArray = _.isArray(temp) ? temp : [temp];
         if ($(this).hasClass('candidate-groups')) {
-            APP.dynamicTasks[pos - 1].candidateGroups = tempArray;
+            APP.dynamicTasks[pos].candidateGroups = tempArray;
         }
         else {
-            APP.dynamicTasks[pos - 1].candidateUsers = tempArray;
+            APP.dynamicTasks[pos].candidateUsers = tempArray;
         }
     });
-    $('input.dynamicTask-name', '#dynamicTasks-panel').on('blur', function(){
+    $('input.dynamicTask-name', '#userTasks-panel').on('blur', function(){
         var pos = parseInt($(this).attr('data-position'));
-        APP.dynamicTasks[pos - 1].name = $(this).val();
+        APP.dynamicTasks[pos].name = $(this).val();
     });
-    $('button.add-button', '#dynamicTasks-panel').on('click', function () {
-        var pos = $(this).attr('data-position');
-        addNewDynamicTaskRow(parseInt(pos));
-        updateDynamicTasksTpl();
-    });
-    $('button.delete-button', '#dynamicTasks-panel').on('click', function () {
+    //$('button.add-button', '#userTasks-panel').on('click', function () {
+    //    var pos = $(this).attr('data-position');
+    //    addNewDynamicTaskRow(parseInt(pos));
+    //    updateDynamicTasksTpl();
+    //});
+    $('button.delete-button', '#userTasks-panel').on('click', function () {
         var pos = $(this).attr('data-position');
         removeDynamicTaskRow(parseInt(pos));
         updateDynamicTasksTpl();

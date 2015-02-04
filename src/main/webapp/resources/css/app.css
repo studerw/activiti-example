@@ -1,4 +1,4 @@
-    html {
+html {
     position: relative;
     min-height: 100%;
 }
@@ -6,7 +6,6 @@
 body {
     padding-top: 50px;
     margin-bottom: 60px;
-
 }
 /*deprecated*/
 .start-template {
@@ -77,4 +76,8 @@ img.proc-diagram{
 
 .navbar-inverse .navbar-brand-active {
     color:#fff;
+}
+
+.chosen-container.chosen-container-single {
+    width: 300px !important; /* or any value that fits your needs */
 }

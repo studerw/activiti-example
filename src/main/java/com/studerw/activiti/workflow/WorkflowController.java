@@ -61,6 +61,10 @@ public class WorkflowController extends BaseController {
 
     }
 
+    @RequestMapping(value = "/chosen-test.htm", method = RequestMethod.GET)
+    public String chosenTest(ModelMap model) {
+        return "workflow/chosen-test";
+    }
 
     @RequestMapping(value = "/index.htm", method = RequestMethod.GET)
     public String index(ModelMap model) {
