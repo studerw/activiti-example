@@ -35,7 +35,7 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/users", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Response<List<UserForm>>> getUsers(HttpServletRequest request) {
         List<UserForm> users = userService.getAllUsers();
-        LOG.debug("returning json response of {} users",  users.size());
+        LOG.trace("returning json response of {} users",  users.size());
         Response res = new Response(true, "users",  users);
         return new ResponseEntity<Response<List<UserForm>>>(res, HttpStatus.OK);
     }
@@ -43,7 +43,7 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/groups", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Response<List<Group>>> getGroups(HttpServletRequest request) {
         List<Group> groups = userService.getAllAssignmentGroups();
-        LOG.debug("returning json response of {} groups",  groups.size());
+        LOG.trace("returning json response of {} groups",  groups.size());
         Response res = new Response(true, "groups",  groups);
         return new ResponseEntity<Response<List<Group>>>(res, HttpStatus.OK);
     }

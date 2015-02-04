@@ -2,16 +2,17 @@ var APP = APP || {};
 APP.users = [];
 APP.groups = [];
 APP.dynamicTasks = [];
-APP.BASE_URL = SERVLET_CONTEXT+'/workflow/dynamicTasks/';
+APP.BASE_URL = SERVLET_CONTEXT + '/workflow/dynamicTasks/';
 
 APP.dynamicTasksTpl = _.template(
-    '<table class="table table-striped"> \
+    '<table id="taskListTable" class="table table-striped"> \
         <thead> \
             <tr> \
                 <td>Position</td> \
                 <td>Candidate Groups</td> \
                 <td>Candidate Users</td> \
                 <td>Description</td> \
+                <td>&nbsp;</td> \
                 <td>&nbsp;</td> \
             </tr> \
         </thead> \
@@ -20,7 +21,7 @@ APP.dynamicTasksTpl = _.template(
                 <tr data-id="<%= dynamicTask.id %>" class="dynamicTask-row">  \
                     <td><%= dynamicTask.index %></td> \
                     <td>\
-                        <select data-placeholder="Candidate Groups" class="chosen-select candidate-groups" data-position="<%= dynamicTask.index %>" multiple>\
+                        <select data-placeholder="Groups" class="chosen-select candidate-groups" data-position="<%= dynamicTask.index %>" multiple>\
                         <% _.each(groups, function(group){ %> \
                             <option value="<%= group.id %>" \
                             <% var selected = _.contains(dynamicTask.candidateGroups, group.id); %>\
@@ -32,7 +33,7 @@ APP.dynamicTasksTpl = _.template(
                         </select>\
                     </td> \
                     <td>\
-                        <select data-placeholder="Candidate Users" class="chosen-select candidate-users" data-position="<%= dynamicTask.index %>" multiple>\
+                        <select data-placeholder="Users" class="chosen-select candidate-users" data-position="<%= dynamicTask.index %>" multiple>\
                         <% _.each(users, function(user){ %> \
                             <option value="<%= user.userName %>" \
                             <% var selected = _.contains(dynamicTask.candidateUsers, user.userName); %>\
@@ -45,7 +46,18 @@ APP.dynamicTasksTpl = _.template(
                     </td> \
                     <td> \
                        <div class="form-group"> \
-                            <input type="text" class="form-control dynamicTask-name" id="dynamicTask-name-<%= dynamicTask.name %>" data-position="<%= dynamicTask.position %>" placeholder="Description" value="<%= dynamicTask.name %>"/>\
+                        <p class="form-control-static"><%= dynamicTask.name %></p>\
+                        </div>\
+                    </td>\
+                    <td>\
+                        <div class="btn-group pull-right">\
+                            <button type="button" class="btn btn-default dropdown-toggle btn-primary" data-toggle="dropdown" aria-expanded="false">\
+                                <span class="glyphicon glyphicon-plus"/>\
+                            </button>\
+                            <ul class="dropdown-menu" role="menu">\
+                                <li><a class="add-button" data-position="<%= dynamicTask.index %>" data-id="<%= dynamicTask.id %>" data-taskType="APPROVE_REJECT" href="#">Approval</a></li>\
+                                <li><a class="add-button" data-position="<%= dynamicTask.index %>" data-id="<%= dynamicTask.id %>" data-taskType="COLLABORATION" href="#">Collaboration</a></li>\
+                            </ul>\
                         </div>\
                     </td>\
                     <td> \
@@ -59,40 +71,119 @@ APP.dynamicTasksTpl = _.template(
     </table>'
 );
 
-function addNewDynamicTaskRow(pos) {
-    var newList = [];
-    _.each(APP.dynamicTasks, function (dynamicTask, index, list) {
-        if (dynamicTask.index <= pos) {
-            newList.push(dynamicTask);
+function refreshTpl() {
+    if (_.isEmpty(APP.dynamicTasks)) {
+        $('#emptyTaskListAddBtn').show();
+    }
+    else {
+        $('#emptyTaskListAddBtn').hide();
+    }
+    $('#userTasks-panel').html(APP.dynamicTasksTpl({
+        dynamicTasks: APP.dynamicTasks,
+        groups: APP.groups,
+        users: APP.users
+    }));
+    if (_.isEmpty(APP.dynamicTasks)) {
+        $('#taskListTable').hide();
+    }
+    else {
+        $('#taskListTable').show();
+    }
+    $('.chosen-select', '#userTasks-panel').chosen({width: '100%'}).change(function () {
+        var pos = parseInt($(this).attr('data-position'));
+        var temp = $(this).val();
+        var tempArray = _.isArray(temp) ? temp : [temp];
+        if ($(this).hasClass('candidate-groups')) {
+            APP.dynamicTasks[pos].candidateGroups = tempArray;
         }
-        if (dynamicTask.index === pos) {
-            var newPos = pos + 1;
-            newList.push({
-                index: newPos,
-                candidateGroups: [],
-                candidateUsers: [],
-                id: 'approveDocDynamicTask_' + newPos,
-                name: 'Approve Document'
-            });
-        }
-        if (dynamicTask.index > pos) {
-            dynamicTask.index += 1;
-            newList.push(dynamicTask);
+        else {
+            APP.dynamicTasks[pos].candidateUsers = tempArray;
         }
     });
-    console.dir(newList);
-    APP.dynamicTasks = newList;
+    $('input.dynamicTask-name', '#userTasks-panel').on('blur', function () {
+        var pos = parseInt($(this).attr('data-position'));
+        APP.dynamicTasks[pos].name = $(this).val();
+    });
+    $('a.add-button', '#userTasks-panel').on('click', function (evt) {
+        //$(this).parents('ul.dropdown-menu').toggle();
+        var _pos = parseInt($(this).attr('data-position'));
+        var _taskType = $(this).attr('data-taskType');
+        addTaskRow(_pos, _taskType);
+        return false;
+    });
+    $('button.delete-button', '#userTasks-panel').on('click', function () {
+        var pos = parseInt($(this).attr('data-position'));
+        removeTaskRow(pos);
+        return false;
+    });
 }
 
-function removeDynamicTaskRow(pos) {
-    if (APP.dynamicTasks.length < 2) {
-        bootbox.alert("At least one dynamicTask is required.", function() {});
-        return;
+//function countByType() {
+//    var counts = {};
+//    _.each(APP.dynamicTaskTypes, function (taskType, index, list) {
+//        var temp = _.filter(APP.dynamicTasks, function (task) {
+//            return task.dynamicUserTaskType === taskType;
+//        });
+//        counts[taskType] = temp.length;
+//    });
+//    return counts;
+//}
+//
+//function getTaskName(pos, taskType) {
+//    var current = pos+1;
+//    var total = countByType()[taskType];
+//    if (_.isUndefined(total)) {
+//        return taskType + " " + current;
+//    }
+//    else {
+//        return taskType + " " + current + " of " +total;
+//    }
+//}
+
+function addTaskRow(pos, taskType) {
+    var updated = [];
+    if (_.isEmpty(APP.dynamicTasks)) {
+        var strPos = pos + 1;
+        updated.push({
+            index: pos,
+            candidateGroups: [],
+            candidateUsers: [],
+            name: taskType,
+            dynamicUserTaskType: taskType
+        });
     }
-    APP.dynamicTasks.splice(pos -1, 1);
+    else {
+        _.each(APP.dynamicTasks, function (dynamicTask, index, list) {
+            if (dynamicTask.index <= pos) {
+                updated.push(dynamicTask);
+            }
+            if (dynamicTask.index === pos) {
+                var strPos = pos + 1;
+                updated.push({
+                    index: pos + 1,
+                    candidateGroups: [],
+                    candidateUsers: [],
+                    name: taskType,
+                    dynamicUserTaskType: taskType
+                });
+            }
+            if (dynamicTask.index > pos) {
+                dynamicTask.index += 1;
+                updated.push(dynamicTask);
+            }
+        });
+    }
+    console.dir(updated);
+    APP.dynamicTasks = updated;
+    refreshTpl();
+}
+
+function removeTaskRow(pos) {
+    APP.dynamicTasks.splice(pos, 1);
     _.each(APP.dynamicTasks, function (dynamicTask, index, list) {
-        dynamicTask.index = index + 1;
+        dynamicTask.index = index;
     });
+    refreshTpl();
 }
 
 function getGroups() {
@@ -137,7 +228,6 @@ function getUsers() {
                 APP.users = data.data;
                 console.dir(APP.users);
             }
-
         },
         error: function (error) {
             alert("There was an error getting the app users");
@@ -149,23 +239,24 @@ function getDynamicTasks(group, docType) {
     $.ajax({
         type: 'GET',
         dataType: 'json',
-        url: APP.BASE_URL+docType +'/'+group+'',
+        url: APP.BASE_URL + docType + '/' + group + '',
         headers: {
             Accept: "application/json"
         },
         success: function (data) {
             if (!data.success) {
-                alert("There was an error updating the workflow");
+                alert(data.message);
+                return;
             }
             $('#tasksGroupLabel').text(data.message);
             APP.dynamicTasks = data.data;
-            updateDynamicTasksTpl(APP.dynamicTasks);
+            refreshTpl(APP.dynamicTasks);
             $('#dynamicTasks').removeClass('hidden').addClass('show');
-            //var newSrc = SERVLET_CONTEXT + '/workflow/diagrams/' + DOC_dynamicTask_ROOT_ID + '-' + group;
-            var newSrc ="http://placehold.it/800x150.png";
-            var rand = _.random(1, 100000000);
-            //newSrc = newSrc + '?rand=' + rand
-            $('#proc-main-diagram').attr('src', newSrc);
+            //var newSrc = SERVLET_CONTEXT + '/workflow/diagram/' + docType + '/' + group;
+            //var newSrc = "http://placehold.it/800x150.png";
+            //var rand = _.random(1, 100000000);
+            //newSrc = newSrc + '?text=' + rand
+            $('#proc-main-diagram').attr('src', randPlaceholder("800x200"));
             //    //need to add random param to avoid caching of the image
             //    var rand = _.random(1, 100000000);
             //    newSrc = newSrc + '?rand=' + rand
@@ -185,43 +276,15 @@ function getDynamicTasks(group, docType) {
     });
 }
 
-function updateDynamicTasksTpl() {
-    $('#userTasks-panel').html(APP.dynamicTasksTpl({
-        dynamicTasks: APP.dynamicTasks,
-        groups: APP.groups,
-        users: APP.users
-    }));
-    $('.chosen-select', '#userTasks-panel').chosen({ width: '100%' }).change(function () {
-        var pos = parseInt($(this).attr('data-position'));
-        var temp = $(this).val();
-        var tempArray = _.isArray(temp) ? temp : [temp];
-        if ($(this).hasClass('candidate-groups')) {
-            APP.dynamicTasks[pos].candidateGroups = tempArray;
-        }
-        else {
-            APP.dynamicTasks[pos].candidateUsers = tempArray;
-        }
-    });
-    $('input.dynamicTask-name', '#userTasks-panel').on('blur', function(){
-        var pos = parseInt($(this).attr('data-position'));
-        APP.dynamicTasks[pos].name = $(this).val();
-    });
-    //$('button.add-button', '#userTasks-panel').on('click', function () {
-    //    var pos = $(this).attr('data-position');
-    //    addNewDynamicTaskRow(parseInt(pos));
-    //    updateDynamicTasksTpl();
-    //});
-    $('button.delete-button', '#userTasks-panel').on('click', function () {
-        var pos = $(this).attr('data-position');
-        removeDynamicTaskRow(parseInt(pos));
-        updateDynamicTasksTpl();
-    });
-}
 
 function updateDynamicTasks(group, docType) {
-    var _group = group;
-    var _docType = docType;
-    $.ajax(APP.BASE_URL+ _docType + '/' + _group, {
+    if (!validateTasks()) {
+        bootbox.alert("Either Candidate Users and/or Candidate Groups must be assigned for each Task.", function () {
+        });
+        return false;
+    }
+    $.ajax({
+        url: APP.BASE_URL + docType + '/' + group,
         type: 'PUT',
         dataType: 'json',
         contentType: "application/json; charset=utf-8",
@@ -231,24 +294,40 @@ function updateDynamicTasks(group, docType) {
         },
         success: function (data) {
             console.dir(data);
-            //var newSrc = SERVLET_CONTEXT + '/workflow/' + _group + '/diagrams/' + DOC_dynamicTask_ROOT_ID + '-' + ;
-            var newSrc ="http://placehold.it/800x200.png";
-            var rand = _.random(1, 100000000);
-            //newSrc = newSrc + '?rand=' + rand
-            $('#proc-main-diagram').attr('src', newSrc);
             if (!data.success) {
-                alert("There was an error updating the workflow.");
+                bootbox.alert("There was an error updating the workflow - " + data.message, function () {
+
+                });
+                return;
             }
-            else {
-                updateDynamicTasks(_group, _docType);
-            }
+            //var newSrc = SERVLET_CONTEXT + '/workflow/diagrams/' + _docType + '/' + _group;
+            //var newSrc = "http://placehold.it/800x200.png";
+            //var rand = _.random(1, 100000000);
+            //newSrc = newSrc + '?rand=' + rand;
+            getDynamicTasks(group, docType);
 
         },
         error: function (error) {
-            alert("There was an error getting the app users");
+            bootbox.alert("There was an error updating the workflow", function () {
+
+            });
         }
 
     });
+}
+
+function randPlaceholder(dimensions) {
+    var rand = _.random(1, 100000000);
+    //http://placehold.it/300&text=placehold.it+rocks!
+    var url = 'http://placehold.it/' + dimensions + '&text=' + rand + '.png';
+    return url;
+}
+
+function validateTasks() {
+    var emptyCandidates = _.some(APP.dynamicTasks, function (current, idx) {
+        return _.isEmpty(current.candidateGroups) && _.isEmpty(current.candidateUsers);
+    });
+    return !emptyCandidates;
 }
 
 $(function () {
@@ -257,18 +336,19 @@ $(function () {
     getUsers();
     $('#update-button').on('click', function () {
         var group = $("#groupSel").val();
-        var docType = $('#docType').val();
+        var docType = $('#docTypeSel').val();
         if (!_.isEmpty(group) && !_.isEmpty(docType)) {
             updateDynamicTasks(group, docType);
         }
     });
     //hide and show the group select based on docType
-    $('#docTypeSel').change(function(){
+    $('#docTypeSel').change(function () {
         //$("#my-Select option[text=" + myText +"]").attr("selected","selected") ;
         //$("#groupSel option[text=" + "Choose a Document Type" + "]").attr("selected", "selected");
         $("#groupSel").val("");
         var val = $(this).val();
-        if (_.isEmpty(val)){
+        if (_.isEmpty(val)) {
+            $('#dynamicTasks').removeClass('show').addClass('hidden');
             $('#groupSelForm').addClass('hidden');//.find('option').remove().end();//.append('<option value="whatever">text</option>').val('whatever');
         }
         else {
@@ -277,9 +357,10 @@ $(function () {
     });
 
     $('#groupSel').change(function () {
-        var group =  $(this).val();
+        var group = $(this).val();
         var docType = $('#docTypeSel').val();
-        if (_.isEmpty(group) || _.isEmpty(docType)){
+        if (_.isEmpty(group) || _.isEmpty(docType)) {
+            $('#dynamicTasks').removeClass('show').addClass('hidden');
             return;
         }
         //alert("DocType =" + docType + ", group =" + group);
@@ -296,6 +377,17 @@ $(function () {
     for (var selector in config) {
         $(selector).chosen(config[selector]);
     }
+
+    $('#emptyCollabBtn').click(function (evt) {
+        //$('.dropdown-menu', $('#emptyTaskListAddBtn')).toggle();
+        addTaskRow(0, 'COLLABORATION');
+        return false;
+    });
+    $('#emptyApproveBtn').click(function (evt) {
+        //$('.dropdown-menu', $('#emptyTaskListAddBtn')).toggle();
+        addTaskRow(0, 'APPROVE_REJECT');
+        return false;
+    });
 
 });
 

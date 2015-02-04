@@ -54,11 +54,10 @@ public class WorkflowController extends BaseController {
         model.addAttribute("dynamicTaskTypes", taskTypes);
         try {
             String json = objectMapper.writeValueAsString(taskTypes);
-            model.addAttribute("dynamicTaskTypesJson", taskTypes);
+            model.addAttribute("dynamicTaskTypesJson", json);
         } catch (JsonProcessingException ex) {
             throw new RuntimeException(ex);
         }
-
     }
 
     @RequestMapping(value = "/chosen-test.htm", method = RequestMethod.GET)
@@ -78,6 +77,7 @@ public class WorkflowController extends BaseController {
             @PathVariable(value = "docType") DocType docType)  {
         LOG.debug("updating tasks for docType: {} and group: {} --> {}", docType, group, dynamicUserTasks.toString());
         ProcessDefinition procDefinition = this.workflowBldr.updateDynamicTasks(docType, group, dynamicUserTasks);
+
 
         //wait for the model diagram to catch up (maybe)
         Response res = new Response(true, group);

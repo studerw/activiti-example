@@ -104,7 +104,7 @@ public class BuilderDeprecated {
 //     * @param group
 //     * @return fully populated BpmnModel with appropriate ids, namespace, sub process tasks, etc.
 //     */
-//    public BpmnModel documentWithTasks(List<DynamicUserTask> dynamicUserTasks, DocType docType, String group) {
+//    public BpmnModel buildModel(List<DynamicUserTask> dynamicUserTasks, DocType docType, String group) {
 //        Assert.notNull(docType);
 //        Assert.hasText(group);
 //        BpmnModel model = new BpmnModel();

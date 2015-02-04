@@ -82,7 +82,7 @@ public class DocApproveTest {
         pub.setId("publishDocServiceTask");
         pub.setName("Publish Approved Document");
         pub.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
-        pub.setImplementation("${documentWorkflow.publish(execution)}");
+        pub.setImplementation("${docWorkflowListener.publish(execution)}");
 
         process.addFlowElement(pub);
         process.addFlowElement(createSequenceFlow(sub.getId(), pub.getId()));
@@ -185,7 +185,7 @@ public class DocApproveTest {
         userTask.setName("Approve Document");
         ActivitiListener taskListener = new ActivitiListener();
         taskListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
-        taskListener.setImplementation("${documentWorkflow.setAssignee(execution, task)}");
+        taskListener.setImplementation("${docWorkflowListener.setAssignee(execution, task)}");
         taskListener.setEvent("create");
         userTask.setTaskListeners(Lists.newArrayList(taskListener));
         sub.addFlowElement(userTask);
@@ -202,7 +202,7 @@ public class DocApproveTest {
         rejectedFlow.setTargetRef(errorEnd.getId());
         ActivitiListener rejectedListener = new ActivitiListener();
         rejectedListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
-        rejectedListener.setImplementation("${documentWorkflow.onRejected(execution)}");
+        rejectedListener.setImplementation("${docWorkflowListener.onRejected(execution)}");
         rejectedListener.setEvent("take");
         rejectedFlow.setExecutionListeners(Lists.newArrayList(rejectedListener));
         rejectedFlow.setConditionExpression("${approved == false}");
@@ -215,7 +215,7 @@ public class DocApproveTest {
         approvedFlow.setTargetRef(end.getId());
         ActivitiListener approvedListener = new ActivitiListener();
         approvedListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
-        approvedListener.setImplementation("${documentWorkflow.onApproved(execution)}");
+        approvedListener.setImplementation("${docWorkflowListener.onApproved(execution)}");
         approvedListener.setEvent("take");
         approvedFlow.setExecutionListeners(Lists.newArrayList(approvedListener));
         approvedFlow.setConditionExpression("${approved == true}");

@@ -1,7 +1,10 @@
 package com.studerw.activiti.model;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.studerw.activiti.model.workflow.DynamicUserTask;
+import com.studerw.activiti.model.workflow.DynamicUserTaskType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;
@@ -9,6 +12,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertTrue;
@@ -29,5 +33,12 @@ public class JsonTest {
         assertTrue(map.size() == 3);
         assertTrue(map.keySet().containsAll(Arrays.asList("name", "age", "group")));
         LOG.debug(map);
+    }
+
+    @Test
+    public void testTaskTypestoJson() throws JsonProcessingException {
+        List<DynamicUserTaskType> taskTypeList = DynamicUserTaskType.asList();
+        String json = objectMapper.writeValueAsString(taskTypeList);
+        LOG.debug(json);
     }
 }

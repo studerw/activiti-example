@@ -18,7 +18,7 @@
             <p>
                 <img class="img-responsive img-rounded proc-diagram" style="width: 100%"
                     <%--src="${pageContext.request.contextPath}/workflow/document/${document.id}/diagram"--%>
-                     src="http://placehold.it/800x200.png"
+                     src="http://placehold.it/800x150.png"
                      alt="Workflow Process Diagram">
             </p>
         </div>

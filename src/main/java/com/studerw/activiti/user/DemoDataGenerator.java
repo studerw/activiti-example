@@ -136,6 +136,18 @@ public class DemoDataGenerator implements ModelDataJsonConstants {
                 "org/activiti/explorer/images/fozzie.jpg",
                 Arrays.asList("marketing", "engineering", "user"),
                 null);
+        createUser("fozzie", "Fozzie", "Bear", "fozzie", "fozzie@activiti.org",
+                "org/activiti/explorer/images/fozzie.jpg",
+                Arrays.asList("marketing", "engineering", "user"),
+                null);
+        createUser("cookie-monster", "Cookie", "Monster", "cookie-monster", "cookie-monster@activiti.org",
+                null,
+                Arrays.asList("marketing", "engineering", "user"),
+                null);
+        createUser("miss-piggy", "Miss", "Piggy", "miss-piggy", "miss-piggy@activiti.org",
+                null,
+                Arrays.asList("marketing", "user"),
+                null);
     }
 
     protected void createUser(String userId, String firstName, String lastName, String password,

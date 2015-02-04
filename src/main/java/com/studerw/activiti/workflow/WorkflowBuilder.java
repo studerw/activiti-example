@@ -33,14 +33,73 @@ public class WorkflowBuilder {
     @Autowired RepositoryService repoSrvc;
     @Autowired WorkflowService workflowService;
 
+    /**
+     * @param dynamicUserTasks
+     * @param docType
+     * @param group
+     * @return fully populated BpmnModel with with appropriate dynamic subprocesses. This doesn't actually deploy anything.
+     */
+    public BpmnModel buildModel(List<DynamicUserTask> dynamicUserTasks, DocType docType, String group) {
+        Assert.notNull(docType);
+        Assert.hasText(group);
+        BpmnModel model = new BpmnModel();
+        model.setTargetNamespace(WFConstants.NAMESPACE_CATEGORY);
+        org.activiti.bpmn.model.Process process = new Process();
+        process.setId(String.format("%s_%s", docType.name(), group));
+        process.setName(String.format("Generated workflow for docType=%s and Group=%s", docType.name(), group));
+
+        model.addProcess(process);
+
+        StartEvent startEvent = new StartEvent();
+        startEvent.setId("start");
+        process.addFlowElement(startEvent);
+
+        org.activiti.bpmn.model.UserTask submitTask = new org.activiti.bpmn.model.UserTask();
+        submitTask.setId("submitDocUserTask");
+        submitTask.setName("Submit doc to Workflow");
+        process.addFlowElement(submitTask);
+        process.addFlowElement(createSequenceFlow(startEvent.getId(), submitTask.getId()));
+
+        ErrorEventDefinition errorDef = new ErrorEventDefinition();
+        errorDef.setErrorCode(WFConstants.ERROR_DOC_REJECTED);
+
+        SubProcess sub = createDynamicSubProcess(dynamicUserTasks, errorDef);
+        process.addFlowElement(sub);
+
+        process.addFlowElement(createSequenceFlow(submitTask.getId(), sub.getId()));
+
+        BoundaryEvent boundaryEvent = new BoundaryEvent();
+        boundaryEvent.setId(WFConstants.REJECTED_BOUNDARY_EVENT_ID);
+        boundaryEvent.setName("Rejected Error Event");
+        boundaryEvent.setAttachedToRef(sub);
+        boundaryEvent.addEventDefinition(errorDef);
+        process.addFlowElement(boundaryEvent);
+
+        process.addFlowElement(createSequenceFlow(boundaryEvent.getId(), submitTask.getId(), "Rejected"));
+
+        EndEvent endEvent = new EndEvent();
+        endEvent.setId("end");
+
+        process.addFlowElement(endEvent);
+        process.addFlowElement(createSequenceFlow(sub.getId(), endEvent.getId()));
+
+        //Generate graphical information
+        new BpmnAutoLayout(model).execute();
+        return model;
+    }
+
+
     protected static SequenceFlow approvalTask(SubProcess sub, EndEvent errorEnd, DynamicUserTask from, int currentIdx, int total, SequenceFlow prev) {
         org.activiti.bpmn.model.UserTask current = new org.activiti.bpmn.model.UserTask();
         current.setId(String.format("%s_%d", WFConstants.TASK_ID_DOC_APPROVAL, currentIdx));
+        current.setName(String.format("Approval (%d / %d)", currentIdx, total));
+/*
         if (StringUtils.isBlank(from.getName())) {
             current.setName(String.format("Approve Document (%d / %d)", currentIdx, total));
         } else {
             current.setName(from.getName());
         }
+*/
 
         ActivitiListener onCreateApproval = new ActivitiListener();
         onCreateApproval.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
@@ -54,7 +113,7 @@ public class WorkflowBuilder {
 /*
                 ActivitiListener taskListener = new ActivitiListener();
                 taskListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
-                taskListener.setImplementation("${documentWorkflow.setAssignee(execution, task)}");
+                taskListener.setImplementation("${docWorkflowListener.setAssignee(execution, task)}");
                 taskListener.setEvent("create");
                 userTask.setTaskListeners(Lists.newArrayList(taskListener));
 */
@@ -77,7 +136,7 @@ public class WorkflowBuilder {
 
         ActivitiListener rejectedListener = new ActivitiListener();
         rejectedListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
-        rejectedListener.setImplementation("${documentWorkflow.onRejected(execution)}");
+        rejectedListener.setImplementation("${docWorkflowListener.onRejected(execution)}");
         rejectedListener.setEvent("take");
         rejectedFlow.setExecutionListeners(Lists.newArrayList(rejectedListener));
         rejectedFlow.setConditionExpression("${approved == false}");
@@ -91,7 +150,7 @@ public class WorkflowBuilder {
 
         ActivitiListener approvedListener = new ActivitiListener();
         approvedListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
-        approvedListener.setImplementation("${documentWorkflow.onApproved(execution)}");
+        approvedListener.setImplementation("${docWorkflowListener.onApproved(execution)}");
         approvedListener.setEvent("take");
         approvedFlow.setExecutionListeners(Lists.newArrayList(approvedListener));
         approvedFlow.setConditionExpression("${approved == true}");
@@ -105,11 +164,27 @@ public class WorkflowBuilder {
     protected static SequenceFlow collaborationTask(SubProcess subProcess, DynamicUserTask from, int currentIdx, int total, SequenceFlow prev) {
         org.activiti.bpmn.model.UserTask current = new org.activiti.bpmn.model.UserTask();
         current.setId(String.format("%s_%d", WFConstants.TASK_ID_DOC_COLLABORATE, currentIdx));
+        current.setName(String.format("Collaboration (%d / %d)", currentIdx, total));
+/*
         if (StringUtils.isBlank(from.getName())) {
             current.setName(String.format("Document Collaboration (%d / %d)", currentIdx, total));
         } else {
             current.setName(from.getName());
         }
+*/
+
+        if (from.getCandidateGroups().isEmpty() && from.getCandidateUsers().isEmpty()) {
+            throw new IllegalArgumentException("user task does not have any candidate users / groups assigned");
+/*
+                ActivitiListener taskListener = new ActivitiListener();
+                taskListener.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
+                taskListener.setImplementation("${docWorkflowListener.setAssignee(execution, task)}");
+                taskListener.setEvent("create");
+                userTask.setTaskListeners(Lists.newArrayList(taskListener));
+*/
+        }
+        current.setCandidateGroups(from.getCandidateGroups());
+        current.setCandidateUsers(from.getCandidateUsers());
 
         ActivitiListener onCreate = new ActivitiListener();
         onCreate.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);

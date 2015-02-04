@@ -7,8 +7,8 @@
 <html lang="en">
 <head>
     <jsp:include page="../fragments/head.jsp"/>
-    <link href="${pageContext.request.contextPath}/resources/js/chosen_v1.3.0/chosen.css" rel="stylesheet">
-    <%--<link href="${pageContext.request.contextPath}/resources/css/bootstrap-choosen.css" rel="stylesheet">--%>
+    <%--<link href="${pageContext.request.contextPath}/resources/js/chosen_v1.3.0/chosen.css" rel="stylesheet">--%>
+    <link href="${pageContext.request.contextPath}/resources/css/bootstrap-choosen.css" rel="stylesheet">
 
     <title>Workflow Edit</title>
 
@@ -30,7 +30,6 @@
     <div class="start-template">
         <div class="page-header">
             <span class="glyphicon glyphicon-cog pull-right"></span>
-
             <h3>Workflows</h3>
         </div>
 
@@ -108,13 +107,13 @@
                     <h3 class="panel-title">User Tasks</h3>
                 </div>
                 <div class="panel-body">
-                    <div class="btn-group pull-right">
-                        <button type="button" class="btn btn-default dropdown-toggle btn-primary" data-toggle="dropdown" aria-expanded="false">
-                            Add Task<span class="caret"></span>
+                    <div class="btn-group pull-right" id="emptyTaskListAddBtn">
+                        <button type="button"  class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                            Add Task &nbsp;<span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu" role="menu">
-                            <li><a href="${pageContext.request.contextPath}/document/bookReport/create.htm">Approval</a></li>
-                            <li><a href="${pageContext.request.contextPath}/document/invoice/create.htm">Collaboration</a></li>
+                            <li><a id="emptyApproveBtn" href="#">Approval</a></li>
+                            <li><a id="emptyCollabBtn" href="#">Collaboration</a></li>
                         </ul>
                     </div>
                     <div id="userTasks-panel" class="clearfix">
@@ -123,10 +122,9 @@
                 </div>
 
                 <p class="pull-right">
-                    <button id="update-button" type="button" style="margin-top: 20px" class="btn btn-primary">Update
-                        Workflow
-                    </button>
+                    <button id="update-button" type="button" style="margin-top: 20px" class="btn btn-primary">Update Workflow</button>
                 </p>
+
             </div>
         </div>
         <%--<div>--%>
@@ -162,7 +160,7 @@
 <script src="${pageContext.request.contextPath}/resources/js/chosen_v1.3.0/chosen.jquery.js"></script>
 <script type="application/javascript">
     APP = {} || APP;
-    APP.dynamicTaskTypes = "${dynamicTaskTypesJson}";
+    APP.dynamicTaskTypes = ${dynamicTaskTypesJson};
 </script>
 <script src="${pageContext.request.contextPath}/resources/js/app/workflow/main.js"></script>
 <script>

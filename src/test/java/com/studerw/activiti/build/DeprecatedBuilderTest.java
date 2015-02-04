@@ -106,7 +106,7 @@ public class DeprecatedBuilderTest {
         dynamicUserTask3.setIndex(2);
         dynamicUserTasks.add(dynamicUserTask3);
 
-        BpmnModel model = workflowBldr.documentWithTasks(dynamicUserTasks, DocType.BOOK_REPORT, "engineering");
+        BpmnModel model = workflowBldr.buildModel(dynamicUserTasks, DocType.BOOK_REPORT, "engineering");
         assertNotNull("model should be valid", model);
 
         Process proc = model.getMainProcess();
@@ -133,7 +133,7 @@ public class DeprecatedBuilderTest {
         dynamicUserTask.setIndex(0);
         dynamicUserTask.setDynamicUserTaskType(DynamicUserTaskType.APPROVE_REJECT);
         dynamicUserTasks.add(dynamicUserTask);
-        BpmnModel model = workflowBldr.documentWithTasks(dynamicUserTasks, DocType.BOOK_REPORT, "engineering");
+        BpmnModel model = workflowBldr.buildModel(dynamicUserTasks, DocType.BOOK_REPORT, "engineering");
         assertNotNull("model should be valid", model);
 
         Process proc = model.getMainProcess();
@@ -145,7 +145,7 @@ public class DeprecatedBuilderTest {
 
         Assert.notNull(updatedProcDef, "something went wrong creating the new processDefinition: " + proc.getId());
 
-//        BpmnModel model = workflowBldr.documentWithTasks(userTasks, DocType.BOOK_REPORT, "engineering");
+//        BpmnModel model = workflowBldr.buildModel(userTasks, DocType.BOOK_REPORT, "engineering");
 //
 //        InputStream in = new DefaultProcessDiagramGenerator().generatePngDiagram(model);
 //        FileUtils.copyInputStreamToFile(in, new File("target/some_group_diagram.png"));

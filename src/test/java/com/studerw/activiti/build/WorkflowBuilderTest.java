@@ -7,12 +7,8 @@ import com.studerw.activiti.model.workflow.DynamicUserTaskType;
 import com.studerw.activiti.workflow.WFConstants;
 import com.studerw.activiti.workflow.WorkflowBuilder;
 import com.studerw.activiti.workflow.WorkflowService;
-import org.activiti.bpmn.BpmnAutoLayout;
 import org.activiti.bpmn.converter.BpmnXMLConverter;
 import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.FlowElement;
-import org.activiti.bpmn.model.Process;
-import org.activiti.bpmn.model.SubProcess;
 import org.activiti.engine.*;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.image.impl.DefaultProcessDiagramGenerator;
@@ -27,14 +23,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.util.Assert;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.util.Collection;
 import java.util.List;
+import java.util.Random;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -70,6 +64,33 @@ import static org.junit.Assert.fail;
         }
     }
 
+    @Test
+    public void testGeneratePng() throws IOException {
+        List<DynamicUserTask> dynamicUserTasks = Lists.newArrayList();
+        DynamicUserTask dynamicUserTask = new DynamicUserTask();
+        DocType docType = DocType.GENERAL;
+        String group = String.valueOf(new Random().nextInt());
+
+        dynamicUserTask.getCandidateGroups().add("management");
+        dynamicUserTask.setIndex(0);
+        dynamicUserTask.setDynamicUserTaskType(DynamicUserTaskType.APPROVE_REJECT);
+        dynamicUserTasks.add(dynamicUserTask);
+
+        DynamicUserTask dynamicUserTask2 = new DynamicUserTask();
+        dynamicUserTask2.getCandidateUsers().add("kermit");
+        dynamicUserTask2.setDynamicUserTaskType(DynamicUserTaskType.COLLABORATION);
+        dynamicUserTask2.setIndex(1);
+        dynamicUserTasks.add(dynamicUserTask2);
+
+        BpmnModel model = this.workflowBldr.buildModel(dynamicUserTasks, docType, group);
+        assertNotNull(model);
+
+        InputStream in = new DefaultProcessDiagramGenerator().generatePngDiagram(model);
+        File f = new File("target/generated_ping_test_2_tasks.png");
+        FileUtils.copyInputStreamToFile(in, f);
+        IOUtils.closeQuietly(in);
+        LOG.debug("image copied to {}", f.getAbsolutePath());
+    }
 
     @Test
     @DirtiesContext
