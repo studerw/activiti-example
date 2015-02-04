@@ -18,13 +18,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * @author William Studer
- * Date: 5/18/14
  * <p>
  * Workflow execution listeners for Document tasks - approve/reject, collaborate, etc
  * Most likely embedded as bean service refs within the BPMN definition.
  * within the BPMN workflow definitions.
  * </p>
+ *
+ * @author William Studer
+ *         Date: 5/18/14
  */
 @Service("docWorkflowListener")
 public class DocWorkflowListener {
@@ -57,7 +58,7 @@ public class DocWorkflowListener {
     }
 
     public void onRejected(DelegateExecution execution) {
-        LOG.debug("doc rejected - process id: {}",execution.getProcessInstanceId());
+        LOG.debug("doc rejected - process id: {}", execution.getProcessInstanceId());
         ProcessInstance pi = runtimeService.createProcessInstanceQuery().
                 processInstanceId(execution.getProcessInstanceId()).singleResult();
         String docId = pi.getBusinessKey();
@@ -70,7 +71,6 @@ public class DocWorkflowListener {
         this.docSrvc.updateDocument(doc);
         LOG.info("{} rejected: {}", doc.getDocType().name(), doc.getTitle());
     }
-
 
 
     /**

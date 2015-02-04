@@ -97,19 +97,19 @@ public class DocumentService {
 
         try {
             identityService.setAuthenticatedUserId(userDetails.getUsername());
-
-            //make sure we aren't submitting more than once
-            ProcessInstance current = workflowService.findProcessInstanceByBusinessKey(docId);
-            if (current != null) {
-                throw new IllegalStateException("Running WF Process with key: " + docId + " already exists.");
-            }
             DocType docType = doc.getDocType();
             String group = doc.getGroupId();
+
             ProcessDefinition procDef = this.workflowService.findProcDef(docType, group);
             if (procDef == null) {
                 throw new IllegalArgumentException("No workflow exists for doctype=" + docType.name() + " and group=" + group);
             }
-            current = runtimeService.startProcessInstanceByKey(procDef.getKey(), docId);
+
+            ProcessInstance current = workflowService.findProcessInstanceByBusinessKey(docId);
+            if (current == null){
+                current = runtimeService.startProcessInstanceByKey(procDef.getKey(), docId);
+            }
+
             Task task = taskService.createTaskQuery().processInstanceId(current.getProcessInstanceId()).singleResult();
             taskService.setAssignee(task.getId(), userDetails.getUsername());
 
@@ -120,7 +120,7 @@ public class DocumentService {
             } else {
                 throw new IllegalArgumentException("Unknown doc type: " + doc.getDocType());
             }*/
-            taskService.setVariableLocal(task.getId(), "taskOutcome", "Submitted to Workflow");
+            taskService.setVariableLocal(task.getId(), "taskOutcome", "Submitted");
             Map<String, Object> processVariables = Maps.newHashMap();
             processVariables.put("initiator", doc.getAuthor());
             processVariables.put("businessKey", doc.getId());

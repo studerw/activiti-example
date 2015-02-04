@@ -15,7 +15,6 @@
 <spring:eval expression="T(com.studerw.activiti.workflow.WFConstants).TASK_ID_USER_APPROVAL" var="userApprovalTask" />
 <spring:eval expression="T(com.studerw.activiti.model.document.DocType).BOOK_REPORT" var="bookReportTypeStr" />
 <spring:eval expression="T(com.studerw.activiti.model.document.DocType).INVOICE" var="invoiceTypeStr" />
-<h3>Count: ${fn:length(candidateTasks)}</h3>
 <c:choose>
     <c:when test="${empty candidateTasks}">
         <p>You do not currently have any tasks to complete.</p>

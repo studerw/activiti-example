@@ -28,7 +28,7 @@ import java.util.Objects;
 
 /**
  * @author William Studer
- * Date: 5/18/14
+ *         Date: 5/18/14
  */
 @Service("localTaskService")
 public class LocalTaskService {
@@ -60,8 +60,7 @@ public class LocalTaskService {
                     candidateTasks.add(CandidateTask.fromTask(task));
                 }
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException("Error converting task to Task Form", e);
         }
         LOG.debug("got {} tasks for user {}", candidateTasks.size(), userId);
@@ -100,10 +99,10 @@ public class LocalTaskService {
             runtimeService.setVariable(task.getExecutionId(), WFConstants.PROCESS_VAR_APPROVED_OR_REJECTED, approved);
             taskService.setAssignee(task.getId(), userDetails.getUsername());
             taskService.addComment(task.getId(), task.getProcessInstanceId(), comment);
-            taskService.setVariableLocal(task.getId(), WFConstants.TASK_VAR_APPROVED_OR_REJECTED, Boolean.valueOf(approved));
+            //String outcome = String.format("%s (%s)", approved ? "Approved" : "Rejected",  userDetails.getUsername());
+            taskService.setVariableLocal(task.getId(), WFConstants.TASK_VAR_OUTCOME, approved ? "Approved" : "Rejected");
             taskService.complete(task.getId());
-        }
-        finally {
+        } finally {
             identityService.setAuthenticatedUserId(null);
         }
     }
@@ -125,9 +124,10 @@ public class LocalTaskService {
             }
             taskService.setAssignee(task.getId(), userDetails.getUsername());
             taskService.addComment(task.getId(), task.getProcessInstanceId(), comment);
+            //String outcome = String.format("Collaborated (%s)", userDetails.getUsername());
+            taskService.setVariableLocal(task.getId(), WFConstants.TASK_VAR_OUTCOME, "Collaborated");
             taskService.complete(task.getId());
-        }
-        finally {
+        } finally {
             identityService.setAuthenticatedUserId(null);
         }
     }
