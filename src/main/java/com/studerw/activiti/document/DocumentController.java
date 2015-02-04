@@ -48,7 +48,4 @@ public class DocumentController extends BaseController {
         model.addAttribute("documents", this.docService.getGroupDocumentsByUser(currentUserName()));
         return "document/list";
     }
-
-
-
 }

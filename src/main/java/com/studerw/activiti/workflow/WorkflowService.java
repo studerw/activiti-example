@@ -2,6 +2,7 @@ package com.studerw.activiti.workflow;
 
 import com.google.common.collect.Lists;
 import com.studerw.activiti.model.document.DocType;
+import org.activiti.bpmn.BpmnAutoLayout;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
@@ -69,11 +70,12 @@ public class WorkflowService {
         ProcessInstance pi =
                 runtimeService.createProcessInstanceQuery().processInstanceBusinessKey(docId).singleResult();
 
-//        RepositoryServiceImpl impl = (RepositoryServiceImpl) repoSrvc;
-//        ProcessDefinitionEntity pde = (ProcessDefinitionEntity) impl.getDeployedProcessDefinition(pi.getProcessDefinitionId());
-//        BpmnModel bpmnModel = repoSrvc.getBpmnModel(pde.getId());
-//        InputStream in = new DefaultProcessDiagramGenerator().generateDiagram(bpmnModel, "png", runtimeService.getActiveActivityIds(pi.getProcessInstanceId()));
-        InputStream in = this.appContext.getResource("classpath:800x200.png").getInputStream();
+        RepositoryServiceImpl impl = (RepositoryServiceImpl) repoSrvc;
+        ProcessDefinitionEntity pde = (ProcessDefinitionEntity) impl.getDeployedProcessDefinition(pi.getProcessDefinitionId());
+        BpmnModel bpmnModel = repoSrvc.getBpmnModel(pde.getId());
+        new BpmnAutoLayout(bpmnModel).execute();
+        InputStream in = new DefaultProcessDiagramGenerator().generateDiagram(bpmnModel, "png", runtimeService.getActiveActivityIds(pi.getProcessInstanceId()));
+//        InputStream in = this.appContext.getResource("classpath:800x200.png").getInputStream();
         byte[] bytes = IOUtils.toByteArray(in);
         IOUtils.closeQuietly(in);
         LOG.debug("Got bytes of size: " + bytes.length);

@@ -97,7 +97,7 @@ public class DiagramController extends BaseController {
 
 
 
-    @RequestMapping(value = "/documents/{docId}/", method = RequestMethod.GET)
+    @RequestMapping(value = "/documents/{docId}", method = RequestMethod.GET)
     public ResponseEntity<byte[]> getActiveDocDiagram(
             @PathVariable("docId") String docId) throws IOException {
         LOG.debug("fetching diagram for docId{}", docId);
