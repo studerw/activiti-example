@@ -345,7 +345,8 @@ $(function () {
     $('#docTypeSel').change(function () {
         //$("#my-Select option[text=" + myText +"]").attr("selected","selected") ;
         //$("#groupSel option[text=" + "Choose a Document Type" + "]").attr("selected", "selected");
-        $("#groupSel").val("");
+        $("#groupSel").val('');
+        $("#groupSel").trigger("change");
         var val = $(this).val();
         if (_.isEmpty(val)) {
             $('#dynamicTasks').removeClass('show').addClass('hidden');
