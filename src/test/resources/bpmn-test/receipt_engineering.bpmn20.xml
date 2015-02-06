@@ -13,7 +13,11 @@
         <userTask id="submitToWorkflow" name="Submit Invoice to Workflow"></userTask>
         <endEvent id="endevent" name="End"></endEvent>
         <subProcess id="DYNAMIC_SUB_PROCESS" name="Dynamic Document Subprocess">
-
+            <startEvent id="dynamic_sub_process_start_event" name="Start Dynamic SubProcess"></startEvent>
+            <endEvent id="dynamic_sub_process_end_event" name="End Dynamic SubProcess"></endEvent>
+            <endEvent id="rejectedErrorEndEvent" name="ErrorEnd">
+                <errorEventDefinition errorRef="errorDocRejected"></errorEventDefinition>
+            </endEvent>
         </subProcess>
         <boundaryEvent id="REJECTED_ERROR_BOUNDARY_EVENT" name="Rejected Error Event" attachedToRef="DYNAMIC_SUB_PROCESS">
             <errorEventDefinition errorRef="ERROR_DOC_REJECTED"></errorEventDefinition>

@@ -15,8 +15,8 @@
 //import org.activiti.engine.history.HistoricTaskInstance;
 //import org.activiti.engine.identity.Group;
 //import org.activiti.engine.task.Comment;
-//import org.apache.logging.log4j.LogManager;
-//import org.apache.logging.log4j.Logger;
+//
+//
 //import org.junit.Test;
 //import org.junit.runner.RunWith;
 //import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +44,7 @@
 //@RunWith(SpringJUnit4ClassRunner.class)
 //@ContextConfiguration({"classpath:spring/testAppContext.xml"})
 //public class DocumentApproveTest {
-//    private static final Logger LOG = LogManager.getLogger(ActivitiSpringTest.class);
+//    private static final Logger LOG = LoggerFactory.getLogger(ActivitiSpringTest.class);
 //    @Autowired
 //    RuntimeService runtimeService;
 //    @Autowired

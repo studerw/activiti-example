@@ -19,8 +19,8 @@ import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.image.impl.DefaultProcessDiagramGenerator;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
+
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,7 +46,7 @@ import static org.junit.Assert.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"classpath:spring/testAppContext.xml"})
 public class DeprecatedBuilderTest {
-    private static final Logger LOG = LogManager.getLogger(DeprecatedBuilderTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DeprecatedBuilderTest.class);
     @Autowired public WorkflowBuilder workflowBldr;
     @Autowired RuntimeService runtimeService;
     @Autowired TaskService taskService;

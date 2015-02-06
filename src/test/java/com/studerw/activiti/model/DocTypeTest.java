@@ -1,22 +1,21 @@
 package com.studerw.activiti.model;
 
 import com.studerw.activiti.model.document.DocType;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 /**
  * @author William Studer
  */
 public class DocTypeTest {
-    private static final Logger LOG = LogManager.getLogger(DocTypeTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DocTypeTest.class);
 
     @Test(expected = IllegalArgumentException.class)
-    public void testValueOf(){
+    public void testValueOf() {
         DocType type = DocType.BOOK_REPORT;
         LOG.debug("name: {}", type.name());
         LOG.debug("ordinal: {}", type.ordinal());

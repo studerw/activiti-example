@@ -3,10 +3,11 @@ package com.studerw.activiti;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.identity.Group;
 import org.activiti.engine.identity.User;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -20,7 +21,7 @@ import static org.junit.Assert.*;
 @ContextConfiguration({"classpath:spring/testAppContext.xml"})
 //@TransactionConfiguration(defaultRollback=true)
 public class IdentityServiceTest {
-    private static final Logger LOG = LogManager.getLogger(IdentityServiceTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(IdentityServiceTest.class);
 
     @Autowired IdentityService identityService;
 

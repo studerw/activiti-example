@@ -14,11 +14,11 @@ import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.image.impl.DefaultProcessDiagramGenerator;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -30,9 +30,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 /**
  * @author William Studer
@@ -40,8 +38,8 @@ import static org.junit.Assert.fail;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"classpath:spring/testAppContext.xml"})
-    public class WorkflowBuilderTest {
-    private static final Logger LOG = LogManager.getLogger(WorkflowBuilderTest.class);
+public class WorkflowBuilderTest {
+    private static final Logger LOG = LoggerFactory.getLogger(WorkflowBuilderTest.class);
     @Autowired public WorkflowBuilder workflowBldr;
     @Autowired RuntimeService runtimeService;
     @Autowired TaskService taskService;
@@ -135,7 +133,6 @@ import static org.junit.Assert.fail;
     }
 
 
-
     @Test
     @DirtiesContext
     public void testCreateGroupWorkflow() throws IOException {
@@ -172,7 +169,7 @@ import static org.junit.Assert.fail;
         assertNotNull(processDefinition);
 
         List<DynamicUserTask> dynamicTasks = this.workflowBldr.getDynamicTasks(processDefinition);
-        LOG.debug(dynamicTasks.size());
+        LOG.debug("{}",dynamicTasks.size());
         assertTrue(dynamicTasks.size() == 4);
         assertTrue(dynamicTasks.get(0).getId().startsWith(WFConstants.TASK_ID_DOC_COLLABORATE));
         assertTrue(dynamicTasks.get(1).getId().startsWith(WFConstants.TASK_ID_DOC_COLLABORATE));

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration PUBLIC "-//LOGGER"
+        "http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/xml/doc-files/log4j.dtd">
+<log4j:configuration>
+
+    <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+        <!--<param name="Threshold" value="WARN"/>-->
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%-5p [%C{1}]  [%x] - %m%n"/>
+        </layout>
+    </appender>
+
+    <!--<appender name="LOGFILE" class="org.apache.log4j.RollingFileAppender">-->
+        <!--&lt;!&ndash; <param name="Threshold" value="INFO" /> &ndash;&gt;-->
+        <!--&lt;!&ndash; <param name="Append" value="false" /> &ndash;&gt;-->
+        <!--<param name="MaxBackupIndex" value="5"/>-->
+        <!--<param name="MaxFileSize" value="10MB"/>-->
+        <!--<param name="File" value="../standalone/log/sso-example.log"/>-->
+        <!--<layout class="org.apache.log4j.PatternLayout">-->
+            <!--&lt;!&ndash; <param name="ConversionPattern" value="%-4r [%C.%M - %t] %-5p [%x] - %m%n" /> &ndash;&gt;-->
+            <!--<param name="ConversionPattern" value="%-5p %d [%t] %c: %m%n"/>-->
+        <!--</layout>-->
+    <!--</appender>-->
+
+    <logger name="com.studerw.activiti">
+        <level value="DEBUG"/>
+    </logger>
+
+    <logger name="org.activiti">
+        <level value="INFO"/>
+    </logger>
+
+    <logger name="gov.dia.chrome">
+        <level value="DEBUG"/>
+    </logger>
+
+    <logger name="org.springframework">
+        <level value="INFO"/>
+    </logger>
+
+    <logger name="org.springframework.security">
+        <level value="INFO"/>
+    </logger>
+
+    <logger name="ezbake">
+        <level value="WARN"/>
+    </logger>
+    <logger name="org.apache">
+        <level value="WARN"/>
+    </logger>
+
+    <logger name="org.jboss">
+        <level value="WARN"/>
+    </logger>
+
+    <root>
+        <level value="WARN"/>
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+</log4j:configuration>

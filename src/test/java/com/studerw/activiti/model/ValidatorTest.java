@@ -4,10 +4,12 @@ import com.studerw.activiti.model.document.BookReport;
 import com.studerw.activiti.model.document.Invoice;
 import com.studerw.activiti.model.task.TaskApprovalForm;
 import com.studerw.activiti.model.task.TaskCollaborationForm;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
+
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -24,7 +26,7 @@ import static org.junit.Assert.assertTrue;
  * @author William Studer
  */
 public class ValidatorTest {
-    private static final Logger LOG = LogManager.getLogger(ValidatorTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ValidatorTest.class);
     ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     Validator validator = null;
     @Before

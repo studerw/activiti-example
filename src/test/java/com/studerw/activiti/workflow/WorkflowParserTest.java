@@ -12,13 +12,15 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.image.impl.DefaultProcessDiagramGenerator;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -35,7 +37,7 @@ import static org.junit.Assert.assertNotNull;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"classpath:spring/testAppContext.xml"})
 public class WorkflowParserTest {
-    private static final Logger LOG = LogManager.getLogger(WorkflowParserTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(WorkflowParserTest.class);
 
     @Autowired RepositoryService repoSrvc;
     @Autowired RuntimeService runtimeService;

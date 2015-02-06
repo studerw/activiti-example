@@ -4,13 +4,13 @@ import com.studerw.activiti.document.DocumentService;
 import com.studerw.activiti.model.document.DocType;
 import org.activiti.engine.*;
 import org.activiti.engine.repository.ProcessDefinition;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
@@ -24,7 +24,7 @@ import static org.junit.Assert.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"classpath:spring/testAppContext.xml"})
 public class WorkflowServiceTest {
-    private static final Logger LOG = LogManager.getLogger(WorkflowServiceTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(WorkflowServiceTest.class);
 
     @Autowired RuntimeService runtimeService;
     @Autowired TaskService taskService;
@@ -130,7 +130,7 @@ public class WorkflowServiceTest {
     }
 
     @Test
-    public void testGetBaseDocTypes(){
+    public void testGetBaseDocTypes() {
         List<DocType> docTypes = this.workflowService.findExistingBaseDocTypes();
         assertTrue(docTypes.size() == 2);
         assertTrue(docTypes.contains(DocType.BOOK_REPORT));

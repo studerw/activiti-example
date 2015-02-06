@@ -17,8 +17,8 @@
 //import org.activiti.engine.task.Comment;
 //import org.activiti.image.impl.DefaultProcessDiagramGenerator;
 //import org.apache.commons.io.FileUtils;
-//import org.apache.logging.log4j.LogManager;
-//import org.apache.logging.log4j.Logger;
+//
+//
 //import org.junit.Test;
 //import org.junit.runner.RunWith;
 //import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +49,7 @@
 //@RunWith(SpringJUnit4ClassRunner.class)
 //@ContextConfiguration({"classpath:spring/testAppContext.xml"})
 //public class DocumentApproveSubProcessTest {
-//    private static final Logger LOG = LogManager.getLogger(DocumentApproveSubProcessTest.class);
+//    private static final Logger LOG = LoggerFactory.getLogger(DocumentApproveSubProcessTest.class);
 //
 //    @Autowired
 //    RuntimeService runtimeService;

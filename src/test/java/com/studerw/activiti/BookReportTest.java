@@ -8,15 +8,14 @@ import com.studerw.activiti.model.document.DocState;
 import com.studerw.activiti.task.LocalTaskService;
 import org.activiti.engine.*;
 import org.activiti.engine.identity.Group;
-import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,18 +27,20 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
 /**
  * @author William Studer
- * Date: 5/25/14
+ *         Date: 5/25/14
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"classpath:spring/testAppContext.xml"})
 public class BookReportTest {
-    private static final Logger LOG = LogManager.getLogger(BookReportTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BookReportTest.class);
     @Autowired RuntimeService runtimeService;
     @Autowired TaskService taskService;
     @Autowired LocalTaskService localTaskService;
@@ -107,7 +108,7 @@ public class BookReportTest {
         assertNotNull(task);
         taskService.complete(task.getId());
         BookReport updated = (BookReport) this.documentService.getDocument(id);
-        LOG.debug(updated);
+        LOG.debug("{}",updated);
 
         assertNotNull("should have returned valid doc", updated);
         assertTrue("Should have state=Published", updated.getDocState() == DocState.PUBLISHED);
@@ -138,14 +139,14 @@ public class BookReportTest {
         taskService.complete(task.getId());
 
         updated = (BookReport) this.documentService.getDocument(id);
-        LOG.debug(updated);
+        LOG.debug("{}", updated);
         assertTrue("Should have state=WAITING_FOR_COLLABORATION", updated.getDocState() == DocState.WAITING_FOR_COLLABORATION);
 
         task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertEquals(task.getTaskDefinitionKey(), "COLLABORATE_DOC_USER_TASK_1");
         localTaskService.collaborateTask(task.getId(), "some colloboration comment 1");
         updated = (BookReport) this.documentService.getDocument(id);
-        LOG.debug(updated);
+        LOG.debug("{}",updated);
         assertTrue("Should have state=WAITING_FOR_COLLABORATION", updated.getDocState() == DocState.WAITING_FOR_COLLABORATION);
 
 
@@ -153,7 +154,7 @@ public class BookReportTest {
         assertEquals(task.getTaskDefinitionKey(), "COLLABORATE_DOC_USER_TASK_2");
         localTaskService.collaborateTask(task.getId(), "some colloboration comment 2");
         updated = (BookReport) this.documentService.getDocument(id);
-        LOG.debug(updated);
+        LOG.debug("{}",updated);
         assertTrue("Should have state=WAITING_FOR_APPROVAL", updated.getDocState() == DocState.WAITING_FOR_APPROVAL);
 
 
@@ -161,17 +162,17 @@ public class BookReportTest {
         assertEquals(task.getTaskDefinitionKey(), "APPROVE_REJECT_DOC_USER_TASK_1");
         localTaskService.approveOrRejectDoc(true, "some comment 1", task.getId());
         updated = (BookReport) this.documentService.getDocument(id);
-        LOG.debug(updated);
+        LOG.debug("{}",updated);
         assertTrue("Should have state=WAITING_FOR_APPROVAL", updated.getDocState() == DocState.WAITING_FOR_APPROVAL);
 
         task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertEquals(task.getTaskDefinitionKey(), "APPROVE_REJECT_DOC_USER_TASK_2");
         localTaskService.approveOrRejectDoc(true, "some comment 2", task.getId());
         updated = (BookReport) this.documentService.getDocument(id);
-        LOG.debug(updated);
+        LOG.debug("{}",updated);
 
         updated = (BookReport) this.documentService.getDocument(id);
-        LOG.debug(updated);
+        LOG.debug("{}",updated);
         assertTrue("Should have state=Published", updated.getDocState() == DocState.PUBLISHED);
     }
 
