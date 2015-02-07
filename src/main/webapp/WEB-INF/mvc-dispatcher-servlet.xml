@@ -49,5 +49,6 @@
           p:basename="classpath:messages/messages"/>
 
     <mvc:view-controller path="/test.htm" view-name="test"/>
+    <mvc:view-controller path="/dd.htm" view-name="dd"/>
 
 </beans>
