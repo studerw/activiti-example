@@ -18,6 +18,7 @@
             <endEvent id="rejectedErrorEndEvent" name="ErrorEnd">
                 <errorEventDefinition errorRef="errorDocRejected"></errorEventDefinition>
             </endEvent>
+            <sequenceFlow sourceRef="dynamic_sub_process_start_event" targetRef="dynamic_sub_process_end_event"/>
         </subProcess>
         <boundaryEvent id="REJECTED_ERROR_BOUNDARY_EVENT" name="Rejected Error Event" attachedToRef="DYNAMIC_SUB_PROCESS">
             <errorEventDefinition errorRef="ERROR_DOC_REJECTED"></errorEventDefinition>

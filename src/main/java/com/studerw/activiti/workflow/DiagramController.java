@@ -18,6 +18,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.codec.Base64;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Random;
 
@@ -55,8 +57,9 @@ public class DiagramController extends BaseController {
         return new ResponseEntity<byte[]>(bytes, responseHeaders, HttpStatus.OK);
     }
 
-    @RequestMapping(value ="/dynamicTasks", method=RequestMethod.PUT)
-    public ResponseEntity<byte[]> getDiagramByTasks(@RequestBody List<DynamicUserTask> dynamicUserTasks){
+    @RequestMapping(value ="/dynamicTasks", method=RequestMethod.POST)
+    public ResponseEntity<byte[]> getBaseDiagramByTasks(
+            @RequestBody List<DynamicUserTask> dynamicUserTasks){
 
         LOG.debug("fetching diagram for tasks: {}", dynamicUserTasks);
 
@@ -70,8 +73,31 @@ public class DiagramController extends BaseController {
         }
         IOUtils.closeQuietly(in);
         HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set("Content-Type", "image/png");
+        responseHeaders.set("Content-Type", MediaType.IMAGE_PNG_VALUE);
         return new ResponseEntity<byte[]>(bytes, responseHeaders, HttpStatus.OK);
+    }
+
+    @RequestMapping(value ="/dynamicTasks", method=RequestMethod.POST, params = "base64", produces = MediaType.TEXT_PLAIN_VALUE)
+    public ResponseEntity<Response<String>> getBaseDiagramBase64ByTasks(
+            @RequestBody List<DynamicUserTask> dynamicUserTasks,
+            @RequestParam(value="base64") boolean base64){
+
+        LOG.debug("fetching base64 encoded diagram for tasks: {}", dynamicUserTasks);
+
+        BpmnModel model = workflowBldr.buildModel(dynamicUserTasks, DocType.GENERAL, String.valueOf(new Random().nextInt()));
+        InputStream in = new DefaultProcessDiagramGenerator().generatePngDiagram(model);
+        byte[] bytes = null;
+        try {
+            bytes = IOUtils.toByteArray(in);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        IOUtils.closeQuietly(in);
+        bytes = Base64.encode(bytes);
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set("Content-Type", MediaType.TEXT_PLAIN_VALUE);
+        Response<String> response = new Response<String>(true, "" , new String(bytes, Charset.forName("UTF-8")));
+        return new ResponseEntity<Response<String>>(response, responseHeaders, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{docType}/{group}", method = RequestMethod.GET)

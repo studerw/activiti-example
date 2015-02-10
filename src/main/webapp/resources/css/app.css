@@ -81,3 +81,8 @@ img.proc-diagram{
 .chosen-container.chosen-container-single {
     width: 300px !important; /* or any value that fits your needs */
 }
+
+#proc-main-diagram {
+    width: 100%;
+    /*height: 200px;*/
+}

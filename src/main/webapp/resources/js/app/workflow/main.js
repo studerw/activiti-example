@@ -252,23 +252,8 @@ function getDynamicTasks(group, docType) {
             APP.dynamicTasks = data.data;
             refreshTpl(APP.dynamicTasks);
             $('#dynamicTasks').removeClass('hidden').addClass('show');
-            //var newSrc = SERVLET_CONTEXT + '/workflow/diagram/' + docType + '/' + group;
-            //var newSrc = "http://placehold.it/800x150.png";
-            //var rand = _.random(1, 100000000);
-            //newSrc = newSrc + '?text=' + rand
             $('#proc-main-diagram').attr('src', randPlaceholder("800x200"));
-            //    //need to add random param to avoid caching of the image
-            //    var rand = _.random(1, 100000000);
-            //    newSrc = newSrc + '?rand=' + rand
-            //    $('#proc-main-diagram').attr('src', newSrc);
-            //    $('#groupTitle').text(group);
-            //}
-            //else {
-            //    $('#dynamicTasks').addClass('hidden');
-            //    var newSrc = SERVLET_CONTEXT + '/workflow/diagrams/' + DOC_dynamicTask_ROOT_ID;
-            //    $('#proc-main-diagram').attr('src', newSrc);
-            //    $('#groupTitle').text('Default');
-            //}
+            updateDiagram();
         },
         error: function (error) {
             alert("There was an error updating the workflow");
@@ -314,6 +299,41 @@ function updateDynamicTasks(group, docType) {
         }
 
     });
+}
+
+function updateDiagram() {
+    var rand = _.random(1, 100000000);
+    var group = $("#groupSel").val();
+    var docType = $('#docTypeSel').val();
+    var url = SERVLET_CONTEXT + '/workflow/diagram/'+docType +'/'+ group
+    url += ('?rand=' + rand);
+    $('#proc-main-diagram').attr('src', url);
+    //var url = SERVLET_CONTEXT + '/workflow/diagram/dynamicTasks?base64=true&rand=' + rand;
+    //$.ajax({
+    //    url: url,
+    //    type: 'POST',
+    //    dataType: 'json',
+    //    contentType: "application/json; charset=utf-8",
+    //    data: JSON.stringify(APP.dynamicTasks),
+    //    headers: {
+    //        //Accept: "application/json"
+    //    },
+    //    success: function (data) {
+    //        if (!data.success) {
+    //            bootbox.alert("There was an error updating the workflow - " + data.message, function () {
+    //            });
+    //            return;
+    //        }
+    //        console.dir(data);
+    //        var base64 = 'data:image/png;base64,' + data.data;
+    //        $('#proc-main-diagram').attr('src', base64);
+    //    },
+    //    error: function (error) {
+    //        debugger;
+    //        bootbox.alert("There was an error updating the workflow image", function () {
+    //        });
+    //    }
+    //});
 }
 
 function randPlaceholder(dimensions) {

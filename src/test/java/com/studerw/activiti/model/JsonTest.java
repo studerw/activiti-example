@@ -9,12 +9,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.UnsupportedCharsetException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author William Studer
@@ -40,5 +43,22 @@ public class JsonTest {
         List<DynamicUserTaskType> taskTypeList = DynamicUserTaskType.asList();
         String json = objectMapper.writeValueAsString(taskTypeList);
         LOG.debug(json);
+    }
+
+    @Test(expected = UnsupportedCharsetException.class)
+    public void testUtf() {
+        Charset charset = Charset.forName("UTF-8");
+        LOG.debug(charset.name());
+
+        charset = Charset.forName("utf-8");
+        LOG.debug(charset.name());
+
+        charset = Charset.forName("utf8");
+        LOG.debug(charset.name());
+
+        charset = Charset.forName("foo");
+        fail("should have thrown exception here");
+
+
     }
 }
