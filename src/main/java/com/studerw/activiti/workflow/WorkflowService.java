@@ -105,6 +105,7 @@ public class WorkflowService {
         LOG.debug("using likeQuery for baseTypes = {}", likeQuery);
                 List < ProcessDefinition > processDefinitions = this.repoSrvc.createProcessDefinitionQuery().
                         processDefinitionCategory(WFConstants.NAMESPACE_CATEGORY).
+                        latestVersion().
                         processDefinitionKeyLike(likeQuery).list();
         LOG.debug("Base type = {}", String.valueOf(docTypes));
         for (ProcessDefinition processDefinition : processDefinitions) {
