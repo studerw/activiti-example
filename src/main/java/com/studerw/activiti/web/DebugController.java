@@ -40,6 +40,5 @@ public class DebugController extends BaseController{
         return "debug";
     }
 
-
 }
 
