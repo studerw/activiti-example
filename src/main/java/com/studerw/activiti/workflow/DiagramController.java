@@ -9,7 +9,6 @@ import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.image.impl.DefaultProcessDiagramGenerator;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +23,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -58,9 +56,9 @@ public class DiagramController extends BaseController {
         return new ResponseEntity<byte[]>(bytes, responseHeaders, HttpStatus.OK);
     }
 
-    @RequestMapping(value ="/dynamicTasks", method=RequestMethod.POST)
+    @RequestMapping(value = "/dynamicTasks", method = RequestMethod.POST)
     public ResponseEntity<byte[]> getBaseDiagramByTasks(
-            @RequestBody List<DynamicUserTask> dynamicUserTasks){
+            @RequestBody List<DynamicUserTask> dynamicUserTasks) {
 
         LOG.debug("fetching diagram for tasks: {}", dynamicUserTasks);
 
@@ -79,10 +77,10 @@ public class DiagramController extends BaseController {
         return new ResponseEntity<byte[]>(bytes, responseHeaders, HttpStatus.OK);
     }
 
-    @RequestMapping(value ="/dynamicTasks", method=RequestMethod.POST, params = "base64", produces = MediaType.TEXT_PLAIN_VALUE)
+    @RequestMapping(value = "/dynamicTasks", method = RequestMethod.POST, params = "base64", produces = MediaType.TEXT_PLAIN_VALUE)
     public ResponseEntity<Response<String>> getBaseDiagramBase64ByTasks(
             @RequestBody List<DynamicUserTask> dynamicUserTasks,
-            @RequestParam(value="base64") boolean base64){
+            @RequestParam(value = "base64") boolean base64) {
 
         LOG.debug("fetching base64 encoded diagram for tasks: {}", dynamicUserTasks);
 
@@ -99,16 +97,16 @@ public class DiagramController extends BaseController {
         bytes = Base64.encode(bytes);
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("Content-Type", MediaType.TEXT_PLAIN_VALUE);
-        Response<String> response = new Response<String>(true, "" , new String(bytes, Charset.forName("UTF-8")));
+        Response<String> response = new Response<String>(true, "", new String(bytes, Charset.forName("UTF-8")));
         return new ResponseEntity<Response<String>>(response, responseHeaders, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{docType}/{group}", method = RequestMethod.GET)
-        public ResponseEntity<byte[]> getDiagramByDocTypeAndGroup(
-             @PathVariable(value = "docType") DocType docType,
-             @PathVariable(value = "group") String group) {
+    public ResponseEntity<byte[]> getDiagramByDocTypeAndGroup(
+            @PathVariable(value = "docType") DocType docType,
+            @PathVariable(value = "group") String group) {
 
-        LOG.debug("finding dynamic tasks for docType = {} and group = {}", docType, group);
+        LOG.debug("finding diagram for docType = {} and group = {}", docType, group);
         ProcessDefinition procDefinition = this.workflowSrvc.findProcDef(docType, group);
         BpmnModel model = this.repositoryService.getBpmnModel(procDefinition.getId());
         new BpmnAutoLayout(model).execute();
@@ -125,7 +123,6 @@ public class DiagramController extends BaseController {
         responseHeaders.set("Content-Type", "image/png");
         return new ResponseEntity<byte[]>(bytes, responseHeaders, HttpStatus.OK);
     }
-
 
 
     @RequestMapping(value = "/documents/{docId}", method = RequestMethod.GET)

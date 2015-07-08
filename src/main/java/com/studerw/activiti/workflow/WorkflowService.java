@@ -50,8 +50,9 @@ public class WorkflowService {
         ProcessDefinition pd =
                 this.repoSrvc.createProcessDefinitionQuery().processDefinitionKey(processId).latestVersion().singleResult();
         LOG.debug("Getting process diagram for processId: {}", pd.getId());
-        //BpmnModel model = repoSrvc.getBpmnModel(pd.getId());
-        InputStream in = this.appContext.getResource("classpath:800x200.png").getInputStream();
+        BpmnModel bpmnModel = repoSrvc.getBpmnModel(pd.getId());
+        new BpmnAutoLayout(bpmnModel).execute();
+        InputStream in = new DefaultProcessDiagramGenerator().generatePngDiagram(bpmnModel);
 
         //InputStream in = new DefaultProcessDiagramGenerator().generatePngDiagram(model);
         byte[] bytes = IOUtils.toByteArray(in);
