@@ -9,11 +9,11 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.version>4.0.8.RELEASE</spring.version>
+        <spring.version>4.1.7.RELEASE</spring.version>
         <activiti-version>5.17.0</activiti-version>
         <jackson.version>2.4.3</jackson.version>
         <slf4j.version>1.7.5</slf4j.version>
-        <spring.security.version>3.2.5.RELEASE</spring.security.version>
+        <spring.security.version>3.2.7.RELEASE</spring.security.version>
         <skipTests>false</skipTests>
     </properties>
 
@@ -311,6 +311,7 @@
                     <port>9090</port>
                     <useTestClasspath>false</useTestClasspath>
                     <contextReloadable>false</contextReloadable>
+                    <ajpPort>9009</ajpPort>
                     <!--<tomcatUsers>${project.basedir}/src/main/resources/tomcat/tomcat-users.xml</tomcatUsers>-->
                     <systemProperties>
                         <JAVA_OPTS>-Xms512m -Xmx1024m -XX:MaxPermSize=1024m</JAVA_OPTS>
