@@ -30,10 +30,6 @@
         <level value="INFO"/>
     </logger>
 
-    <logger name="gov.dia.chrome">
-        <level value="DEBUG"/>
-    </logger>
-
     <logger name="org.springframework">
         <level value="INFO"/>
     </logger>
@@ -42,9 +38,6 @@
         <level value="INFO"/>
     </logger>
 
-    <logger name="ezbake">
-        <level value="WARN"/>
-    </logger>
     <logger name="org.apache">
         <level value="WARN"/>
     </logger>
