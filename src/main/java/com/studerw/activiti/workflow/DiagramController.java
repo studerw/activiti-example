@@ -4,6 +4,7 @@ import com.studerw.activiti.model.Response;
 import com.studerw.activiti.model.document.DocType;
 import com.studerw.activiti.model.workflow.DynamicUserTask;
 import com.studerw.activiti.web.BaseController;
+import org.activiti.bpmn.BpmnAutoLayout;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.repository.ProcessDefinition;
@@ -70,8 +71,9 @@ public class DiagramController extends BaseController {
             bytes = IOUtils.toByteArray(in);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } finally{
+            IOUtils.closeQuietly(in);
         }
-        IOUtils.closeQuietly(in);
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("Content-Type", MediaType.IMAGE_PNG_VALUE);
         return new ResponseEntity<byte[]>(bytes, responseHeaders, HttpStatus.OK);
@@ -91,8 +93,9 @@ public class DiagramController extends BaseController {
             bytes = IOUtils.toByteArray(in);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } finally{
+            IOUtils.closeQuietly(in);
         }
-        IOUtils.closeQuietly(in);
         bytes = Base64.encode(bytes);
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("Content-Type", MediaType.TEXT_PLAIN_VALUE);
@@ -108,14 +111,16 @@ public class DiagramController extends BaseController {
         LOG.debug("finding dynamic tasks for docType = {} and group = {}", docType, group);
         ProcessDefinition procDefinition = this.workflowSrvc.findProcDef(docType, group);
         BpmnModel model = this.repositoryService.getBpmnModel(procDefinition.getId());
+        new BpmnAutoLayout(model).execute();
         InputStream in = new DefaultProcessDiagramGenerator().generatePngDiagram(model);
         byte[] bytes = null;
         try {
             bytes = IOUtils.toByteArray(in);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } finally {
+            IOUtils.closeQuietly(in);
         }
-        IOUtils.closeQuietly(in);
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("Content-Type", "image/png");
         return new ResponseEntity<byte[]>(bytes, responseHeaders, HttpStatus.OK);
