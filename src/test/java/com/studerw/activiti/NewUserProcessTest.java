@@ -62,7 +62,7 @@ public class NewUserProcessTest {
         LOG.debug("{}",violations.size());
 
         processVariables.put("userForm", userForm);
-        ProcessInstance pi = runtimeService.startProcessInstanceByKey("newChromeUser", processVariables);
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("newUser", processVariables);
 
         Task task = taskService.createTaskQuery().taskCandidateGroup("admin").
                 //includeProcessVariables().
