@@ -10,16 +10,16 @@
              xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/DI
              http://www.omg.org/spec/BPMN/20100524/MODEL"
              targetNamespace="studerw.com">
-    <process id="newChromeUser" name="Approve New Chrome User" isExecutable="true">
-        <documentation>This process is initiated when a user enters the system but is not found yet in the Chrome User
+    <process id="newUser" name="Approve New  User" isExecutable="true">
+        <documentation>This process is initiated when a user enters the system but is not found yet in the  User
             repository. Upon submitting the standard registration information,
             an administrator will be taked with adding or denying the user.
         </documentation>
-        <startEvent id="startChromeUser" name="Start" activiti:initiator="initiator"></startEvent>
+        <startEvent id="startUser" name="Start" activiti:initiator="initiator"></startEvent>
         <userTask id="approveUserTask" name="Approve New User Account">
             
         </userTask>
-        <sequenceFlow id="flow1" sourceRef="startChromeUser" targetRef="approveUserTask"></sequenceFlow>
+        <sequenceFlow id="flow1" sourceRef="startUser" targetRef="approveUserTask"></sequenceFlow>
         <exclusiveGateway id="approvalExclusiveGateway" name="Exclusive Gateway"></exclusiveGateway>
         <sequenceFlow id="flow2" sourceRef="approveUserTask" targetRef="approvalExclusiveGateway"></sequenceFlow>
         <serviceTask id="newUserApproved" name="Create User Account, send Alerts"
@@ -45,9 +45,9 @@
         <sequenceFlow id="flow6" sourceRef="newUserApproved" targetRef="endevent1"></sequenceFlow>
     </process>
 
-    <!--<bpmndi:BPMNDiagram id="BPMNDiagram_newChromeUser">-->
-        <!--<bpmndi:BPMNPlane bpmnElement="newChromeUser" id="BPMNPlane_newChromeUser">-->
-            <!--<bpmndi:BPMNShape bpmnElement="startChromeUser" id="BPMNShape_startChromeUser">-->
+    <!--<bpmndi:BPMNDiagram id="BPMNDiagram_newUser">-->
+        <!--<bpmndi:BPMNPlane bpmnElement="newUser" id="BPMNPlane_newUser">-->
+            <!--<bpmndi:BPMNShape bpmnElement="startUser" id="BPMNShape_startUser">-->
                 <!--<omgdc:Bounds height="35.0" width="35.0" x="90.0" y="240.0"></omgdc:Bounds>-->
             <!--</bpmndi:BPMNShape>-->
             <!--<bpmndi:BPMNShape bpmnElement="approveUserTask" id="BPMNShape_approveUserTask">-->
