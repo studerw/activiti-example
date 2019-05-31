@@ -21,7 +21,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import javax.print.Doc;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -52,13 +51,12 @@ public class WorkflowService {
         LOG.debug("Getting process diagram for processId: {}", pd.getId());
         BpmnModel bpmnModel = repoSrvc.getBpmnModel(pd.getId());
         new BpmnAutoLayout(bpmnModel).execute();
-        InputStream in = new DefaultProcessDiagramGenerator().generatePngDiagram(bpmnModel);
-
-        //InputStream in = new DefaultProcessDiagramGenerator().generatePngDiagram(model);
-        byte[] bytes = IOUtils.toByteArray(in);
-        IOUtils.closeQuietly(in);
-        LOG.debug("Got bytes of size: {}", bytes.length);
-        return bytes;
+        try (InputStream in = new DefaultProcessDiagramGenerator().generatePngDiagram(bpmnModel)) {
+            //InputStream in = new DefaultProcessDiagramGenerator().generatePngDiagram(model);
+            byte[] bytes = IOUtils.toByteArray(in);
+            LOG.debug("Got bytes of size: {}", bytes.length);
+            return bytes;
+        }
     }
 
     /**
@@ -75,12 +73,12 @@ public class WorkflowService {
         ProcessDefinitionEntity pde = (ProcessDefinitionEntity) impl.getDeployedProcessDefinition(pi.getProcessDefinitionId());
         BpmnModel bpmnModel = repoSrvc.getBpmnModel(pde.getId());
         new BpmnAutoLayout(bpmnModel).execute();
-        InputStream in = new DefaultProcessDiagramGenerator().generateDiagram(bpmnModel, "png", runtimeService.getActiveActivityIds(pi.getProcessInstanceId()));
+        try (InputStream in = new DefaultProcessDiagramGenerator().generateDiagram(bpmnModel, "png", runtimeService.getActiveActivityIds(pi.getProcessInstanceId()))) {
 //        InputStream in = this.appContext.getResource("classpath:800x200.png").getInputStream();
-        byte[] bytes = IOUtils.toByteArray(in);
-        IOUtils.closeQuietly(in);
-        LOG.debug("Got bytes of size: " + bytes.length);
-        return bytes;
+            byte[] bytes = IOUtils.toByteArray(in);
+            LOG.debug("Got bytes of size: " + bytes.length);
+            return bytes;
+        }
     }
 
     /**
